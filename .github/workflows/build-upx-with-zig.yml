@@ -1,0 +1,197 @@
+name: 'Build UPX with zig cc'
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4476+0f0076666
+
+jobs:
+  job-build-upx-with-zig:
+    name: ${{ format('{0}', matrix.zig_target) }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 51 jobs
+          # linux-musl (statically linked, can use qemu-user for testing)
+          - { zig_target: aarch64-linux-musl, zig_pic: -fPIE, qemu: qemu-aarch64 }
+          - { zig_target: arm-linux-musleabi, zig_pic: -fPIE, qemu: qemu-arm }
+          - { zig_target: arm-linux-musleabihf, zig_pic: -fPIE, qemu: qemu-arm }
+          - { zig_target: armeb-linux-musleabi, zig_pic: -fPIE, qemu: qemu-armeb }
+          - { zig_target: armeb-linux-musleabihf, zig_pic: -fPIE, qemu: qemu-armeb }
+          - { zig_target: i386-linux-musl, zig_pic: -fPIE, qemu: qemu-i386 }
+          - { zig_target: mips-linux-musl, zig_pic: -fPIE, qemu: qemu-mips }
+          - { zig_target: mipsel-linux-musl, zig_pic: -fPIE, qemu: qemu-mipsel }
+          - { zig_target: mips64-linux-musl, zig_pic: -fPIE, qemu: qemu-mips64, tt: bash }
+          - { zig_target: mips64el-linux-musl, zig_pic: -fPIE, qemu: qemu-mips64el, tt: bash }
+          - { zig_target: powerpc-linux-musl, zig_pic: -fPIE, qemu: qemu-ppc }
+          - { zig_target: powerpc64-linux-musl, zig_pic: -fPIE, qemu: qemu-ppc64 }
+          - { zig_target: powerpc64le-linux-musl, zig_pic: -fPIE, qemu: qemu-ppc64le }
+          - { zig_target: riscv64-linux-musl, zig_pic: -fPIE, qemu: qemu-riscv64, tt: bash }
+          - { zig_target: s390x-linux-musl, zig_pic: -fPIE, qemu: qemu-s390x, tt: bash }
+          - { zig_target: x86_64-linux-musl, zig_pic: -fPIE, qemu: qemu-x86_64 }
+          # other
+          - { zig_target: aarch64-linux-gnu }
+          - { zig_target: aarch64-macos.11-none }
+          - { zig_target: aarch64-macos.12-none }
+          - { zig_target: aarch64-windows-gnu }
+          - { zig_target: arm-linux-gnueabi }
+          - { zig_target: arm-linux-gnueabihf }
+          - { zig_target: arm-windows-gnu }
+          - { zig_target: armeb-linux-gnueabi }
+          - { zig_target: armeb-linux-gnueabihf }
+          - { zig_target: i386-linux-gnu }
+          - { zig_target: i386-linux-gnu.2.3.4 }              # RHEL 4
+          - { zig_target: i386-linux-gnu.2.7 }                # Ubuntu 8.04
+          - { zig_target: i386-windows-gnu, wine: wine32 }
+          - { zig_target: mips-linux-gnueabi }
+          - { zig_target: mips-linux-gnueabihf }
+          - { zig_target: mipsel-linux-gnueabi }
+          - { zig_target: mipsel-linux-gnueabihf }
+          - { zig_target: mips64-linux-gnuabi64 }
+          - { zig_target: mips64el-linux-gnuabi64 }
+          - { zig_target: powerpc-linux-gnueabi }
+          - { zig_target: powerpc64-linux-gnu }
+          - { zig_target: powerpc64le-linux-gnu }
+          - { zig_target: riscv64-linux-gnu }
+          - { zig_target: s390x-linux-gnu }
+          - { zig_target: sparc-linux-gnu }
+          - { zig_target: sparc64-linux-gnu }
+          - { zig_target: x86_64-linux-gnu }
+          - { zig_target: x86_64-linux-gnu.2.3.4 }            # RHEL 4
+          - { zig_target: x86_64-linux-gnu.2.11 }             # RHEL 6, SLES 11
+          - { zig_target: x86_64-macos.11-none }
+          - { zig_target: x86_64-macos.12-none }
+          - { zig_target: x86_64-windows-gnu, wine: wine64 }
+          # ILP32 on 64-bit archs
+          - { zig_target: x86_64-linux-gnux32 }
+          - { zig_target: mips64-linux-gnuabin32 }
+          - { zig_target: mips64el-linux-gnuabin32 }
+
+    env:
+      # for zig-cc wrappers:
+      #ZIG_FLAGS: ${{ matrix.zig_pic }} ${{ matrix.zig_flags }} # ignore -fPIE for now
+      ZIG_FLAGS: ${{ matrix.zig_flags }}
+      ZIG_TARGET: ${{ matrix.zig_target }}
+      # for upx.git top-level Makefile:
+      UPX_CMAKE_BUILD_FLAGS: --verbose
+      # for running the basic tests:
+      UPX: --prefer-ucl --no-color --no-progress
+      UPX_DEBUG_DISABLE_GITREV_WARNING: 1
+      UPX_DEBUG_DOCTEST_VERBOSE: 0
+
+    steps:
+      - name: 'Install system packages'
+        run: |
+          uname -a; pwd; id; umask
+          export DEBIAN_FRONTEND=noninteractive
+          [[ -n '${{ matrix.qemu }}' ]] && sudo apt-get install -y --no-install-recommends qemu-user
+          [[ -n '${{ matrix.wine }}' ]] && sudo apt-get install -y --no-install-recommends wine
+          true
+
+#     # note that ~/.local/bin is included in the default $PATH
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_TARBALL) }}
+        run: |
+          mkdir -p -v ~/.local/bin
+          cd ~/.local/bin
+          wget -q 'https://ziglang.org/builds/'${ZIG_DIST_TARBALL}.tar.xz
+          tar -xJf ${ZIG_DIST_TARBALL}.tar.xz
+          rm ${ZIG_DIST_TARBALL}.tar.xz
+          ln -s -v $(readlink -ef ${ZIG_DIST_TARBALL}/zig) .
+          zig version
+          # create wrapper scripts (needed for CMake)
+          echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\nexec zig cc --target=$ZIG_TARGET $ZIG_FLAGS $ZIG_CFLAGS "$@"' > zig-cc
+          echo -e '#!/bin/sh\nexec zig c++ --target=$ZIG_TARGET $ZIG_FLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
+          chmod +x zig-*
+          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+
+      - name: 'Check out UPX source code'
+        run: |
+          git clone --depth 1 --branch devel4 https://github.com/upx/upx.git upx
+          git -C upx submodule update --init
+
+##    - name: 'Build with gcc - Release'
+##      run: 'make -C upx build/release-gcc'
+
+      - name: ${{ format('Build Release with zig-cc --target {0}', matrix.zig_target) }}
+        run: |
+          mkdir -p upx/build/zig/$ZIG_TARGET/release
+          cd       upx/build/zig/$ZIG_TARGET/release
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx
+          cmake --build . --config Release --parallel --verbose
+          file ./upx*
+
+      - name: ${{ format('Build Debug with zig-cc --target {0}', matrix.zig_target) }}
+        run: |
+          mkdir -p upx/build/zig/$ZIG_TARGET/debug
+          cd       upx/build/zig/$ZIG_TARGET/debug
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx
+          cmake --build . --config Debug --parallel --verbose
+          file ./upx*
+
+      - name: 'Make artifact'
+        run: |
+          cd upx
+          N=upx-zigcc-${ZIG_TARGET}-${GITHUB_SHA:0:7}
+          mkdir -p "tmp/artifact/$N"
+          (cd build && cp -ai --parents zig/*/*/upx* "../tmp/artifact/$N")
+          (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          # GitHub Actions magic: set "artifact_name" environment value for use in next step
+          echo "artifact_name=$N" >> $GITHUB_ENV
+
+      - name: 'Upload artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: upx/tmp/artifact
+
+      - name: 'Run basic tests under QEMU - Release'
+        if: ${{ matrix.qemu != '' }}
+        run: |
+          cd upx/build/zig/$ZIG_TARGET/release
+          file ./upx
+          qemu=${{ matrix.qemu }}
+          tt=${{ matrix.tt }}
+          [[ $tt == bash ]] && tt=/bin/bash
+          [[ -z $tt ]] && tt=./upx
+          $qemu ./upx --version | head -n 1
+          $qemu ./upx -3 $tt -o tt.packed
+          $qemu ./upx -l tt.packed
+          $qemu ./upx -t tt.packed
+          $qemu ./upx -d tt.packed -o tt.unpacked
+          [[ $tt == ./upx ]] && $qemu ./tt.packed --version | head -n 1
+          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version | head -n 1
+          true
+
+      - name: 'Run basic tests under QEMU - Debug'
+        if: ${{ matrix.qemu != '' }}
+        run: |
+          cd upx/build/zig/$ZIG_TARGET/debug
+          file ./upx
+          qemu=${{ matrix.qemu }}
+          tt=${{ matrix.tt }}
+          [[ $tt == bash ]] && tt=/bin/bash
+          [[ -z $tt ]] && tt=./upx
+          $qemu ./upx --version | head -n 1
+          $qemu ./upx -3 $tt -o tt.packed
+          $qemu ./upx -l tt.packed
+          $qemu ./upx -t tt.packed
+          $qemu ./upx -d tt.packed -o tt.unpacked
+          [[ $tt == ./upx ]] && $qemu ./tt.packed --version | head -n 1
+          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version | head -n 1
+          true
+
+      - name: 'Run basic tests under Wine - Release'
+        if: ${{ matrix.wine != '' }}
+        shell: bash
+        run: |
+          cd upx/build/zig/$ZIG_TARGET/release
+          file ./upx.exe
+          wine=${{ matrix.wine }}
+          $wine ./upx.exe --version
+          # TODO: add more tests once this is building...
