@@ -5,7 +5,11 @@ on:
   workflow_dispatch:
 
 env:
-  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4544+0ae60f723 # 2022-10-23
+  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4548+a3033c7bd # 2022-10-23
+
+# NOTE: we could work-around some failing builds by adding extra compilation
+# flags, but the point of this test repository is to ensure that zig-cc
+# just works "out of the box".
 
 jobs:
   job-build-upx-with-zig:
@@ -100,6 +104,7 @@ jobs:
 
     env:
       # for zig-cc wrapper scripts (see below):
+      ##ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
@@ -194,13 +199,13 @@ jobs:
           tt='${{ matrix.tt }}'
           [[ $tt == bash ]] && tt=/bin/bash
           [[ -z $tt ]] && tt=./upx
-          $qemu ./upx --version | head -n 1
+          $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
-          [[ $tt == ./upx ]] && $qemu ./tt.packed --version | head -n 1
-          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version | head -n 1
+          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
+          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
           true
 
       - name: 'Run basic tests under QEMU - Debug'
@@ -213,13 +218,13 @@ jobs:
           tt='${{ matrix.tt }}'
           [[ $tt == bash ]] && tt=/bin/bash
           [[ -z $tt ]] && tt=./upx
-          $qemu ./upx --version | head -n 1
+          $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
-          [[ $tt == ./upx ]] && $qemu ./tt.packed --version | head -n 1
-          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version | head -n 1
+          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
+          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
           true
 
       - name: 'Run basic tests under Wine - Release'
@@ -229,5 +234,5 @@ jobs:
           cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           file ./upx.exe
           wine='${{ matrix.wine }}'
-          $wine ./upx.exe --version
+          $wine ./upx.exe --version-short
           # TODO: add more tests once this is building
