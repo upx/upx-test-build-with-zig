@@ -26,5 +26,5 @@ for actual build results and logs.
 Visit https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html
 for some background info about `zig cc`.
 
-Current Zig version: 2022-10-24 `zig-linux-x86_64-0.10.0-dev.4560+828735ac0`
+Current Zig version: 2022-10-25 `zig-linux-x86_64-0.10.0-dev.4562+b3cd38ea4`
 from https://ziglang.org/download/
