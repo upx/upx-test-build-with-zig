@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4548+a3033c7bd # 2022-10-23
+  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4560+828735ac0 # 2022-10-24
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
