@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4562+b3cd38ea4 # 2022-10-25
+  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4563+55c5da1b2 # 2022-10-25
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -177,10 +177,10 @@ jobs:
           cmake --build . --config Debug --parallel --verbose
           file ./upx*
 
-      - name: ${{ format('Make artifact from upx {0} git-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
         run: |
           cd upx
-          N=upx-zigcc-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
+          N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
           xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
@@ -237,6 +237,18 @@ jobs:
         run: |
           set -ex -o pipefail
           cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
+          file ./upx.exe
+          wine='${{ matrix.wine }}'
+          $wine ./upx.exe --version-short
+          # TODO: add more tests once this is building
+
+      - name: 'Run basic tests under Wine - Debug'
+        if: ${{ matrix.wine != '' }}
+        run: |
+          set -ex -o pipefail
+          cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
           wine='${{ matrix.wine }}'
           $wine ./upx.exe --version-short
