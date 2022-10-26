@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4565+cd4865d88 # 2022-10-26
+  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4576+d42a719e8 # 2022-10-26
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -161,7 +161,7 @@ jobs:
           make -C upx build/debug-gcc     && make -C upx/build/debug-gcc test
 
       # CMAKE_AR needs to be an absolute file path; CMake bug?
-      - name: ${{ format('Build Release with zig-cc --target={0} {1}', matrix.zig_target, matrix.zig_pic) }}
+      - name: ${{ format('Build Release with zig-cc -target {0} {1}', matrix.zig_target, matrix.zig_pic) }}
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
@@ -169,7 +169,7 @@ jobs:
           cmake --build . --config Release --parallel --verbose
           file ./upx*
 
-      - name: ${{ format('Build Debug with zig-cc --target={0} {1}', matrix.zig_target, matrix.zig_pic) }}
+      - name: ${{ format('Build Debug with zig-cc -target {0} {1}', matrix.zig_target, matrix.zig_pic) }}
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
