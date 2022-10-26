@@ -5,7 +5,8 @@ on:
   workflow_dispatch:
 
 env:
-  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4576+d42a719e8 # 2022-10-26
+  # 2022-10-27
+  ZIG_DIST_NAME: zig-linux-x86_64-0.10.0-dev.4588+9c0d975a0
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -19,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 78 jobs
+          # 80 jobs
           # linux-musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE }
@@ -61,6 +62,7 @@ jobs:
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64-macos.11-none }
           - { zig_target: aarch64-macos.12-none }
+          - { zig_target: aarch64-macos.13-none }
           - { zig_target: aarch64-windows-gnu }
           - { zig_target: aarch64_be-linux-gnu }
           - { zig_target: arm-linux-gnueabi }
@@ -91,9 +93,10 @@ jobs:
           - { zig_target: x86_64-linux-gnu.2.5 }              # RHEL 5
           - { zig_target: x86_64-linux-gnu.2.11 }             # RHEL 6, SLES 11
           - { zig_target: x86_64-linux-gnu.2.17 }             # RHEL 7
-          - { zig_target: x86_64-macos.10-none }
+          - { zig_target: x86_64-linux-gnu.2.36 }             # lastest glibc version
           - { zig_target: x86_64-macos.11-none }
           - { zig_target: x86_64-macos.12-none }
+          - { zig_target: x86_64-macos.13-none }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
           # ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
@@ -118,23 +121,25 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: 'Install system packages'
+      - name: 'Install QEMU and Wine'
+        if: ${{ matrix.qemu != '' || matrix.wine != '' }}
         run: |
           uname -a; pwd; id; umask
           export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update && sudo apt-get upgrade -y
           [[ -n '${{ matrix.qemu }}' ]] && sudo apt-get install -y --no-install-recommends qemu-user
           [[ -n '${{ matrix.wine }}' ]] && sudo apt-get install -y --no-install-recommends wine
           true
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
-      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_TARBALL) }}
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_NAME) }}
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
-          wget -q 'https://ziglang.org/builds/'${ZIG_DIST_TARBALL}.tar.xz
-          tar -xJf ${ZIG_DIST_TARBALL}.tar.xz
-          rm ${ZIG_DIST_TARBALL}.tar.xz
-          ln -s -v $(readlink -ef ${ZIG_DIST_TARBALL}/zig) .
+          wget -q 'https://ziglang.org/builds/'${ZIG_DIST_NAME}.tar.xz
+          tar -xoaf ${ZIG_DIST_NAME}.tar.xz
+          rm ${ZIG_DIST_NAME}.tar.xz
+          ln -s -v $(readlink -en ${ZIG_DIST_NAME}/zig) .
           zig version
           # create wrapper scripts (needed for CMake)
           echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
