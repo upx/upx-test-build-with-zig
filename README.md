@@ -17,7 +17,8 @@ Test building UPX with 'zig cc'
 This repository consists of a single
 [GitHub Actions workflow file](.github/workflows/build-upx-with-zig.yml)
 that builds
-[UPX](https://github.com/upx/upx) with [Zig](https://ziglang.org)
+[UPX](https://github.com/upx/upx) with
+[prebuilt Zig binaries](https://ziglang.org/download/)
 using 78 different build targets.
 
 See [Actions](https://github.com/upx/upx-test-build-with-zig/actions)
@@ -26,5 +27,5 @@ for actual build results and logs.
 Visit https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html
 for some background info about `zig cc`.
 
-Current Zig version: 2022-10-25 `zig-linux-x86_64-0.10.0-dev.4563+55c5da1b2`
+Current Zig version: 2022-10-26 `zig-linux-x86_64-0.10.0-dev.4565+cd4865d88`
 from https://ziglang.org/download/

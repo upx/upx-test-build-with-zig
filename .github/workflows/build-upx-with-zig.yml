@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4563+55c5da1b2 # 2022-10-25
+  ZIG_DIST_TARBALL: zig-linux-x86_64-0.10.0-dev.4565+cd4865d88 # 2022-10-26
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -138,8 +138,8 @@ jobs:
           zig version
           # create wrapper scripts (needed for CMake)
           echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
-          echo -e '#!/bin/sh\nexec zig cc  --target=$ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
-          echo -e '#!/bin/sh\nexec zig c++ --target=$ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\nexec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\nexec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
           echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
