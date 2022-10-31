@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 env:
-  # 2022-10-27
-  ZIG_DIST_NAME: zig-linux-x86_64-0.10.0-dev.4588+9c0d975a0
+  # 2022-10-31
+  ZIG_DIST_NAME: zig-linux-x86_64-0.10.0-dev.4720+9b54c9dee
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
