@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 env:
-  # 2022-10-31
-  ZIG_DIST_NAME: zig-linux-x86_64-0.10.0-dev.4720+9b54c9dee
+  # 2022-11-01
+  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.3+0bbb00035
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -91,9 +91,9 @@ jobs:
           - { zig_target: x86_64-linux-gnu }
           - { zig_target: x86_64-linux-gnu.2.3.4 }            # RHEL 4
           - { zig_target: x86_64-linux-gnu.2.5 }              # RHEL 5
-          - { zig_target: x86_64-linux-gnu.2.11 }             # RHEL 6, SLES 11
+          - { zig_target: x86_64-linux-gnu.2.11 }             # SLES 11 + RHEL 6
           - { zig_target: x86_64-linux-gnu.2.17 }             # RHEL 7
-          - { zig_target: x86_64-linux-gnu.2.36 }             # lastest glibc version
+          - { zig_target: x86_64-linux-gnu.2.36 }             # latest glibc version
           - { zig_target: x86_64-macos.11-none }
           - { zig_target: x86_64-macos.12-none }
           - { zig_target: x86_64-macos.13-none }
@@ -128,7 +128,8 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get update && sudo apt-get upgrade -y
           [[ -n '${{ matrix.qemu }}' ]] && sudo apt-get install -y --no-install-recommends qemu-user
-          [[ -n '${{ matrix.wine }}' ]] && sudo apt-get install -y --no-install-recommends wine
+          [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y --no-install-recommends wine32
+          [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y --no-install-recommends wine64
           true
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
