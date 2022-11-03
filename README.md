@@ -17,9 +17,9 @@ Test building UPX with 'zig cc'
 This repository consists of a single
 [GitHub Actions workflow file](.github/workflows/build-upx-with-zig.yml)
 that builds
-[UPX](https://github.com/upx/upx) with a
-[prebuilt Zig binary](https://ziglang.org/download/)
-using 80 different build targets.
+[UPX](https://github.com/upx/upx) with a recent
+[Zig binary](https://ziglang.org/download/)
+using 89 different build targets.
 
 See [Actions](https://github.com/upx/upx-test-build-with-zig/actions)
 for actual build results and logs.

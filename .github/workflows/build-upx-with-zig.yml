@@ -1,12 +1,15 @@
 name: 'Build UPX with zig cc'
 
+# 89 build targets (jobs), see also
+#   zig targets | jq '.["libc"]'
+
+env:
+  # 2022-11-02
+  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.22+57dbeb90a
+
 on:
   push:
   workflow_dispatch:
-
-env:
-  # 2022-11-01
-  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.3+0bbb00035
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -20,7 +23,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 80 jobs
           # linux-musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE }
@@ -56,6 +58,10 @@ jobs:
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: bash, zig_pic: -fPIE }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: bash }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: bash, zig_pic: -fPIE }
+          - { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
+          - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
+          - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
+          - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 -cpu Westmere }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 -cpu Westmere, zig_pic: -fPIE }
           # other
@@ -70,9 +76,12 @@ jobs:
           - { zig_target: arm-windows-gnu }
           - { zig_target: armeb-linux-gnueabi }
           - { zig_target: armeb-linux-gnueabihf }
+          - { zig_target: csky-linux-gnueabi }
+          - { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
           - { zig_target: i386-linux-gnu.2.3.4 }              # RHEL 4
           - { zig_target: i386-linux-gnu.2.7 }                # Ubuntu 8.04
+          - { zig_target: i386-linux-gnu.2.36 }               # latest glibc version
           - { zig_target: i386-windows-gnu, wine: wine32 }
           - { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
@@ -88,6 +97,8 @@ jobs:
           - { zig_target: s390x-linux-gnu }
           - { zig_target: sparc-linux-gnu }
           - { zig_target: sparc64-linux-gnu }
+          - { zig_target: thumb-linux-gnueabi }
+          - { zig_target: thumb-linux-gnueabihf }
           - { zig_target: x86_64-linux-gnu }
           - { zig_target: x86_64-linux-gnu.2.3.4 }            # RHEL 4
           - { zig_target: x86_64-linux-gnu.2.5 }              # RHEL 5
@@ -246,8 +257,14 @@ jobs:
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
           wine='${{ matrix.wine }}'
+          tt='./upx.exe'
           $wine ./upx.exe --version-short
-          # TODO: add more tests once this is building
+          $wine ./upx.exe -3 $tt -o tt.packed.exe
+          $wine ./upx.exe -l tt.packed.exe
+          $wine ./upx.exe -t tt.packed.exe
+          $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
+          $wine ./tt.packed.exe --version-short
+          $wine ./tt.unpacked.exe --version-short
 
       - name: 'Run basic tests under Wine - Debug'
         if: ${{ matrix.wine != '' }}
@@ -257,5 +274,11 @@ jobs:
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
           wine='${{ matrix.wine }}'
+          tt='./upx.exe'
           $wine ./upx.exe --version-short
-          # TODO: add more tests once this is building
+          $wine ./upx.exe -3 $tt -o tt.packed.exe
+          $wine ./upx.exe -l tt.packed.exe
+          $wine ./upx.exe -t tt.packed.exe
+          $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
+          $wine ./tt.packed.exe --version-short
+          $wine ./tt.unpacked.exe --version-short
