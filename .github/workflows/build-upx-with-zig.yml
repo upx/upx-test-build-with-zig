@@ -1,11 +1,11 @@
 name: 'Build UPX with zig cc'
 
-# 89 build targets (jobs), see also
+# 90 build targets (jobs), see also
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2022-11-02
-  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.22+57dbeb90a
+  # 2022-11-04
+  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.52+42755a194
 
 on:
   push:
@@ -115,6 +115,8 @@ jobs:
           - { zig_target: x86_64-linux-gnux32 }
           - { zig_target: x86_64-linux-muslx32 }              # not supported by Zig ??
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
+          # special
+          - { zig_target: wasm32-wasi-musl }
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -137,10 +139,11 @@ jobs:
         run: |
           uname -a; pwd; id; umask
           export DEBIAN_FRONTEND=noninteractive
+          [[ '${{ matrix.wine }}' == wine32 ]] && sudo dpkg --add-architecture i386
           sudo apt-get update && sudo apt-get upgrade -y
+          [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
+          [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine
           [[ -n '${{ matrix.qemu }}' ]] && sudo apt-get install -y --no-install-recommends qemu-user
-          [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y --no-install-recommends wine32
-          [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y --no-install-recommends wine64
           true
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
@@ -257,6 +260,7 @@ jobs:
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
           wine='${{ matrix.wine }}'
+          wine='wine'
           tt='./upx.exe'
           $wine ./upx.exe --version-short
           $wine ./upx.exe -3 $tt -o tt.packed.exe
@@ -274,6 +278,7 @@ jobs:
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
           wine='${{ matrix.wine }}'
+          wine='wine'
           tt='./upx.exe'
           $wine ./upx.exe --version-short
           $wine ./upx.exe -3 $tt -o tt.packed.exe
