@@ -5,7 +5,7 @@ name: 'Build UPX with zig cc'
 
 env:
   # 2022-11-04
-  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.52+42755a194
+  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.53+cbed6bb08
 
 on:
   push:
@@ -116,7 +116,7 @@ jobs:
           - { zig_target: x86_64-linux-muslx32 }              # not supported by Zig ??
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
           # special
-          - { zig_target: wasm32-wasi-musl }
+          - { zig_target: wasm32-wasi-musl, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -128,6 +128,9 @@ jobs:
       UPX_REF_NAME: devel4
       # for upx.git top-level Makefile when building with clang/gcc:
       UPX_CMAKE_BUILD_FLAGS: --verbose
+      # for cmake below:
+      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
+      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
       # for running the basic tests under QEMU/Wine:
       UPX: --no-color --no-progress
       UPX_DEBUG_DISABLE_GITREV_WARNING: 1
@@ -185,7 +188,7 @@ jobs:
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
-          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
           cmake --build . --config Release --parallel --verbose
           file ./upx*
 
@@ -193,7 +196,7 @@ jobs:
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
-          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
           cmake --build . --config Debug --parallel --verbose
           file ./upx*
 
