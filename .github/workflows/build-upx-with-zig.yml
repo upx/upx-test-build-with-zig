@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2022-11-04
-  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.53+cbed6bb08
+  # 2022-11-06
+  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.80+c8a5ad6d9
 
 on:
   push:
@@ -116,7 +116,7 @@ jobs:
           - { zig_target: x86_64-linux-muslx32 }              # not supported by Zig ??
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
           # special
-          - { zig_target: wasm32-wasi-musl, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
+          - { zig_target: wasm32-wasi-musl, zig_flags: -DDOCTEST_CONFIG_NO_POSIX_SIGNALS, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -137,18 +137,6 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: 'Install QEMU and Wine'
-        if: ${{ matrix.qemu != '' || matrix.wine != '' }}
-        run: |
-          uname -a; pwd; id; umask
-          export DEBIAN_FRONTEND=noninteractive
-          [[ '${{ matrix.wine }}' == wine32 ]] && sudo dpkg --add-architecture i386
-          sudo apt-get update && sudo apt-get upgrade -y
-          [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
-          [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine
-          [[ -n '${{ matrix.qemu }}' ]] && sudo apt-get install -y --no-install-recommends qemu-user
-          true
-
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_NAME) }}
         run: |
@@ -158,7 +146,7 @@ jobs:
           tar -xoaf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
           ln -s -v $(readlink -en ${ZIG_DIST_NAME}/zig) .
-          zig version
+          echo -n 'zig version: '; zig version
           # create wrapper scripts (needed for CMake)
           echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
           echo -e '#!/bin/sh\nexec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
@@ -166,6 +154,9 @@ jobs:
           echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+          # update ZIG_TARGET (i386 => x86)
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
+          echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
 
       - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
         run: |
@@ -217,6 +208,14 @@ jobs:
           name: ${{ env.artifact_name }}
           path: upx/tmp/artifact
 
+      - name: 'Install QEMU'
+        if: ${{ matrix.qemu != '' }}
+        run: |
+          uname -a; pwd; id; umask
+          export DEBIAN_FRONTEND=noninteractive
+          sudo apt-get update && sudo apt-get upgrade -y
+          sudo apt-get install -y --no-install-recommends qemu-user
+
       - name: 'Run basic tests under QEMU - Release'
         if: ${{ matrix.qemu != '' }}
         run: |
@@ -253,6 +252,17 @@ jobs:
           $qemu ./upx -d tt.packed -o tt.unpacked
           [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
+          true
+
+      - name: 'Install Wine'
+        if: ${{ matrix.wine != '' }}
+        run: |
+          uname -a; pwd; id; umask
+          export DEBIAN_FRONTEND=noninteractive
+          [[ '${{ matrix.wine }}' == wine32 ]] && sudo dpkg --add-architecture i386
+          sudo apt-get update && sudo apt-get upgrade -y
+          [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
+          [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine
           true
 
       - name: 'Run basic tests under Wine - Release'
