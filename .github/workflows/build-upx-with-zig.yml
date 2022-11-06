@@ -5,7 +5,7 @@ name: 'Build UPX with zig cc'
 
 env:
   # 2022-11-06
-  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.80+c8a5ad6d9
+  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.84+1aeef2973
 
 on:
   push:
@@ -175,7 +175,7 @@ jobs:
           make -C upx build/debug-gcc     && make -C upx/build/debug-gcc test
 
       # CMAKE_AR needs to be an absolute file path; CMake bug?
-      - name: ${{ format('Build Release with zig-cc -target {0} {1}', matrix.zig_target, matrix.zig_pic) }}
+      - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
@@ -183,7 +183,7 @@ jobs:
           cmake --build . --config Release --parallel --verbose
           file ./upx*
 
-      - name: ${{ format('Build Debug with zig-cc -target {0} {1}', matrix.zig_target, matrix.zig_pic) }}
+      - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
@@ -194,7 +194,8 @@ jobs:
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
         run: |
           cd upx
-          N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
+          #N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
+          N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
           xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
