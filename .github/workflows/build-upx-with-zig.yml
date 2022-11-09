@@ -1,4 +1,4 @@
-name: 'Build UPX with zig cc'
+name: 'Build simple program with zig cc'
 
 # 90 build targets (jobs), see also
 #   zig targets | jq '.["libc"]'
@@ -16,7 +16,7 @@ on:
 # just works "out of the box".
 
 jobs:
-  job-build-upx-with-zig:
+  job-build-simple-with-zig:
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-22.04
     strategy:
@@ -116,25 +116,20 @@ jobs:
           - { zig_target: x86_64-linux-muslx32 }              # not supported by Zig ??
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
           # special
-          - { zig_target: wasm32-wasi-musl, zig_flags: -DDOCTEST_CONFIG_NO_POSIX_SIGNALS, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
+          - { zig_target: wasm32-wasi-musl, zig_flags: -DDOCTEST_CONFIG_NO_POSIX_SIGNALS, cmake: -DPKG_CONFIG_DISABLE_SANITIZE=1 }
 
     env:
       # for zig-cc wrapper scripts (see below):
-      ##ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
-      # for upx.git cloning:
-      UPX_REF_NAME: devel4
-      # for upx.git top-level Makefile when building with clang/gcc:
-      UPX_CMAKE_BUILD_FLAGS: --verbose
+      # for git cloning:
+      PKG_REF_NAME: simple
+      # for top-level Makefile when building with clang/gcc:
+      PKG_CMAKE_BUILD_FLAGS: --verbose
       # for cmake below:
       EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
       EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
-      # for running the basic tests under QEMU/Wine:
-      UPX: --no-color --no-progress
-      UPX_DEBUG_DISABLE_GITREV_WARNING: 1
-      UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
@@ -158,47 +153,45 @@ jobs:
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
 
-      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+      - name: ${{ format('Check out Simple {0} source code', env.PKG_REF_NAME) }}
         run: |
-          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx upx
-          git -C upx submodule update --init
-          # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
-          rev=$(git -C upx rev-parse --short=7 HEAD)
-          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+          git clone --branch $PKG_REF_NAME --depth 1 https://github.com/upx/upx-test-build-with-zig ppp
+          # GitHub Actions magic: set "PKG_GITREV_SHORT" environment value for use in steps below
+          rev=$(git -C ppp rev-parse --short=7 HEAD)
+          echo "PKG_GITREV_SHORT=$rev" >> $GITHUB_ENV
 
       - name: 'Build with local clang and gcc'
         if: ${{ matrix.zig_target == 'x86_64-linux-gnu' }} # only do this once per Action
         run: |
-          make -C upx build/release-clang && make -C upx/build/release-clang test
-          make -C upx build/debug-clang   && make -C upx/build/debug-clang test
-          make -C upx build/release-gcc   && make -C upx/build/release-gcc test
-          make -C upx build/debug-gcc     && make -C upx/build/debug-gcc test
+          make -C ppp build/release-clang && make -C ppp/build/release-clang test
+          make -C ppp build/debug-clang   && make -C ppp/build/debug-clang test
+          make -C ppp build/release-gcc   && make -C ppp/build/release-gcc test
+          make -C ppp build/debug-gcc     && make -C ppp/build/debug-gcc test
 
       # CMAKE_AR needs to be an absolute file path; CMake bug?
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
-          mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
-          cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          mkdir -p ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          cd       ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
           cmake --build . --config Release --parallel --verbose
-          file ./upx*
+          file ./simple_*
 
       - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
-          mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
-          cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          mkdir -p ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          cd       ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
           cmake --build . --config Debug --parallel --verbose
-          file ./upx*
+          file ./simple_*
 
-      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+      - name: ${{ format('Make artifact from simple-{0}-{1}', env.PKG_REF_NAME, env.PKG_GITREV_SHORT) }}
         run: |
-          cd upx
-          #N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
-          N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
-          xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
+          cd ppp
+          N=simple-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
+          xbuild=build-simple-${PKG_REF_NAME}-${PKG_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
-          (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
+          (cd build && shopt -s nullglob && cp -ai --parents */simple_* zig/*/*/simple_* "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
           # GitHub Actions magic: set "artifact_name" environment value for use in next step
           echo "artifact_name=$N" >> $GITHUB_ENV
@@ -207,7 +200,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.artifact_name }}
-          path: upx/tmp/artifact
+          path: ppp/tmp/artifact
 
       - name: 'Install QEMU'
         if: ${{ matrix.qemu != '' }}
@@ -221,39 +214,21 @@ jobs:
         if: ${{ matrix.qemu != '' }}
         run: |
           set -ex -o pipefail
-          cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
-          file ./upx
+          cd ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          file ./simple_*
           qemu='${{ matrix.qemu }}'
-          tt='${{ matrix.tt }}'
-          [[ $tt == bash ]] && tt=/bin/bash
-          [[ -z $tt ]] && tt=./upx
-          $qemu ./upx --version-short
-          $qemu ./upx -3 $tt -o tt.packed
-          $qemu ./upx -l tt.packed
-          $qemu ./upx -t tt.packed
-          $qemu ./upx -d tt.packed -o tt.unpacked
-          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
-          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
-          true
+          $qemu ./simple_c
+          $qemu ./simple_x
 
       - name: 'Run basic tests under QEMU - Debug'
         if: ${{ matrix.qemu != '' }}
         run: |
           set -ex -o pipefail
-          cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
-          file ./upx
+          cd ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          file ./simple_*
           qemu='${{ matrix.qemu }}'
-          tt='${{ matrix.tt }}'
-          [[ $tt == bash ]] && tt=/bin/bash
-          [[ -z $tt ]] && tt=./upx
-          $qemu ./upx --version-short
-          $qemu ./upx -3 $tt -o tt.packed
-          $qemu ./upx -l tt.packed
-          $qemu ./upx -t tt.packed
-          $qemu ./upx -d tt.packed -o tt.unpacked
-          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
-          [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
-          true
+          $qemu ./simple_c
+          $qemu ./simple_x
 
       - name: 'Install Wine'
         if: ${{ matrix.wine != '' }}
@@ -270,34 +245,24 @@ jobs:
         if: ${{ matrix.wine != '' }}
         run: |
           set -ex -o pipefail
-          cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
-          [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
-          file ./upx.exe
+          cd ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          [[ -f simple_c && ! -f simple_c.exe ]] && mv -i -v simple_c simple_c.exe
+          [[ -f simple_x && ! -f simple_x.exe ]] && mv -i -v simple_x simple_x.exe
+          file ./simple_*.exe
           wine='${{ matrix.wine }}'
           wine='wine'
-          tt='./upx.exe'
-          $wine ./upx.exe --version-short
-          $wine ./upx.exe -3 $tt -o tt.packed.exe
-          $wine ./upx.exe -l tt.packed.exe
-          $wine ./upx.exe -t tt.packed.exe
-          $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
-          $wine ./tt.packed.exe --version-short
-          $wine ./tt.unpacked.exe --version-short
+          $wine ./simple_c.exe
+          $wine ./simple_x.exe
 
       - name: 'Run basic tests under Wine - Debug'
         if: ${{ matrix.wine != '' }}
         run: |
           set -ex -o pipefail
-          cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
-          [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
-          file ./upx.exe
+          cd ppp/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          [[ -f simple_c && ! -f simple_c.exe ]] && mv -i -v simple_c simple_c.exe
+          [[ -f simple_x && ! -f simple_x.exe ]] && mv -i -v simple_x simple_x.exe
+          file ./simple_*.exe
           wine='${{ matrix.wine }}'
           wine='wine'
-          tt='./upx.exe'
-          $wine ./upx.exe --version-short
-          $wine ./upx.exe -3 $tt -o tt.packed.exe
-          $wine ./upx.exe -l tt.packed.exe
-          $wine ./upx.exe -t tt.packed.exe
-          $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
-          $wine ./tt.packed.exe --version-short
-          $wine ./tt.unpacked.exe --version-short
+          $wine ./simple_c.exe
+          $wine ./simple_x.exe

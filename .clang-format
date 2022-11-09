@@ -1,0 +1,15 @@
+---
+BasedOnStyle: LLVM
+AccessModifierOffset: -4
+AlwaysBreakTemplateDeclarations: true
+ColumnLimit: 100
+IndentWidth: 4
+SortIncludes: true
+SpaceAfterCStyleCast: true
+Standard: Cpp03
+StatementMacros: [
+  CLANG_FORMAT_DUMMY_STATEMENT,
+  COMPILE_TIME_ASSERT,
+  COMPILE_TIME_ASSERT_HEADER,
+]
+...
