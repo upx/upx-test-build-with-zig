@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2022-11-08
-  ZIG_DIST_NAME: zig-linux-x86_64-0.11.0-dev.104+36e618aef
+  # 2022-11-09
+  ZIG_DIST_VERSION: 0.11.0-dev.109+a2e67173d
 
 on:
   push:
@@ -16,7 +16,8 @@ on:
 # just works "out of the box".
 
 jobs:
-  job-build-upx-with-zig:
+  job-build-on-linux:
+    if: ${{ true }}
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-22.04
     strategy:
@@ -128,7 +129,7 @@ jobs:
       UPX_REF_NAME: devel4
       # for upx.git top-level Makefile when building with clang/gcc:
       UPX_CMAKE_BUILD_FLAGS: --verbose
-      # for cmake below:
+      # for cmake:
       EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
       EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
       # for running the basic tests under QEMU/Wine:
@@ -138,14 +139,16 @@ jobs:
 
     steps:
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
-      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_NAME) }}
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
+          ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           wget -q 'https://ziglang.org/builds/'${ZIG_DIST_NAME}.tar.xz
           tar -xoaf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
-          ln -s -v $(readlink -en ${ZIG_DIST_NAME}/zig) .
+          ln -s -v ${ZIG_DIST_NAME}/zig zig
+          #echo "PATH=$PATH" && which zig
           echo -n 'zig version: '; zig version
           # create wrapper scripts (needed for CMake)
           echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
@@ -179,7 +182,7 @@ jobs:
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
-          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
           cmake --build . --config Release --parallel --verbose
           file ./upx*
 
@@ -187,15 +190,15 @@ jobs:
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
-          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
           cmake --build . --config Debug --parallel --verbose
           file ./upx*
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
         run: |
           cd upx
-          #N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
-          N=upx-zigcc-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
+          #N=upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
+          N=upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
           xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
@@ -301,3 +304,103 @@ jobs:
           $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
           $wine ./tt.packed.exe --version-short
           $wine ./tt.unpacked.exe --version-short
+
+  # building on macOS does not work...
+  job-build-on-macos:
+    if: ${{ true }}
+    name: ${{ format('macOS {0} {1}', matrix.zig_target, matrix.zig_pic) }}
+    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { zig_target: x86_64-macos-none }
+          # { zig_target: x86_64-macos.11-none }
+          # { zig_target: x86_64-macos.12-none }
+          # { zig_target: x86_64-macos.13-none }
+
+    env:
+      # for zig-cc wrapper scripts (see below):
+      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
+      ZIG_FLAGS: ${{ matrix.zig_flags }}
+      ZIG_PIC: ${{ matrix.zig_pic }}
+      ZIG_TARGET: ${{ matrix.zig_target }}
+      # for upx.git cloning:
+      UPX_REF_NAME: devel4
+      # for upx.git top-level Makefile when building with clang/gcc:
+      UPX_CMAKE_BUILD_FLAGS: --verbose
+      # for cmake:
+      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
+      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
+      # for running the basic tests:
+      UPX: --no-color --no-progress
+      UPX_DEBUG_DISABLE_GITREV_WARNING: 1
+      UPX_DEBUG_DOCTEST_VERBOSE: 0
+
+    steps:
+      # note that ~/bin is included in the default $PATH on macOS-11 and macOS-12
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
+        run: |
+          mkdir -p -v ~/bin
+          cd ~/bin
+          ZIG_DIST_NAME=zig-macos-x86_64-${ZIG_DIST_VERSION}
+          wget -q 'https://ziglang.org/builds/'${ZIG_DIST_NAME}.tar.xz
+          tar -xoJf ${ZIG_DIST_NAME}.tar.xz
+          rm ${ZIG_DIST_NAME}.tar.xz
+          ln -s -v ${ZIG_DIST_NAME}/zig zig
+          #echo "PATH=$PATH" && which zig
+          echo -n 'zig version: '; zig version
+          # create wrapper scripts (needed for CMake)
+          echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\nexec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\nexec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
+          chmod +x zig-ar zig-cc zig-cxx zig-ranlib
+          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+
+      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+        run: |
+          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx upx
+          git -C upx submodule update --init
+          # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
+          rev=$(git -C upx rev-parse --short=7 HEAD)
+          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+
+      # CMAKE_AR needs to be an absolute file path; CMake bug?
+      - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
+          cmake --build . --config Release --parallel --verbose
+          file ./upx*
+
+      - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
+          cmake --build . --config Debug --parallel --verbose
+          file ./upx*
+
+      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+        run: |
+          cd upx
+          N=upx-zigcc-macos-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
+          xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
+          mkdir -p "tmp/artifact/$N/$xbuild"
+          (cd build && shopt -s nullglob && rsync -a */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild/")
+          (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          # GitHub Actions magic: set "artifact_name" environment value for use in next step
+          echo "artifact_name=$N" >> $GITHUB_ENV
+
+      - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: upx/tmp/artifact
+
+      - name: 'Run basic tests'
+        run: |
+          cmake --build upx/build/release --target test
+          cmake --build upx/build/debug   --target test
