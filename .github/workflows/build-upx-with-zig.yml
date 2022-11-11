@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2022-11-09
-  ZIG_DIST_VERSION: 0.11.0-dev.109+a2e67173d
+  # 2022-11-11
+  ZIG_DIST_VERSION: 0.11.0-dev.137+e40c38d25
 
 on:
   push:
@@ -126,7 +126,7 @@ jobs:
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
-      UPX_REF_NAME: devel4
+      UPX_REF_NAME: devel
       # for upx.git top-level Makefile when building with clang/gcc:
       UPX_CMAKE_BUILD_FLAGS: --verbose
       # for cmake:
@@ -305,7 +305,7 @@ jobs:
           $wine ./tt.packed.exe --version-short
           $wine ./tt.unpacked.exe --version-short
 
-  # building on macOS does not work...
+  # basic tests on macOS do not work - problem with C++ exception handling??
   job-build-on-macos:
     if: ${{ true }}
     name: ${{ format('macOS {0} {1}', matrix.zig_target, matrix.zig_pic) }}
@@ -321,12 +321,12 @@ jobs:
 
     env:
       # for zig-cc wrapper scripts (see below):
-      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
+      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # (enabled on macOS by default)
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
-      UPX_REF_NAME: devel4
+      UPX_REF_NAME: devel
       # for upx.git top-level Makefile when building with clang/gcc:
       UPX_CMAKE_BUILD_FLAGS: --verbose
       # for cmake:
@@ -366,12 +366,18 @@ jobs:
           rev=$(git -C upx rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
 
+      - name: 'Build with local clang'
+        if: ${{ matrix.zig_target == 'x86_64-macos-none' }} # only do this once per Action
+        run: |
+          make -C upx build/release-clang && make -C upx/build/release-clang test
+          make -C upx build/debug-clang   && make -C upx/build/debug-clang test
+
       # CMAKE_AR needs to be an absolute file path; CMake bug?
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
-          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
           cmake --build . --config Release --parallel --verbose
           file ./upx*
 
@@ -379,7 +385,7 @@ jobs:
         run: |
           mkdir -p upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           cd       upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
-          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/bin/zig-ar -DCMAKE_C_COMPILER=zig-cc -DCMAKE_CXX_COMPILER=zig-cxx -DCMAKE_RANLIB=$HOME/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
           cmake --build . --config Debug --parallel --verbose
           file ./upx*
 
@@ -389,8 +395,8 @@ jobs:
           N=upx-zigcc-macos-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
           xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
-          (cd build && shopt -s nullglob && rsync -a */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild/")
-          (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          (cd build && shopt -s nullglob && rsync -R -a */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild/")
+          (cd tmp/artifact && gtar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
           # GitHub Actions magic: set "artifact_name" environment value for use in next step
           echo "artifact_name=$N" >> $GITHUB_ENV
 
@@ -400,7 +406,10 @@ jobs:
           name: ${{ env.artifact_name }}
           path: upx/tmp/artifact
 
-      - name: 'Run basic tests'
+      - name: 'Run basic tests - Release'
         run: |
-          cmake --build upx/build/release --target test
-          cmake --build upx/build/debug   --target test
+          cmake --build upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release --target test
+
+      - name: 'Run basic tests - Debug'
+        run: |
+          cmake --build upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug   --target test
