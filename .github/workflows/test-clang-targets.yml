@@ -1,0 +1,149 @@
+name: 'Test clang targets'
+
+# see $targets below; and compare with build-upx-with-zig.yml
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  job-build-on-linux:
+    if: ${{ true }}
+    name: ${{ format('container {0}', matrix.container) }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # { container: 'alpine:3.16', clang: clang-13 }
+          - { container: 'alpine:edge', clang: clang-15 } # clang-15.0.4, same as current zig-devel
+
+    steps:
+      - name: ${{ format('Install {0} on {1}', matrix.clang, matrix.container) }}
+        run: |
+          uname -a; pwd; id; umask
+          apk update && apk upgrade
+          apk add bash clang file llvm
+          ls -l /usr/bin/clang*; ls -l /usr/bin/llvm*; clang --version
+
+      - name: 'Test clang targets'
+        shell: bash
+        run: |
+          echo "BASH_VERSION=$BASH_VERSION"
+
+          # enumerate targets; see build-upx-with-zig.yml
+          targets=()
+          # Linux
+          targets+=( aarch64-linux-gnu:-fPIC:-fPIE)
+          targets+=( arm-linux-gnueabi:-fPIC:-fPIE)           # soft-float
+          targets+=( arm-linux-gnueabihf:-fPIC:-fPIE)         # hard-float
+          targets+=( armeb-linux-gnueabi:-fPIC:-fPIE)         # soft-float
+          targets+=( armeb-linux-gnueabihf:-fPIC:-fPIE)       # hard-float
+          ##targets+=( csky-linux-gnu:-fPIC:-fPIE)            # NO musl
+          targets+=( i386-linux-gnu:-fPIC:-fPIE)
+          ##targets+=( m68k-linux-gnu:-fPIC:-fPIE)
+          targets+=( mips-linux-gnueabi:-fPIC:-fPIE)          # defaults to gnueabihf hard-float
+          targets+=( mipsel-linux-gnueabi:-fPIC:-fPIE)        # defaults to gnueabihf hard-float
+          targets+=( mips64-linux-gnuabin64:-fPIC:-fPIE)
+          targets+=( mips64el-linux-gnuabin64:-fPIC:-fPIE)
+          targets+=( powerpc-linux-gnu:-fPIC:-fPIE)           # hard-float
+          targets+=( powerpc64-linux-gnu:-fPIC:-fPIE)
+          targets+=( powerpc64le-linux-gnu:-fPIC:-fPIE)
+          targets+=( riscv64-linux-gnu:-fPIC:-fPIE)
+          targets+=( sparc-linux-gnu:-fPIC:-fPIE)             # NO musl
+          targets+=( sparc64-linux-gnu:-fPIC:-fPIE)           # NO musl
+          targets+=( s390x-linux-gnu:-fPIC:-fPIE)
+          targets+=( x86_64-linux-gnu:-fPIC:-fPIE)
+          # Linux ILP32 on 64-bit archs
+          targets+=( mips64-linux-gnuabin32:-fPIC:-fPIE)
+          targets+=( mips64el-linux-gnuabin32:-fPIC:-fPIE)
+          targets+=( x86_64-linux-gnux32:-fPIC:-fPIE)
+          # Windows
+          targets+=( arm-windows-gnu )
+          targets+=( aarch64-windows-gnu )
+          targets+=( i386-windows-gnu )
+          targets+=( x86_64-windows-gnu )
+          # macOS
+          targets+=( arm64-macos-none )
+          targets+=( arm64-macos.11-none )
+          targets+=( arm64-macos.12-none )
+          targets+=( arm64-macos.13-none )
+          targets+=( x86_64-macos-none )
+          targets+=( x86_64-macos.11-none )
+          targets+=( x86_64-macos.12-none )
+          targets+=( x86_64-macos.13-none )
+          # special
+          targets+=( wasm32-freestanding-none )
+
+          # create very simple source code
+          echo '/* can use freestanding headers only */
+          #include <limits.h>
+          #include <stdarg.h>
+          #include <stddef.h>
+          #include <stdint.h>
+          /* basic arithmetics */
+          int test_add_int(int a, int b) { return a + b; }
+          char *test_add_ptr_int(char *a, int b) { return a + b; }
+          char *test_add_ptr_size_t(char *a, size_t b) { return a + b; }
+          int test_inc_int(int a) { return a + 1; }
+          int test_mul_int(int a, int b) { return a * b; }
+          double test_add_double(double a, double b) { return a + b; }
+          double test_add_double_int(double a, int b) { return a + (double) b; }
+          /* force some text/code relocations */
+          extern int extern_int_func(int);
+          int test_reloc_text(int a) { return extern_int_func(a) ^ 1; }
+          /* force some data relocations */
+          static int local_int = 1;
+          int global_int = 2;
+          extern int extern_int;
+          int global_int_array[4] = { 1, 2, 3, 4 };
+          const int global_const_int_array[4] = { 2, 3, 5, 7 };
+          int *test_reloc_local_data(void) { return &local_int; }
+          int *test_reloc_global_data(void) { return &global_int; }
+          int *test_reloc_extern_data(void) { return &extern_int; }
+          int test_reloc_global_array(int a) { return global_int_array[a & 3]; }
+          int test_reloc_global_const_array(int a) { return global_const_int_array[a & 3]; }
+          ' > test_c.c
+          echo '#include "test_c.c"' > test_x.cpp
+          head -n30 test_*.*
+
+          # compile for all targets
+          # default cflags similar to UPX
+          cflags="-O2 -Wall -Wextra -Wcast-align -Wcast-qual -Wpointer-arith -Wshadow -Wwrite-strings"
+          # compile to object files with "clang -c" and "clang++ -c"
+          for tp in "${targets[@]}"; do
+            target=${tp%%:*}
+            pic_flags=( '' )
+            [[ $tp == *:-fPIC* ]] && pic_flags+=( -fPIC )
+            [[ $tp == *:-fPIE* ]] && pic_flags+=( -fPIE )
+            for pic in "${pic_flags[@]}"; do
+              echo -e "\n===== compiling $target $pic"
+              clang   --target=$target $pic $cflags -o ${target}${pic}.c.o -c test_c.c
+              clang++ --target=$target $pic $cflags -o ${target}${pic}.x.o -c test_x.cpp
+              file ${target}${pic}.[cx].o
+            done
+          done
+
+          # prepare artifact
+          N=upx-${{ matrix.clang }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}
+          mkdir -p "tmp/artifact/$N/${{ matrix.clang }}"
+          cp -ai *.[cx].o "tmp/artifact/$N/${{ matrix.clang }}"
+          (cd tmp/artifact && tar -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          # GitHub Actions magic: set "artifact_name" environment value for use in next step
+          echo "artifact_name=$N" >> $GITHUB_ENV
+
+      - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: tmp/artifact
+
+      - name: 'Inspect objects with llvm-objdump'
+        # only look at C files (as C++ objects seem to be identical, except for name-mangling)
+        run: for f in *.[c].o; do llvm-objdump -d -r $f; done
+
+# TODO: where is llvm's obj2yaml ??
+#     - name: 'Inspect objects with obj2yaml'
+#       run: for f in *.[c].o; do obj2yaml $f; done

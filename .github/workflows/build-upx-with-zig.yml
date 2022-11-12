@@ -8,7 +8,7 @@ env:
   ZIG_DIST_VERSION: 0.11.0-dev.900+0fb53bd24
 
 on:
-  push:
+  #push: # INFO: skip this workflow file on the [test-clang-targets] branch
   workflow_dispatch:
 
 # NOTE: we could work-around some failing builds by adding extra compilation

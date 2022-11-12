@@ -1,0 +1,53 @@
+name: 'Build UPX with clang on Alpine'
+
+on:
+  #push: # INFO: this WORKS, so skip for now
+  workflow_dispatch:
+
+jobs:
+  job-build-on-alpine:
+    if: ${{ false }} # WORKS, so skip for now
+    name: ${{ format('container {0}', matrix.container) }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { container: 'alpine:3.12' } # clang-10, gcc-9.3; WORKS
+          - { container: 'alpine:3.13' } # clang-10, gcc-10.2; WORKS
+          - { container: 'alpine:3.14' } # clang-11, gcc-10.3; WORKS
+          - { container: 'alpine:3.15' } # clang-12, gcc-10.3; WORKS
+          - { container: 'alpine:3.16' } # clang-13, gcc-11.2; WORKS
+          - { container: 'alpine:edge' } # clang-15, gcc-12.2; WORKS
+
+    env:
+      # for upx.git cloning:
+      UPX_REF_NAME: devel
+      # for upx.git top-level Makefile when building with clang/gcc:
+      UPX_CMAKE_BUILD_FLAGS: --verbose
+
+    steps:
+      - name: ${{ format('Install clang on {0}', matrix.container) }}
+        run: |
+          uname -a; pwd; id; umask
+          apk update && apk upgrade
+          # we need g++ for the libgcc libs and crt startup objects
+          apk add clang cmake g++ git make
+          ls -l /usr/bin/clang*; clang --version; gcc --version
+      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+        run: |
+          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx upx
+          git -C upx submodule update --init
+          # [multithreading]: insert a line at the beginning of two files
+          sed -i '1i #define UPX_DOCTEST_CONFIG_MULTITHREADING 1' upx/src/conf.h upx/src/util/dt_impl.cpp
+          git -C upx diff || true
+      - name: 'Build Release with clang'
+        run: make -C upx build/release-clang
+      - name: 'Build Debug with clang'
+        run: make -C upx build/debug-clang
+      - name: 'Test Release with clang'
+        run: make -C upx/build/release-clang test
+      - name: 'Test Debug with clang'
+        run: make -C upx/build/debug-clang test
