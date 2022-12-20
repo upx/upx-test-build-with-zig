@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # { container: 'alpine:3.16', clang: clang-13 }
-          - { container: 'alpine:edge', clang: clang-15 } # clang-15.0.4, same as current zig-devel
+          - { container: 'alpine:3.17', clang: clang-15 } # clang-15.0.6, same as current zig-devel
+          # { container: 'alpine:edge', clang: clang-15 } # clang-15.0.6, same as current zig-devel
 
     steps:
       - name: ${{ format('Install {0} on {1}', matrix.clang, matrix.container) }}
@@ -144,6 +144,5 @@ jobs:
         # only look at C files (as C++ objects seem to be identical, except for name-mangling)
         run: for f in *.[c].o; do llvm-objdump -d -r $f; done
 
-# TODO: where is llvm's obj2yaml ??
-#     - name: 'Inspect objects with obj2yaml'
-#       run: for f in *.[c].o; do obj2yaml $f; done
+      - name: 'Inspect objects with obj2yaml'
+        run: for f in *.[c].o; do /usr/lib/llvm15/bin/obj2yaml $f; done

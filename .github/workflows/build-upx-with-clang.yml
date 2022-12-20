@@ -6,7 +6,7 @@ on:
 
 jobs:
   job-build-on-alpine:
-    if: ${{ false }} # WORKS, so skip for now
+    ####if: ${{ false }} # WORKS, so skip for now
     name: ${{ format('container {0}', matrix.container) }}
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
@@ -20,6 +20,7 @@ jobs:
           - { container: 'alpine:3.14' } # clang-11, gcc-10.3; WORKS
           - { container: 'alpine:3.15' } # clang-12, gcc-10.3; WORKS
           - { container: 'alpine:3.16' } # clang-13, gcc-11.2; WORKS
+          - { container: 'alpine:3.17' } # clang-15, gcc-12.2; WORKS
           - { container: 'alpine:edge' } # clang-15, gcc-12.2; WORKS
 
     env:
@@ -40,14 +41,14 @@ jobs:
         run: |
           git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx upx
           git -C upx submodule update --init
-          # [multithreading]: insert a line at the beginning of two files
+          # enable [multithreading]: insert a line at the beginning of two files
           sed -i '1i #define UPX_DOCTEST_CONFIG_MULTITHREADING 1' upx/src/conf.h upx/src/util/dt_impl.cpp
           git -C upx diff || true
       - name: 'Build Release with clang'
         run: make -C upx build/release-clang
       - name: 'Build Debug with clang'
         run: make -C upx build/debug-clang
-      - name: 'Test Release with clang'
+      - name: 'Basic test Release with clang'
         run: make -C upx/build/release-clang test
-      - name: 'Test Debug with clang'
+      - name: 'Basic test Debug with clang'
         run: make -C upx/build/debug-clang test
