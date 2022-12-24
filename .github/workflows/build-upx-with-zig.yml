@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2022-12-20
-  ZIG_DIST_VERSION: 0.11.0-dev.900+0fb53bd24
+  # 2022-12-24
+  ZIG_DIST_VERSION: 0.11.0-dev.935+bb62d5105
 
 on:
   push:
