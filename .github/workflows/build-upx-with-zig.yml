@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2022-12-24
-  ZIG_DIST_VERSION: 0.11.0-dev.935+bb62d5105
+  # 2023-01-01
+  ZIG_DIST_VERSION: 0.11.0-dev.1025+aadd1b252
 
 on:
   push:
@@ -27,8 +27,8 @@ jobs:
           # linux-musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE }
-          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be }
-          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, zig_pic: -fPIE }
+          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED }
+          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm }
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
@@ -39,26 +39,26 @@ jobs:
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: bash }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: bash, zig_pic: -fPIE }
+          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
+          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musl, qemu: qemu-mips }
           - { zig_target: mips-linux-musl, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musl, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musl, qemu: qemu-mipsel, zig_pic: -fPIE }
-          - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: bash }
-          - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: bash, zig_pic: -fPIE }
-          - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: bash }
-          - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: bash, zig_pic: -fPIE }
+          - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
-          - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
-          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
-          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
+          - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, tt: UPX-BUG, zig_pic: -fPIE }
+          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, tt: UPX-BUG }
+          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, tt: UPX-BUG, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
-          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: bash }
-          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: bash, zig_pic: -fPIE }
-          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: bash }
-          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: bash, zig_pic: -fPIE }
+          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
+          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
@@ -172,10 +172,10 @@ jobs:
       - name: 'Build with local clang and gcc'
         if: ${{ matrix.zig_target == 'x86_64-linux-gnu' }} # only do this once per Action
         run: |
-          make -C upx build/release-clang && make -C upx/build/release-clang test
-          make -C upx build/debug-clang   && make -C upx/build/debug-clang test
-          make -C upx build/release-gcc   && make -C upx/build/release-gcc test
-          make -C upx build/debug-gcc     && make -C upx/build/debug-gcc test
+          make -C upx build/extra/clang/release && make -C upx/build/extra/clang/release test
+          make -C upx build/extra/clang/debug   && make -C upx/build/extra/clang/debug test
+          make -C upx build/extra/gcc/release   && make -C upx/build/extra/gcc/release test
+          make -C upx build/extra/gcc/debug     && make -C upx/build/extra/gcc/debug test
 
       # CMAKE_AR needs to be an absolute file path; CMake bug?
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
@@ -228,7 +228,8 @@ jobs:
           file ./upx
           qemu='${{ matrix.qemu }}'
           tt='${{ matrix.tt }}'
-          [[ $tt == bash ]] && tt=/bin/bash
+          [[ $tt == UPX-BUG ]] && tt=/bin/bash
+          [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
@@ -247,7 +248,8 @@ jobs:
           file ./upx
           qemu='${{ matrix.qemu }}'
           tt='${{ matrix.tt }}'
-          [[ $tt == bash ]] && tt=/bin/bash
+          [[ $tt == UPX-BUG ]] && tt=/bin/bash
+          [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
@@ -370,8 +372,8 @@ jobs:
       - name: 'Build with local clang'
         if: ${{ matrix.zig_target == 'x86_64-macos-none' }} # only do this once per Action
         run: |
-          make -C upx build/release-clang && make -C upx/build/release-clang test
-          make -C upx build/debug-clang   && make -C upx/build/debug-clang test
+          make -C upx build/extra/clang/release && make -C upx/build/extra/clang/release test
+          make -C upx build/extra/clang/debug   && make -C upx/build/extra/clang/debug test
 
       # CMAKE_AR needs to be an absolute file path; CMake bug?
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
