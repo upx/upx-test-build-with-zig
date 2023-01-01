@@ -15,6 +15,8 @@ on:
 # flags, but the point of this test repository is to ensure that zig-cc
 # just works "out of the box".
 
+# PERMISSIVE: we actually do that on the `[permissive]` branch of this repo
+
 jobs:
   job-build-on-linux:
     if: ${{ true }}
@@ -57,8 +59,8 @@ jobs:
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
-          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, permissive: -mcpu=z13 }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE, permissive: -mcpu=z13 }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
@@ -95,7 +97,7 @@ jobs:
           - { zig_target: powerpc64-linux-gnu }
           - { zig_target: powerpc64le-linux-gnu }
           - { zig_target: riscv64-linux-gnu }
-          - { zig_target: s390x-linux-gnu }
+          - { zig_target: s390x-linux-gnu, permissive: -mcpu=z13 }
           - { zig_target: sparc-linux-gnu }
           - { zig_target: sparc64-linux-gnu }
           - { zig_target: thumb-linux-gnueabi }
@@ -122,7 +124,8 @@ jobs:
     env:
       # for zig-cc wrapper scripts (see below):
       ##ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
-      ZIG_FLAGS: ${{ matrix.zig_flags }}
+      # [permissive]: add matrix.permissive flags
+      ZIG_FLAGS: ${{ matrix.zig_flags }} ${{ matrix.permissive }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
@@ -130,8 +133,9 @@ jobs:
       # for upx.git top-level Makefile when building with clang/gcc:
       UPX_CMAKE_BUILD_FLAGS: --verbose
       # for cmake:
-      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
-      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
+      # [permissive]: add matrix.cmake_permissive flags
+      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }} ${{ matrix.cmake_permissive }}
+      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }} ${{ matrix.cmake_permissive }}
       # for running the basic tests under QEMU/Wine:
       UPX: --no-color --no-progress
       UPX_DEBUG_DISABLE_GITREV_WARNING: 1
@@ -230,6 +234,7 @@ jobs:
           tt='${{ matrix.tt }}'
           [[ $tt == UPX-BUG ]] && tt=/bin/bash
           [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
+          tt=/bin/bash # [permissive]: always use bash for now to avoid possible errors in UPX itself
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
@@ -250,6 +255,7 @@ jobs:
           tt='${{ matrix.tt }}'
           [[ $tt == UPX-BUG ]] && tt=/bin/bash
           [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
+          tt=/bin/bash # [permissive]: always use bash for now to avoid possible errors in UPX itself
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
