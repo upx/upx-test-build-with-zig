@@ -28,8 +28,18 @@ And visit https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-c
 for some background info about `zig cc`.
 
 
+Noteworthy open zig issues
+==========================
+
+- https://github.com/ziglang/zig/issues/6573  libc++ does not work on multi-threaded ARM yet
+  - https://reviews.llvm.org/D75183
+  - https://github.com/ziglang/zig/commit/3997828a6176
+- https://github.com/ziglang/zig/issues/12992 zig c++ does not support exceptions on macos
+
+
 Noteworthy zig commits that improve 'zig cc'
 ============================================
 
 - 2022-12-28 https://github.com/ziglang/zig/commit/7350f0d mingw: add missing vscprintf.c file
 - 2022-12-28 https://github.com/ziglang/zig/commit/34887cf powerpc does not have a red zone
+  - but this is WRONG; see https://github.com/torvalds/linux/commit/573ebfa6601f
