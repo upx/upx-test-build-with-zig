@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2023-01-03
-  ZIG_DIST_VERSION: 0.11.0-dev.1079+c1f404ad5
+  # 2023-01-04
+  ZIG_DIST_VERSION: 0.11.0-dev.1183+2b9478ce1
 
 on:
   push:
@@ -145,7 +145,8 @@ jobs:
           cd ~/.local/bin
           ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           wget -q 'https://ziglang.org/builds/'${ZIG_DIST_NAME}.tar.xz
-          tar -xoaf ${ZIG_DIST_NAME}.tar.xz
+          ls -l ${ZIG_DIST_NAME}.tar.xz
+          tar -xoJf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
           ln -s -v ${ZIG_DIST_NAME}/zig zig
           #echo "PATH=$PATH" && which zig
@@ -348,6 +349,7 @@ jobs:
           cd ~/bin
           ZIG_DIST_NAME=zig-macos-x86_64-${ZIG_DIST_VERSION}
           wget -q 'https://ziglang.org/builds/'${ZIG_DIST_NAME}.tar.xz
+          ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
           ln -s -v ${ZIG_DIST_NAME}/zig zig
