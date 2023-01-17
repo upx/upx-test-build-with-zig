@@ -42,5 +42,6 @@ Noteworthy zig commits that improve 'zig cc'
 
 - 2022-12-28 https://github.com/ziglang/zig/commit/7350f0d mingw: add missing vscprintf.c file
 - 2022-12-28 https://github.com/ziglang/zig/commit/34887cf powerpc does not have a red zone
-  - but this is **WRONG**: see https://github.com/torvalds/linux/commit/573ebfa6601f
-  - but this is **WRONG**: see https://github.com/llvm/llvm-project/commit/660b0d7f7bba
+  - but this is **WRONG**:
+    - see https://github.com/torvalds/linux/commit/573ebfa6601f
+    - see https://github.com/llvm/llvm-project/commit/660b0d7f7bba
