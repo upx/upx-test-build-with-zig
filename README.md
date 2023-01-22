@@ -35,6 +35,7 @@ Noteworthy open zig issues
   - https://reviews.llvm.org/D75183
   - https://github.com/ziglang/zig/commit/3997828a6176
 - https://github.com/ziglang/zig/issues/12992 zig c++ does not support exceptions on macos
+  - https://github.com/ziglang/zig/pull/14397
 
 
 Noteworthy zig commits that improve 'zig cc'
