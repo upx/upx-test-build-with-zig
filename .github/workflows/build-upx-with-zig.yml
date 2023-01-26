@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2023-01-24
-  ZIG_DIST_VERSION: 0.11.0-dev.1436+59d9afcb5
+  # 2023-01-26
+  ZIG_DIST_VERSION: 0.11.0-dev.1460+e675af069
 
 on:
   push:
@@ -319,9 +319,9 @@ jobs:
       matrix:
         include:
           - { zig_target: x86_64-macos-none }
-          # { zig_target: x86_64-macos.11-none }
-          # { zig_target: x86_64-macos.12-none }
-          # { zig_target: x86_64-macos.13-none }
+          - { zig_target: x86_64-macos.11-none }
+          - { zig_target: x86_64-macos.12-none }
+          - { zig_target: x86_64-macos.13-none }
 
     env:
       # for zig-cc wrapper scripts (see below):
