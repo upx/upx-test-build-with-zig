@@ -121,6 +121,7 @@ jobs:
 
     env:
       # for zig-cc wrapper scripts (see below):
+      # [multithreading]: see 'sed' command below
       ##ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
@@ -166,6 +167,9 @@ jobs:
         run: |
           git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx upx
           git -C upx submodule update --init
+          # [multithreading]: insert a line at the beginning of two files
+          sed -i '1i #define UPX_DOCTEST_CONFIG_MULTITHREADING 1' upx/src/conf.h upx/src/check/dt_impl.cpp
+          git -C upx diff || true
           # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
           rev=$(git -C upx rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
