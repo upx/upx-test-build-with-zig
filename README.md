@@ -34,14 +34,17 @@ Noteworthy open zig issues
 - https://github.com/ziglang/zig/issues/6573  libc++ does not work on multi-threaded ARM yet
   - https://reviews.llvm.org/D75183
   - https://github.com/ziglang/zig/commit/3997828a6176
+- https://github.com/ziglang/zig/issues/12886
+- https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
+- https://github.com/ziglang/zig/issues/13385
 
 
-Noteworthy zig commits that improve 'zig cc'
-============================================
+Noteworthy changes that improve 'zig cc'
+========================================
 
 - 2022-12-28 https://github.com/ziglang/zig/commit/7350f0d mingw: add missing vscprintf.c file
 - 2022-12-28 https://github.com/ziglang/zig/commit/34887cf powerpc does not have a red zone
-  - TODO: but this is **WRONG**:
+  - TODO: but this seems **WRONG**:
     - see https://github.com/torvalds/linux/commit/573ebfa6601f
     - see https://github.com/llvm/llvm-project/commit/660b0d7f7bba
 - 2023-01-21 https://github.com/ziglang/zig/pull/14397
