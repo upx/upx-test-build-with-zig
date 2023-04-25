@@ -20,7 +20,7 @@ jobs:
     if: ${{ true }}
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: alpine:edge # other versions such as alpine:3.17 also work; no-container also works
+    container: 'alpine:3.17' # other versions such as alpine:3.17 also work; no-container also works
     strategy:
       fail-fast: false
       matrix:
@@ -51,9 +51,9 @@ jobs:
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
-          - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, tt: UPX-BUG, zig_pic: -fPIE }
-          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, tt: UPX-BUG }
-          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, tt: UPX-BUG, zig_pic: -fPIE }
+          - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
+          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
+          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
