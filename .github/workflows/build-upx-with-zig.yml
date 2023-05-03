@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2023-04-27
-  ZIG_DIST_VERSION: 0.11.0-dev.2828+5b9e528bc
+  # 2023-05-03
+  ZIG_DIST_VERSION: 0.11.0-dev.2964+e9cbdb2cf
 
 on:
   push:
@@ -82,7 +82,7 @@ jobs:
           - { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
           - { zig_target: i386-linux-gnu.2.3.4 }              # RHEL 4
-          - { zig_target: i386-linux-gnu.2.7 }                # Ubuntu 8.04
+          - { zig_target: i386-linux-gnu.2.7 }                # Ubuntu 8.04; REGRESSION: broken with zig llvm-16 update
           - { zig_target: i386-linux-gnu.2.36 }               # latest glibc version
           - { zig_target: i386-windows-gnu, wine: wine32 }
           - { zig_target: m68k-linux-gnu }
@@ -104,7 +104,7 @@ jobs:
           - { zig_target: x86_64-linux-gnu }
           - { zig_target: x86_64-linux-gnu.2.3.4 }            # RHEL 4
           - { zig_target: x86_64-linux-gnu.2.5 }              # RHEL 5
-          - { zig_target: x86_64-linux-gnu.2.11 }             # SLES 11 + RHEL 6
+          - { zig_target: x86_64-linux-gnu.2.11 }             # SLES 11 + RHEL 6; REGRESSION: broken with zig llvm-16 update
           - { zig_target: x86_64-linux-gnu.2.17 }             # RHEL 7
           - { zig_target: x86_64-linux-gnu.2.36 }             # latest glibc version
           - { zig_target: x86_64-macos.11-none }
