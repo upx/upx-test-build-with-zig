@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2023-06-18
-  ZIG_DIST_VERSION: 0.11.0-dev.3677+e95fc2023
+  # 2023-06-21
+  ZIG_DIST_VERSION: 0.11.0-dev.3731+c6e2e1ae4
 
 on:
   push:
@@ -118,7 +118,7 @@ jobs:
           - { zig_target: x86_64-linux-muslx32 }              # not supported by Zig ??
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
           # special
-          - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
+          - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
 
     env:
       # for zig-cc wrapper scripts (see below):
