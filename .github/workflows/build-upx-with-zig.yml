@@ -68,9 +68,9 @@ jobs:
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Westmere, zig_pic: -fPIE }
           # other
           - { zig_target: aarch64-linux-gnu }
-          - { zig_target: aarch64-macos.11-none }
-          - { zig_target: aarch64-macos.12-none }
-          - { zig_target: aarch64-macos.13-none }
+          - { zig_target: aarch64-macos.11.0-none }
+          - { zig_target: aarch64-macos.12.0-none }
+          - { zig_target: aarch64-macos.13.0-none }
           - { zig_target: aarch64-windows-gnu }
           - { zig_target: aarch64_be-linux-gnu }
           - { zig_target: arm-linux-gnueabi }
@@ -107,9 +107,9 @@ jobs:
           - { zig_target: x86_64-linux-gnu.2.11 }             # SLES 11 + RHEL 6; REGRESSION: broken with zig llvm-16 update
           - { zig_target: x86_64-linux-gnu.2.17 }             # RHEL 7
           - { zig_target: x86_64-linux-gnu.2.36 }             # latest glibc version
-          - { zig_target: x86_64-macos.11-none }
-          - { zig_target: x86_64-macos.12-none }
-          - { zig_target: x86_64-macos.13-none }
+          - { zig_target: x86_64-macos.11.0-none }
+          - { zig_target: x86_64-macos.12.0-none }
+          - { zig_target: x86_64-macos.13.0-none }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
           # ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
@@ -358,9 +358,9 @@ jobs:
       matrix:
         include:
           - { zig_target: x86_64-macos-none }
-          - { zig_target: x86_64-macos.11-none }
-          - { zig_target: x86_64-macos.12-none }
-          - { zig_target: x86_64-macos.13-none }
+          - { zig_target: x86_64-macos.11.0-none }
+          - { zig_target: x86_64-macos.12.0-none }
+          - { zig_target: x86_64-macos.13.0-none }
 
     env:
       # for zig-cc wrapper scripts (see below):
