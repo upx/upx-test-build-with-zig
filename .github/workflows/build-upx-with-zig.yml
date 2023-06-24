@@ -20,7 +20,8 @@ jobs:
     if: ${{ true }}
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: 'alpine:3.17' # other versions such as alpine:3.17 also work; no-container also works
+    # TODO: qemu-8 makes problems, so use alpine:3.17 for qemu-7
+    container: ${{ matrix.qemu != '' && 'alpine:3.17' || 'alpine:3.18' }}
     strategy:
       fail-fast: false
       matrix:
@@ -145,7 +146,7 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: 'Install Alpine Linux container packages'
+      - name: ${{ format('Install packages {0}', (matrix.qemu != '' && 'alpine:3.17' || 'alpine:3.18')) }}
         if: ${{ job.container }}
         shell: sh
         run: |
@@ -293,12 +294,12 @@ jobs:
           true
 
       - name: 'Install Wine'
-        if: ${{ matrix.wine == 'wine64' || (matrix.wine == 'wine32' && !job.container) }}
+        if: ${{ matrix.wine != '' }}
         shell: bash
         run: |
           uname -a; pwd; id; umask
           if test -f /etc/alpine-release; then
-            # Alpine Linux is pure 64-bit so there is no wine32
+            # wine-8 can run win32 programs in wow64 mode under pure 64-bit Alpine Linux
             apk add wine
           else
             export DEBIAN_FRONTEND=noninteractive
@@ -310,7 +311,7 @@ jobs:
           true
 
       - name: 'Run basic tests under Wine - Release'
-        if: ${{ matrix.wine == 'wine64' || (matrix.wine == 'wine32' && !job.container) }}
+        if: ${{ matrix.wine != '' }}
         shell: bash
         run: |
           set -ex -o pipefail
@@ -318,7 +319,7 @@ jobs:
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
           if test -f /etc/alpine-release; then
-            wine=wine64
+            wine=wine
           else
             wine='${{ matrix.wine }}'
             wine=wine
@@ -333,7 +334,7 @@ jobs:
           $wine ./tt.unpacked.exe --version-short
 
       - name: 'Run basic tests under Wine - Debug'
-        if: ${{ matrix.wine == 'wine64' || (matrix.wine == 'wine32' && !job.container) }}
+        if: ${{ matrix.wine != '' }}
         shell: bash
         run: |
           set -ex -o pipefail
