@@ -4,8 +4,8 @@ name: 'Build UPX with zig cc'
 #   zig targets | jq '.["libc"]'
 
 env:
-  # 2023-06-30
-  ZIG_DIST_VERSION: 0.11.0-dev.3892+0a6cd257b
+  # 2023-07-05
+  ZIG_DIST_VERSION: 0.11.0-dev.3937+78eb3c561
 
 on:
   push:
@@ -306,7 +306,7 @@ jobs:
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo dpkg --add-architecture i386
             sudo apt-get update && sudo apt-get upgrade -y
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
-            [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine
+            [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine wine64
           fi
           true
 
@@ -318,12 +318,7 @@ jobs:
           cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
-          if test -f /etc/alpine-release; then
-            wine=wine
-          else
-            wine='${{ matrix.wine }}'
-            wine=wine
-          fi
+          wine=wine
           tt='./upx.exe'
           $wine ./upx.exe --version-short
           $wine ./upx.exe -3 $tt -o tt.packed.exe
