@@ -20,8 +20,8 @@ jobs:
     if: ${{ true }}
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    # TODO: qemu-8 makes problems, so use alpine:3.17 for qemu-7
-    container: ${{ matrix.qemu != '' && 'alpine:3.17' || 'alpine:3.18' }}
+    # TODO: qemu-8 makes problems, so use alpine:3.15 for qemu-6
+    container: ${{ matrix.qemu != '' && 'alpine:3.15' || 'alpine:3.18' }}
     strategy:
       fail-fast: false
       matrix:
@@ -146,7 +146,7 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: ${{ format('Install packages {0}', (matrix.qemu != '' && 'alpine:3.17' || 'alpine:3.18')) }}
+      - name: ${{ format('Install packages {0}', (matrix.qemu != '' && 'alpine:3.15' || 'alpine:3.18')) }}
         if: ${{ job.container }}
         shell: sh
         run: |
@@ -336,12 +336,7 @@ jobs:
           cd upx/build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           [[ -f upx && ! -f upx.exe ]] && mv -i -v upx upx.exe
           file ./upx.exe
-          if test -f /etc/alpine-release; then
-            wine=wine64
-          else
-            wine='${{ matrix.wine }}'
-            wine=wine
-          fi
+          wine=wine
           tt='./upx.exe'
           $wine ./upx.exe --version-short
           $wine ./upx.exe -3 $tt -o tt.packed.exe
