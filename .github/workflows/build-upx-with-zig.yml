@@ -20,8 +20,7 @@ jobs:
     if: ${{ true }}
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    # TODO: qemu-8 makes problems, so use alpine:3.15 for qemu-6
-    container: ${{ matrix.qemu != '' && 'alpine:3.15' || 'alpine:3.18' }}
+    container: 'alpine:3.18'
     strategy:
       fail-fast: false
       matrix:
@@ -146,7 +145,7 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: ${{ format('Install packages {0}', (matrix.qemu != '' && 'alpine:3.15' || 'alpine:3.18')) }}
+      - name: ${{ format('Install packages {0}', 'alpine:3.18') }}
         if: ${{ job.container }}
         shell: sh
         run: |
