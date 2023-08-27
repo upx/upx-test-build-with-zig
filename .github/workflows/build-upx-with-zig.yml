@@ -17,10 +17,10 @@ on:
 
 jobs:
   job-build-on-linux:
-    if: ${{ true }}
+    if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: 'alpine:3.18'
+    container: 'alpine:edge'
     strategy:
       fail-fast: false
       matrix:
@@ -145,7 +145,7 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: ${{ format('Install packages {0}', 'alpine:3.18') }}
+      - name: ${{ format('Install packages {0}', 'alpine:edge') }}
         if: ${{ job.container }}
         shell: sh
         run: |
@@ -345,7 +345,7 @@ jobs:
           $wine ./tt.unpacked.exe --version-short
 
   job-build-on-macos:
-    if: ${{ true }}
+    if: github.repository_owner == 'upx'
     name: ${{ format('macOS {0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: macos-12
     strategy:
