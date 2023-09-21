@@ -1,15 +1,18 @@
-name: 'Build UPX with zig cc'
+# Copyright (C) Markus Franz Xaver Johannes Oberhumer
 
 # 96 build targets (jobs), see also
 #   zig targets | jq '.["libc"]'
 
+name: 'Build UPX with zig cc'
+
+on: [push, workflow_dispatch]
+
 env:
+  CMAKE_REQUIRED_QUIET: OFF
+  DEBIAN_FRONTEND: noninteractive
+  UPX_CMAKE_BUILD_FLAGS: --verbose
   # 2023-09-21
   ZIG_DIST_VERSION: 0.12.0-dev.464+a63a1c5cb
-
-on:
-  push:
-  workflow_dispatch:
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -134,8 +137,6 @@ jobs:
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
       UPX_REF_NAME: devel
-      # for upx.git top-level Makefile when building with clang/gcc:
-      UPX_CMAKE_BUILD_FLAGS: --verbose
       # for cmake:
       EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
       EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
@@ -221,7 +222,6 @@ jobs:
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
         shell: bash
         run: |
-          #N=upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${ZIG_TARGET}${ZIG_PIC}
           N=upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
           xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
@@ -244,7 +244,6 @@ jobs:
           if test -f /etc/alpine-release; then
             apk add '${{ matrix.qemu }}'
           else
-            export DEBIAN_FRONTEND=noninteractive
             sudo apt-get update && sudo apt-get upgrade -y
             sudo apt-get install -y --no-install-recommends qemu-user
           fi
@@ -300,7 +299,6 @@ jobs:
             # wine-8 can run win32 programs in wow64 mode under pure 64-bit Alpine Linux
             apk add wine
           else
-            export DEBIAN_FRONTEND=noninteractive
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo dpkg --add-architecture i386
             sudo apt-get update && sudo apt-get upgrade -y
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
@@ -365,8 +363,6 @@ jobs:
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
       UPX_REF_NAME: devel
-      # for upx.git top-level Makefile when building with clang/gcc:
-      UPX_CMAKE_BUILD_FLAGS: --verbose
       # for cmake:
       EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
       EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
