@@ -89,7 +89,8 @@ jobs:
           - { zig_target: i386-linux-gnu.2.7 }                # Ubuntu 8.04; REGRESSION: broken with zig llvm-16 update
           - { zig_target: i386-linux-gnu.2.36 }               # latest glibc version
           - { zig_target: i386-windows-gnu, wine: wine32 }
-          - { zig_target: i386-windows.xp-gnu, wine: wine32 }
+          # { zig_target: i386-windows.xp-gnu, wine: wine32 }     # does not work: libunwind needs AcquireSRWLockShared() (>= Windows Vista)
+          - { zig_target: i386-windows.vista-gnu, wine: wine32 }  # does not work: on i386 libunwind needs EnumProcessModules() (from PSABI_VERSION 2, i.e >= Windows 7)
           - { zig_target: i386-windows.win7-gnu, wine: wine32 }
           - { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
@@ -118,7 +119,8 @@ jobs:
           - { zig_target: x86_64-macos.12.0-none }
           - { zig_target: x86_64-macos.13.0-none }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
-          - { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
+          # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }     # does not work: libunwind needs AcquireSRWLockShared() (>= Windows Vista)
+          - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }  # works!
           - { zig_target: x86_64-windows.win7-gnu, wine: wine64 }
           # ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
