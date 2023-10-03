@@ -27,13 +27,22 @@ for actual build results and logs.
 And visit https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html
 for some background info about `zig cc`.
 
+Regressions
+===========
 
-Noteworthy open zig issues
-==========================
+- 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a
+  - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
+- 2023-10-02: 0.12.0-dev.706+62a0fbdae
+  - i386-windows.xp-gnu stopped building
+  - x86_64-windows.xp-gnu stopped building and working
+  - error is: `lib/libunwind/src/RWMutex.hpp:42:5: error: use of undeclared identifier 'AcquireSRWLockShared'`
+    - this is correct as this function was introduced in Windows Vista
+  - might be caused by https://github.com/ziglang/zig/commit/15ce9652525d
+    - but the real error might be in libunwind which probably should check _WIN32_WINNT
 
-- https://github.com/ziglang/zig/issues/6573  libc++ does not work on multi-threaded ARM yet
-  - https://reviews.llvm.org/D75183
-  - https://github.com/ziglang/zig/commit/3997828a6176
+Noteworthy zig issues
+=====================
+
 - https://github.com/ziglang/zig/issues/12886
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
 - https://github.com/ziglang/zig/issues/13385
@@ -51,3 +60,5 @@ Noteworthy changes that improve 'zig cc'
     - closes https://github.com/ziglang/zig/issues/12992 zig c++ does not support exceptions on macos
 - 2023-01-22 https://github.com/ziglang/zig/commit/aa626de
 - 2023-01-22 https://github.com/ziglang/zig/commit/8484df5 zig cc: add -Wno-overriding-t-option to clang on darwin
+- 2023-07-21 https://github.com/ziglang/zig/commit/8a18abf Remove the SingleThread limitation for ARM
+    - closes https://github.com/ziglang/zig/issues/6573
