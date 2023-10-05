@@ -42,6 +42,7 @@ Noteworthy zig issues
 Noteworthy changes that improve 'zig cc'
 ========================================
 
+- 2022-11-17 https://github.com/ziglang/zig/commit/88a0f3d windows: fix _tls_index
 - 2022-12-28 https://github.com/ziglang/zig/commit/7350f0d mingw: add missing vscprintf.c file
 - 2022-12-28 https://github.com/ziglang/zig/commit/34887cf powerpc does not have a red zone
   - TODO: but this seems **WRONG**:
