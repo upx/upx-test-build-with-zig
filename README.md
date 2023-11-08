@@ -33,6 +33,9 @@ Regressions
 - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a
   - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
 
+- 2023-10-24: 0.12.0-dev.1243+6bf554f9a
+  - `zig cc -c -fPIE` stopped working; possible cause: https://github.com/ziglang/zig/commit/aa76ca2
+
 Noteworthy zig issues
 =====================
 
