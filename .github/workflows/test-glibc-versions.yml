@@ -1,0 +1,152 @@
+# Copyright (C) Markus Franz Xaver Johannes Oberhumer
+# see also: zig targets | jq '.["libc"]'
+
+name: 'Test glibc versions'
+
+# info: run workflow manually from GitHub Actions web page
+on: [workflow_dispatch]
+
+env:
+  CMAKE_REQUIRED_QUIET: "OFF"
+  CTEST_OUTPUT_ON_FAILURE: "ON"
+  DEBIAN_FRONTEND: noninteractive
+  NO_COLOR: 1
+  UPX_CMAKE_BUILD_FLAGS: --verbose
+
+jobs:
+  job-build-on-linux:
+    # if: github.repository_owner == 'upx'
+    name: ${{ format('{0} / {1}', matrix.zig_target, matrix.zig_dist_version) }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        zig_target:
+          # i386-linux-gnu
+          - i386-linux-gnu.2.3.4                # RHEL 4
+          - i386-linux-gnu.2.5                  # RHEL 5
+          - i386-linux-gnu.2.7                  # Ubuntu 8.04 LTS
+          - i386-linux-gnu.2.11                 # SLES 11
+          - i386-linux-gnu.2.12                 # RHEL 6, manylinux2010
+          - i386-linux-gnu.2.17                 # RHEL 7, manylinux2014
+          - i386-linux-gnu.2.18                 # __cxa_thread_atexit_impl (needed for libc++ multithreading)
+          - i386-linux-gnu.2.24                 # Debian 9
+          - i386-linux-gnu.2.28                 # RHEL 8, Debian 10, manylinux_2_28
+          - i386-linux-gnu.2.38                 # latest glibc version supported by zig
+          # x86_64-linux-gnu
+          - x86_64-linux-gnu.2.3.4              # RHEL 4
+          - x86_64-linux-gnu.2.5                # RHEL 5
+          - x86_64-linux-gnu.2.7                # Ubuntu 8.04 LTS
+          - x86_64-linux-gnu.2.11               # SLES 11
+          - x86_64-linux-gnu.2.12               # RHEL 6, manylinux2010
+          - x86_64-linux-gnu.2.17               # RHEL 7, manylinux2014
+          - x86_64-linux-gnu.2.18               # __cxa_thread_atexit_impl (needed for libc++ multithreading)
+          - x86_64-linux-gnu.2.24               # Debian 9
+          - x86_64-linux-gnu.2.28               # RHEL 8, Debian 10, manylinux_2_28
+          - x86_64-linux-gnu.2.38               # latest glibc version supported by zig
+        zig_dist_version:
+          - 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7
+          - 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6
+          - 0.12.0-dev.1504+81219586b           # 2023-11-08 llvm-17.0.3
+
+    env:
+      ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
+      # for zig-cc wrapper scripts (see below):
+      CC: zig-cc
+      CXX: zig-cxx
+      ##ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO: enable this once other issues are fixed
+      ZIG_FLAGS: ${{ matrix.zig_flags }}
+      ZIG_PIC: ${{ matrix.zig_pic }}
+      ZIG_TARGET: ${{ matrix.zig_target }}
+      # for upx.git cloning:
+      UPX_REF_NAME: devel
+      # for cmake:
+      EXTRA_CMAKE_CONFIG_FLAGS:
+      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG:
+      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE:
+      # for running the basic tests
+      UPX: --no-color --no-progress
+      UPX_DEBUG_DISABLE_GITREV_WARNING: 1
+      UPX_DEBUG_DOCTEST_VERBOSE: 0
+
+    steps:
+      # note that ~/.local/bin is included in the default $PATH on Ubuntu
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
+        shell: bash
+        run: |
+          mkdir -p -v ~/.local/bin
+          cd ~/.local/bin
+          ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
+          wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          ls -l ${ZIG_DIST_NAME}.tar.xz
+          tar -xoJf ${ZIG_DIST_NAME}.tar.xz
+          rm ${ZIG_DIST_NAME}.tar.xz
+          ln -s -v ${ZIG_DIST_NAME}/zig zig
+          #echo "PATH=$PATH" && which zig
+          echo -n 'zig version: '; zig version
+          # create wrapper scripts (needed for CMake)
+          log=
+          log='set -x\n'
+          echo -e '#!/bin/sh\n'$log'exec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\n'$log'exec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\n'$log'exec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
+          chmod +x zig-ar zig-cc zig-cxx zig-ranlib
+          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+          # update ZIG_TARGET (i386 => x86)
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
+          echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
+          if [[ $ZIG_TARGET == *gnu.2.3.* ]]; then
+            # glibc-2.3.4: missing __stack_chk_fail
+            echo "EXTRA_CMAKE_CONFIG_FLAGS=-DUPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
+            echo "ZIG_FLAGS=$ZIG_FLAGS -fno-sanitize=all" >> $GITHUB_ENV
+          fi
+
+      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+        run: |
+          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx .
+          git submodule update --init
+          # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
+          rev=$(git rev-parse --short=7 HEAD)
+          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+
+      # CMAKE_AR needs to be an absolute file path; CMake bug?
+      - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          mkdir -p build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          cd       build/zig/${ZIG_TARGET}${ZIG_PIC}/release
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Release -DCMAKE_AR=$HOME/.local/bin/zig-ar DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS $EXTRA_CMAKE_CONFIG_FLAGS_RELEASE
+          cmake --build . --config Release --parallel --verbose
+          file ./upx*
+
+      - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        if: success() || failure() # run this step even if the previous step failed
+        run: |
+          mkdir -p build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          cd       build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
+          cmake ../../../.. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_AR=$HOME/.local/bin/zig-ar -DCMAKE_RANLIB=$HOME/.local/bin/zig-ranlib $EXTRA_CMAKE_CONFIG_FLAGS $EXTRA_CMAKE_CONFIG_FLAGS_DEBUG
+          cmake --build . --config Debug --parallel --verbose
+          file ./upx*
+
+      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+        shell: bash
+        run: |
+          N=$(echo "upx-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-zigcc-${{ matrix.zig_target }}${ZIG_PIC}--${ZIG_DIST_VERSION}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
+          xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
+          mkdir -p "tmp/artifact/$N/$xbuild"
+          (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
+          (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          # GitHub Actions magic: set "artifact_name" environment value for use in next step
+          echo "artifact_name=$N" >> $GITHUB_ENV
+
+      - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.artifact_name }}
+          path: tmp/artifact
+
+      - name: 'Run basic tests'
+        run: |
+          UPX_DEBUG_DOCTEST_VERBOSE= ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -v
+          make -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug test
+          make -C build/zig/${ZIG_TARGET}${ZIG_PIC}/release test
