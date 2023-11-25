@@ -33,8 +33,9 @@ Regressions
 - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a
   - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
 
-- 2023-10-24: 0.12.0-dev.1243+6bf554f9a
-  - `zig cc -c -fPIE` stopped working; possible cause: https://github.com/ziglang/zig/commit/aa76ca2
+- 2023-11-14: 0.12.0-dev.1606+569182dbb
+  - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
+
 
 Noteworthy zig issues
 =====================
@@ -69,3 +70,4 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/12886
 - https://github.com/ziglang/zig/issues/12992
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
+- https://github.com/ziglang/zig/issues/17928 zig cc -c -fPIE stopped working

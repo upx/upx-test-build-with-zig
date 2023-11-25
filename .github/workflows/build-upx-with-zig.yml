@@ -18,8 +18,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2023-11-14
-  ZIG_DIST_VERSION: 0.12.0-dev.1606+569182dbb
+  # 2023-11-24
+  ZIG_DIST_VERSION: 0.12.0-dev.1717+54f4abae2
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -74,8 +74,8 @@ jobs:
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Westmere }
-          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Westmere, zig_pic: -fPIE }
+          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Nehalem }
+          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Nehalem, zig_pic: -fPIE }
           # other
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64-macos-none }
