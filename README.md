@@ -30,8 +30,14 @@ for some background info about `zig cc`.
 Regressions
 ===========
 
+- 2023-04-09: 0.11.0-dev.2470+c22a30ac9
+  - glibc-2.7 and glibc-2.11 targets stopped working
+  - 0.11.0-dev.2401+348751462 works
+  - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
+
 - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a
   - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
+  - 0.11.0-dev.3301+230ea411f works
 
 - 2023-11-14: 0.12.0-dev.1606+569182dbb
   - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
