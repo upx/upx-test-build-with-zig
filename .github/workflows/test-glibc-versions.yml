@@ -24,7 +24,7 @@ jobs:
         zig_target:
           # i386-linux-gnu
           - i386-linux-gnu.2.3.4                # RHEL 4
-          - i386-linux-gnu.2.5                  # RHEL 5
+          - i386-linux-gnu.2.5                  # RHEL 5, manylinux1
           - i386-linux-gnu.2.7                  # Ubuntu 8.04 LTS
           - i386-linux-gnu.2.11                 # SLES 11
           - i386-linux-gnu.2.12                 # RHEL 6, manylinux2010
@@ -36,7 +36,7 @@ jobs:
           - i386-linux-gnu.2.38                 # latest glibc version supported by zig
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.4              # RHEL 4
-          - x86_64-linux-gnu.2.5                # RHEL 5
+          - x86_64-linux-gnu.2.5                # RHEL 5, manylinux1
           - x86_64-linux-gnu.2.7                # Ubuntu 8.04 LTS
           - x86_64-linux-gnu.2.11               # SLES 11
           - x86_64-linux-gnu.2.12               # RHEL 6, manylinux2010
