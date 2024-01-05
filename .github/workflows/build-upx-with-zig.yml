@@ -18,8 +18,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2023-12-30
-  ZIG_DIST_VERSION: 0.12.0-dev.1859+27d4bf753
+  # 2024-01-04
+  ZIG_DIST_VERSION: 0.12.0-dev.2036+fc79b22a9
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -157,9 +157,8 @@ jobs:
       # for upx.git cloning:
       UPX_REF_NAME: devel
       # for cmake:
-      # NOTE: disable sanitize until https://github.com/ziglang/zig/issues/18009 is fixed
-      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }} -DUPX_CONFIG_DISABLE_SANITIZE=1
-      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }} -DUPX_CONFIG_DISABLE_SANITIZE=1
+      EXTRA_CMAKE_CONFIG_FLAGS_DEBUG: ${{ matrix.cmake }} ${{ matrix.cmake_debug }}
+      EXTRA_CMAKE_CONFIG_FLAGS_RELEASE: ${{ matrix.cmake }} ${{ matrix.cmake_release }}
       # for running the basic tests under QEMU/Wine:
       UPX: --no-color --no-progress
       UPX_DEBUG_DISABLE_GITREV_WARNING: 1
