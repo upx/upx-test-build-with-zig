@@ -34,17 +34,15 @@ Regressions
   - glibc-2.7 and glibc-2.11 targets stopped working
   - 0.11.0-dev.2401+348751462 works
   - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
+  - also see below: 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0
 
 - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a
   - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
   - 0.11.0-dev.3301+230ea411f works
 
-- 2023-11-14: 0.12.0-dev.1606+569182dbb
-  - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
 
-
-Noteworthy zig issues
-=====================
+Noteworthy open zig issues
+==========================
 
 - https://github.com/ziglang/zig/issues/13385
 
@@ -64,10 +62,17 @@ Noteworthy changes that improve 'zig cc'
 - 2023-01-22 https://github.com/ziglang/zig/commit/8484df5 zig cc: add -Wno-overriding-t-option to clang on darwin
 - 2023-07-21 https://github.com/ziglang/zig/commit/8a18abf Remove the SingleThread limitation for ARM
     - closes https://github.com/ziglang/zig/issues/6573
+
+
+Other noteworthy changes
+========================
+
 - 2023-10-02 https://github.com/ziglang/zig/commit/15ce965 define _WIN32_WINNT based on target
   - TODO: reveals that libunwind cannot be compiled for XP and Vista (i386 only)
     - libunwind needs AcquireSRWLockShared() (>= Windows Vista aka Windows 6)
     - on i386 libunwind also needs EnumProcessModules() (from PSABI_VERSION 2, i.e >= Windows 7)
+- 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0 minimum required glibc is v2.17
+
 
 Closed zig issues
 =================
@@ -77,3 +82,4 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/12992
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
 - https://github.com/ziglang/zig/issues/17928 zig cc -c -fPIE stopped working
+- https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
