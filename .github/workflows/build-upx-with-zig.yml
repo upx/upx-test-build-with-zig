@@ -18,8 +18,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2024-01-05
-  ZIG_DIST_VERSION: 0.12.0-dev.2043+6ebeb85ab
+  # 2024-01-06
+  ZIG_DIST_VERSION: 0.12.0-dev.2059+42389cb9c
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
