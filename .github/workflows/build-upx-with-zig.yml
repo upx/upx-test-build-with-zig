@@ -18,8 +18,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2024-01-25
-  ZIG_DIST_VERSION: 0.12.0-dev.2341+92211135f
+  # 2024-02-01
+  ZIG_DIST_VERSION: 0.12.0-dev.2536+788a0409a
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -99,9 +99,9 @@ jobs:
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7
           - { zig_target: i386-linux-gnu.2.38 }                     # latest glibc version supported by zig
           - { zig_target: i386-windows-gnu, wine: wine32 }
-          # { zig_target: i386-windows.xp-gnu, wine: wine32 }       # libunwind does not compile; see README
-          - { zig_target: i386-windows.vista-gnu, wine: wine32 }    # libunwind does not compile on i386; see README
           - { zig_target: i386-windows.win7-gnu, wine: wine32 }
+          - { zig_target: i386-windows.win8-gnu, wine: wine32 }
+          - { zig_target: i386-windows.win10-gnu, wine: wine32 }
           - { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
@@ -136,9 +136,9 @@ jobs:
           - { zig_target: x86_64-macos.12.0-none }
           - { zig_target: x86_64-macos.13.0-none }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
-          # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }     # libunwind does not compile; see README
-          - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }  # works!
           - { zig_target: x86_64-windows.win7-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.win8-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
           # ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
           - { zig_target: mips64el-linux-gnuabin32 }

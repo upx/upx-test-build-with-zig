@@ -27,24 +27,14 @@ for actual build results and logs.
 And visit https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html
 for some background info about `zig cc`.
 
-Regressions
-===========
-
-- 2023-04-09: 0.11.0-dev.2470+c22a30ac9
-  - glibc-2.7 and glibc-2.11 targets stopped working
-  - 0.11.0-dev.2401+348751462 works
-  - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
-  - also see below: 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0
-
-- 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a
-  - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
-  - 0.11.0-dev.3301+230ea411f works
-
 
 Noteworthy open zig issues
 ==========================
 
+- https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
 - https://github.com/ziglang/zig/issues/13385
+- https://github.com/ziglang/zig/issues/18690
+- TODO: libcxx should be upgraded from 17.0.0 to 17.0.6
 
 
 Noteworthy changes that improve 'zig cc'
@@ -67,11 +57,24 @@ Noteworthy changes that improve 'zig cc'
 Other noteworthy changes
 ========================
 
-- 2023-10-02 https://github.com/ziglang/zig/commit/15ce965 define _WIN32_WINNT based on target
-  - TODO: reveals that libunwind cannot be compiled for XP and Vista (i386 only)
+- glibc issues
+  - 2023-04-09: 0.11.0-dev.2470+c22a30ac9 glibc-2.7 and glibc-2.11 targets stopped working
+    - 0.11.0-dev.2401+348751462 works
+  - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
+  - 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0 minimum required glibc is v2.17
+  - 2024-01-xx: glibc-2.7 and glibc-2.11 work again
+
+- mips64-linux-gnuabin32 and mips64el-linux-gnuabin32
+  - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
+    - 0.11.0-dev.3301+230ea411f works
+  - 2024-01-06: 0.12.0-dev.2059+42389cb9c now works again
+
+- older Windows versions (XP and Vista)
+  - 2023-10-02 https://github.com/ziglang/zig/commit/15ce965 define _WIN32_WINNT based on target
+  - INFO: reveals that libunwind cannot be compiled for XP and Vista (i386 only)
     - libunwind needs AcquireSRWLockShared() (>= Windows Vista aka Windows 6)
     - on i386 libunwind also needs EnumProcessModules() (from PSABI_VERSION 2, i.e >= Windows 7)
-- 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0 minimum required glibc is v2.17
+  - 2024-01-xx: zig now targets `ucrt` instead of `msvcrt`, so Windows 7 is required anyway
 
 
 Closed zig issues
