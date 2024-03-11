@@ -33,7 +33,8 @@ Noteworthy open zig issues
 
 - https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
 - https://github.com/ziglang/zig/issues/13385
-- https://github.com/ziglang/zig/issues/18690
+- https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
+- https://github.com/ziglang/zig/issues/19206 zig cc -target x86_64-macos-none stopped working
 - TODO: libcxx should be upgraded from 17.0.0 to 17.0.6
 
 
