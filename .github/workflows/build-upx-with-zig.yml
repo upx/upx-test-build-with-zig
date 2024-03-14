@@ -1,7 +1,7 @@
 # Copyright (C) Markus Franz Xaver Johannes Oberhumer
 # see also: zig targets | jq '.["libc"]'
 
-# 100 build-on-linux targets (jobs)
+# 102 build-on-linux targets (jobs)
 #   4 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform some basic runtime tests using QEMU.
@@ -18,8 +18,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2024-03-12
-  ZIG_DIST_VERSION: 0.12.0-dev.3247+26e895e3d
+  # 2024-03-14
+  ZIG_DIST_VERSION: 0.12.0-dev.3291+17bad9f88
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -426,7 +426,7 @@ jobs:
         if: ${{ matrix.zig_target == 'x86_64-macos-none' }} # only do this once per Action
         run: |
           # disable packing macOS binaries for now (in Release mode)
-          make build/extra/clang/release ## && make -C build/extra/clang/release test
+          make build/extra/clang/release UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON && make -C build/extra/clang/release test
           make build/extra/clang/debug   && make -C build/extra/clang/debug test
 
       # CMAKE_AR needs to be an absolute file path; CMake bug?
@@ -451,7 +451,7 @@ jobs:
           N=upx-zigcc-macos-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
           xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
           mkdir -p "tmp/artifact/$N/$xbuild"
-          (cd build && shopt -s nullglob && rsync -R -a */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild/")
+          (cd build && shopt -s nullglob && rsync -R -a */upx* */*/*/upx* "../tmp/artifact/$N/$xbuild/")
           (cd tmp/artifact && gtar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
           # GitHub Actions magic: set "artifact_name" environment value for use in next step
           echo "artifact_name=$N" >> $GITHUB_ENV

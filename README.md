@@ -19,7 +19,7 @@ This repository consists of a single
 that builds
 [UPX](https://github.com/upx/upx) with a recent
 [Zig binary](https://ziglang.org/download/)
-testing 104 different build targets.
+testing 106 different build targets.
 
 See [Actions](https://github.com/upx/upx-test-build-with-zig/actions)
 for actual build results and logs.
@@ -32,6 +32,8 @@ Noteworthy open zig issues
 ==========================
 
 - https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
+  - this means that Windows currently cannot use multi-threading; major blocker
+  - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/13385
 - https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
 - https://github.com/ziglang/zig/issues/19206 zig cc -target x86_64-macos-none stopped working
