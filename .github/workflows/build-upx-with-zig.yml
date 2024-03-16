@@ -2,7 +2,7 @@
 # see also: zig targets | jq '.["libc"]'
 
 # 102 build-on-linux targets (jobs)
-#   4 build-on-macos targets (jobs)
+#  10 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform some basic runtime tests using QEMU.
 # All i386-windows and x86_64-windows targets also perform some basic
@@ -19,7 +19,7 @@ env:
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
   # 2024-03-16
-  ZIG_DIST_VERSION: 0.12.0-dev.3322+a4508ad71
+  ZIG_DIST_VERSION: 0.12.0-dev.3328+5cd7fef17
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
