@@ -1,0 +1,136 @@
+# Copyright (C) Markus Franz Xaver Johannes Oberhumer
+
+# test macos, see https://github.com/ziglang/zig/issues/19206
+
+name: 'Test macOS'
+
+# info: run workflow manually from GitHub Actions web page
+on: [workflow_dispatch]
+
+env:
+  CMAKE_REQUIRED_QUIET: "OFF"
+  CTEST_OUTPUT_ON_FAILURE: "ON"
+  DEBIAN_FRONTEND: noninteractive
+  NO_COLOR: 1
+  UPX_CMAKE_BUILD_FLAGS: --verbose
+  # 2024-03-16
+  ZIG_DIST_VERSION: 0.12.0-dev.3322+a4508ad71
+
+jobs:
+  job-build-on-macos:
+    if: github.repository_owner == 'upx'
+    name: ${{ format('{0} {1} {2}', matrix.os, matrix.zig_target, matrix.zig_pic) }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-11, zig_target: x86_64-macos-none }
+          - { os: macos-11, zig_target: x86_64-macos.11.0-none }
+          - { os: macos-12, zig_target: x86_64-macos-none }
+          - { os: macos-12, zig_target: x86_64-macos.11.0-none }
+          - { os: macos-13, zig_target: x86_64-macos-none }
+          - { os: macos-13, zig_target: x86_64-macos.11.0-none }
+          - { os: macos-14, zig_target: x86_64-macos-none }
+          - { os: macos-14, zig_target: x86_64-macos.11.0-none }
+          - { os: macos-14, zig_target: aarch64-macos-none }
+          - { os: macos-14, zig_target: aarch64-macos.11.0-none }
+
+    env:
+      # for zig-cc wrapper scripts (see below):
+      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # (enabled on macOS by default)
+      ZIG_FLAGS: ${{ matrix.zig_flags }}
+      ZIG_PIC: ${{ matrix.zig_pic }}
+      ZIG_TARGET: ${{ matrix.zig_target }}
+      # for upx.git cloning:
+      UPX_REF_NAME: devel
+      # for running the basic tests:
+      UPX: --no-color --no-progress
+      UPX_DEBUG_DISABLE_GITREV_WARNING: 1
+      UPX_DEBUG_DOCTEST_VERBOSE: 0
+      # misc
+      BUILD_SUBDIR: zig-on-${{ matrix.os }}
+
+    steps:
+      # note that ~/bin is included in the default $PATH on macOS-11 and macOS-12
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
+        run: |
+          uname -a; pwd; id; umask
+          mkdir -p -v ~/bin
+          cd ~/bin
+          ZIG_DIST_NAME=zig-macos-aarch64-${ZIG_DIST_VERSION}
+          case ${{ matrix.os }} in
+            *-1[0-3]) ZIG_DIST_NAME=zig-macos-x86_64-${ZIG_DIST_VERSION} ;;
+          esac
+          wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          ls -l ${ZIG_DIST_NAME}.tar.xz
+          tar -xoJf ${ZIG_DIST_NAME}.tar.xz
+          rm ${ZIG_DIST_NAME}.tar.xz
+          ln -s -v ${ZIG_DIST_NAME}/zig zig
+          #echo "PATH=$PATH" && which zig
+          echo -n 'zig version: '; zig version
+          # create wrapper scripts (needed for CMake)
+          echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\nexec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\nexec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
+          chmod +x zig-ar zig-cc zig-cxx zig-ranlib
+          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+
+      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+        run: |
+          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx .
+          git submodule update --init
+          # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
+          rev=$(git rev-parse --short=7 HEAD)
+          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+          #
+          case "${{ matrix.os }}" in
+          macos-11 | macos-12) echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV ;;
+          # FIXME: UPX on macos-13+ is broken => disable self-test for now
+          macos-13 | macos-14) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
+          esac
+
+      - name: 'Build with local clang'
+        if: ${{ endsWith(matrix.zig_target,'-macos-none') }} # only do this once per Action
+        run: |
+          make build/extra/clang/release && make -C build/extra/clang/release test
+          make build/extra/clang/debug   && make -C build/extra/clang/debug test
+
+      - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          make UPX_XTARGET=$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC} xtarget/release \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/bin/zig-ar" CMAKE_RANLIB="$HOME/bin/zig-ranlib"
+          file build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release/upx*
+
+      - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          make UPX_XTARGET=$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC} xtarget/debug \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/bin/zig-ar" CMAKE_RANLIB="$HOME/bin/zig-ranlib"
+          file build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug/upx*
+
+      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+        run: |
+          N=upx-zigcc-${{ matrix.os }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}
+          xbuild=build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}
+          mkdir -p "tmp/artifact/$N/$xbuild"
+          (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
+          (cd tmp/artifact && gtar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          # GitHub Actions magic: set "artifact_name" environment value for use in next step
+          echo "artifact_name=$N" >> $GITHUB_ENV
+
+      - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.artifact_name }}
+          path: tmp/artifact
+
+      - name: 'Run basic tests - Release'
+        run: |
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short
+          cmake --build build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release --target test
+
+      - name: 'Run basic tests - Debug'
+        run: |
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug/upx --version-short
+          cmake --build build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug --target test
