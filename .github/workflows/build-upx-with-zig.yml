@@ -1,7 +1,7 @@
 # Copyright (C) Markus Franz Xaver Johannes Oberhumer
 # see also: zig targets | jq '.["libc"]'
 
-# 102 build-on-linux targets (jobs)
+# 106 build-on-linux targets (jobs)
 #  10 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform some basic runtime tests using QEMU.
@@ -18,8 +18,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2024-03-17
-  ZIG_DIST_VERSION: 0.12.0-dev.3336+dbb11915b
+  # 2024-03-18
+  ZIG_DIST_VERSION: 0.12.0-dev.3352+95cb93944
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -131,10 +131,14 @@ jobs:
           - { zig_target: aarch64-windows-gnu }
           - { zig_target: arm-windows-gnu }
           - { zig_target: i386-windows-gnu, wine: wine32 }
+          - { zig_target: i386-windows.xp-gnu, wine: wine32 }
+          - { zig_target: i386-windows.vista-gnu, wine: wine32 }
           - { zig_target: i386-windows.win7-gnu, wine: wine32 }
           - { zig_target: i386-windows.win8-gnu, wine: wine32 }
           - { zig_target: i386-windows.win10-gnu, wine: wine32 }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win7-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win8-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
@@ -148,7 +152,7 @@ jobs:
           - { zig_target: x86_64-macos.12.0-none }
           - { zig_target: x86_64-macos.13.0-none }
           # special
-          - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, cmake: -DUPX_CONFIG_DISABLE_SANITIZE=1 }
+          - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON' }
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -213,6 +217,8 @@ jobs:
           # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
           rev=$(git rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+          set -x
+          test -z "${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" || echo "UPX_CONFIG_DISABLE_SANITIZE=${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" >> $GITHUB_ENV
 
       - name: 'Build with local clang and gcc'
         if: ${{ matrix.zig_target == 'x86_64-linux-gnu' }} # only do this once per Action
@@ -412,10 +418,12 @@ jobs:
           #echo "PATH=$PATH" && which zig
           echo -n 'zig version: '; zig version
           # create wrapper scripts (needed for CMake)
-          echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
-          echo -e '#!/bin/sh\nexec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
-          echo -e '#!/bin/sh\nexec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
-          echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
+          log=
+          log='set -x\n'
+          echo -e '#!/bin/sh\n'$log'exec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\n'$log'exec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\n'$log'exec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
 

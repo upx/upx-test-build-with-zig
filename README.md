@@ -19,7 +19,7 @@ This repository consists of a single
 that builds
 [UPX](https://github.com/upx/upx) with a recent
 [Zig binary](https://ziglang.org/download/)
-testing 112 different build targets.
+testing 116 different build targets.
 
 See [Actions](https://github.com/upx/upx-test-build-with-zig/actions)
 for actual build results and logs.
@@ -65,7 +65,7 @@ Other noteworthy changes
   - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
   - 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0 minimum required glibc is v2.17
   - 2024-01-xx: glibc-2.7 and glibc-2.11 work again
-  - 2024-03-xx: glibc-2.7 and glibc-2.11 are broken again; TODO: submit my glibc <features.h> patch
+  - 2024-03-xx: glibc-2.7 and glibc-2.11 are broken again; TODO: submit my glibc `<features.h>` patch
 
 - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32
   - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
@@ -75,9 +75,10 @@ Other noteworthy changes
 - older Windows versions (XP and Vista)
   - 2023-10-02 https://github.com/ziglang/zig/commit/15ce965 define _WIN32_WINNT based on target
     - INFO: this reveals that libunwind cannot be compiled for XP and Vista (i386 only)
-      - libunwind needs AcquireSRWLockShared() (>= Windows Vista aka Windows 6)
-      - on i386 libunwind also needs EnumProcessModules() (from PSABI_VERSION 2, i.e >= Windows 7)
+      - libunwind needs `AcquireSRWLockShared()` (>= Windows Vista aka Windows 6)
+      - on i386 libunwind also needs `EnumProcessModules()` from PSABI_VERSION 2, i.e >= Windows 7
   - 2024-01-xx: zig now targets `ucrt` instead of `msvcrt`, so Windows 7 is required anyway
+    - TODO: is this true?
 
 
 Closed zig issues
