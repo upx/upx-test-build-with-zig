@@ -29,12 +29,16 @@ jobs:
           - { os: macos-11, zig_target: x86_64-macos.11.0-none }
           - { os: macos-12, zig_target: x86_64-macos-none }
           - { os: macos-12, zig_target: x86_64-macos.11.0-none }
+          - { os: macos-12, zig_target: x86_64-macos.12.0-none }
+          - { os: macos-12, zig_target: x86_64-macos.13.0-none }
           - { os: macos-13, zig_target: x86_64-macos-none }
           - { os: macos-13, zig_target: x86_64-macos.11.0-none }
           - { os: macos-14, zig_target: x86_64-macos-none }
           - { os: macos-14, zig_target: x86_64-macos.11.0-none }
           - { os: macos-14, zig_target: aarch64-macos-none }
           - { os: macos-14, zig_target: aarch64-macos.11.0-none }
+          - { os: macos-14, zig_target: aarch64-macos.12.0-none }
+          - { os: macos-14, zig_target: aarch64-macos.13.0-none }
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -70,10 +74,12 @@ jobs:
           #echo "PATH=$PATH" && which zig
           echo -n 'zig version: '; zig version
           # create wrapper scripts (needed for CMake)
-          echo -e '#!/bin/sh\nexec zig ar "$@"' > zig-ar
-          echo -e '#!/bin/sh\nexec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
-          echo -e '#!/bin/sh\nexec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
-          echo -e '#!/bin/sh\nexec zig ranlib "$@"' > zig-ranlib
+          log=
+          log='set -x\n'
+          echo -e '#!/bin/sh\n'$log'exec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\n'$log'exec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\n'$log'exec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
 
@@ -86,9 +92,9 @@ jobs:
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
           #
           case "${{ matrix.os }}" in
-          macos-11 | macos-12) echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV ;;
-          # FIXME: UPX on macos-13+ is broken => disable self-test for now
-          macos-13 | macos-14) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
+            macos-11 | macos-12) echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV ;;
+            # FIXME: UPX on macos-13+ is broken => disable self-test for now
+            macos-13 | macos-14) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
           esac
 
       - name: 'Build with local clang'

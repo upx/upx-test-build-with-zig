@@ -35,7 +35,6 @@ Noteworthy open zig issues
   - this means that Windows currently cannot use multi-threading; **major blocker**
   - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/13385
-- https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
 - TODO: libcxx should be upgraded from 17.0.0 to 17.0.6
 
 
@@ -90,4 +89,5 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
 - https://github.com/ziglang/zig/issues/17928 zig cc -c -fPIE stopped working
 - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
+- https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
 - https://github.com/ziglang/zig/issues/19206 zig cc -target x86_64-macos-none stopped working
