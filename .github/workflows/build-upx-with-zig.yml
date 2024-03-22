@@ -19,7 +19,7 @@ env:
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
   # 2024-03-22
-  ZIG_DIST_VERSION: 0.12.0-dev.3403+b5cef9e8b
+  ZIG_DIST_VERSION: 0.12.0-dev.3405+31791ae15
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -210,11 +210,11 @@ jobs:
           # update ZIG_TARGET (i386 => x86)
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
-          # -fPIE is for compilation only; also use the correct linker flags
-          # TODO: DO WE NEED THIS ??
-          #if [[ $ZIG_PIC == "-fPIE" ]]; then true;
-          #  echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
-          #fi
+          # -fPIE is for compilation only => also use the correct linker flag "-pie"
+          # TODO: do we actually need this with the zig driver?
+          if [[ $ZIG_PIC == "-fPIE" ]]; then true;
+            echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
+          fi
           # patch glibc <features.h>
           cd ${ZIG_DIST_NAME}/lib/libc/include/generic-glibc
           md5sum features.h
