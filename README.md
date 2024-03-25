@@ -35,7 +35,9 @@ Noteworthy open zig issues
   - this means that Windows currently cannot use multi-threading; **major blocker**
   - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/13385
+- https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
 - TODO: libcxx should be upgraded from 17.0.0 to 17.0.6
+- TODO: musl libc should be upgraded from 1.2.4 to 1.2.5
 
 
 Noteworthy changes that did improve 'zig cc'
