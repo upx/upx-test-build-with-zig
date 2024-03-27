@@ -61,8 +61,8 @@ jobs:
         zig_dist_version:
           # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
           # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
-          # 2024-03-25 llvm-17.0.6; current llvm-17
-          - 0.12.0-dev.3437+af0668d6c
+          # 2024-03-27 llvm-17.0.6; current llvm-17
+          - 0.12.0-dev.3457+341857e5c
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
@@ -114,11 +114,6 @@ jobs:
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
             echo "ZIG_FLAGS=$ZIG_FLAGS -fno-sanitize=all" >> $GITHUB_ENV
           fi
-          # patch glibc <features.h>
-          cd ${ZIG_DIST_NAME}/lib/libc/include/generic-glibc
-          mv features.h features.h.ORIG
-          wget -q https://raw.githubusercontent.com/markus-oberhumer-forks/ziglang--zig/improve-old-glibc-versions/lib/libc/include/generic-glibc/features.h
-          md5sum features.h*
 
       - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
         run: |

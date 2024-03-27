@@ -19,8 +19,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2024-03-25
-  ZIG_DIST_VERSION: 0.12.0-dev.3438+5c628312b
+  # 2024-03-27
+  ZIG_DIST_VERSION: 0.12.0-dev.3457+341857e5c
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -219,11 +219,6 @@ jobs:
           if [[ $ZIG_PIC == "-fPIE" ]]; then true;
             echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
           fi
-          # patch glibc <features.h>
-          cd ${ZIG_DIST_NAME}/lib/libc/include/generic-glibc
-          mv features.h features.h.ORIG
-          wget -q https://raw.githubusercontent.com/markus-oberhumer-forks/ziglang--zig/improve-old-glibc-versions/lib/libc/include/generic-glibc/features.h
-          md5sum features.h*
 
       - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
         run: |

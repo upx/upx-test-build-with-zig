@@ -35,9 +35,8 @@ Noteworthy open zig issues
   - this means that Windows currently cannot use multi-threading; **major blocker**
   - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/13385
-- https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
-- TODO: libcxx should be upgraded from 17.0.0 to 17.0.6
-- TODO: musl libc should be upgraded from 1.2.4 to 1.2.5
+- TODO zig: libcxx should be upgraded from 17.0.0 to 17.0.6
+- TODO zig: musl libc should be upgraded from 1.2.4 to 1.2.5
 
 
 Noteworthy changes that did improve 'zig cc'
@@ -66,7 +65,7 @@ Other noteworthy changes
   - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
   - 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0 minimum required glibc is v2.17
   - 2024-01-xx: glibc-2.7 and glibc-2.11 work again
-  - 2024-03-xx: glibc-2.7 and glibc-2.11 are broken again; TODO: submit my glibc `<features.h>` patch
+  - 2024-03-26: https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
 
 - mips64-linux-gnuabin32 and mips64el-linux-gnuabin32
   - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
