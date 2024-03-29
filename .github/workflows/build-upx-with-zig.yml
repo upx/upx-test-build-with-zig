@@ -19,8 +19,8 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
-  # 2024-03-27
-  ZIG_DIST_VERSION: 0.12.0-dev.3457+341857e5c
+  # 2024-03-29
+  ZIG_DIST_VERSION: 0.12.0-dev.3489+c808e546a
 
 # NOTE: we could work-around some failing builds by adding extra compilation
 # flags, but the point of this test repository is to ensure that zig-cc
@@ -64,8 +64,9 @@ jobs:
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
-          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
-          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
+          # powerpc64: obscure problem with C++ exceptions in UPX doctest checks when *NOT* using -fstack-protector
+          - { zig_target: powerpc64-linux-musl, zig_flags: -fstack-protector, qemu: qemu-ppc64 }
+          - { zig_target: powerpc64-linux-musl, zig_flags: -fstack-protector, qemu: qemu-ppc64, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
@@ -76,8 +77,8 @@ jobs:
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Nehalem }
-          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, qemu_flags: -cpu Nehalem, zig_pic: -fPIE }
+          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 }
+          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIE }
           # linux-gnu (glibc)
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64_be-linux-gnu }
@@ -272,8 +273,9 @@ jobs:
         shell: bash
         run: |
           uname -a; pwd; id; umask
+          qemu='${{ matrix.qemu }}'
           if test -f /etc/alpine-release; then
-            apk add '${{ matrix.qemu }}'
+            apk add "${qemu%% *}"
           else
             sudo apt-get update && sudo apt-get upgrade -y
             sudo apt-get install -y --no-install-recommends qemu-user
@@ -286,7 +288,7 @@ jobs:
           set -ex -o pipefail
           cd build/zig/${ZIG_TARGET}${ZIG_PIC}/release
           file ./upx
-          qemu='${{ matrix.qemu }} ${{ matrix.qemu_flags }}'
+          qemu='${{ matrix.qemu }}'
           tt='${{ matrix.tt }}'
           [[ $tt == UPX-BUG ]] && tt=/bin/bash
           [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
@@ -307,7 +309,7 @@ jobs:
           set -ex -o pipefail
           cd build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
           file ./upx
-          qemu='${{ matrix.qemu }} ${{ matrix.qemu_flags }}'
+          qemu='${{ matrix.qemu }}'
           tt='${{ matrix.tt }}'
           [[ $tt == UPX-BUG ]] && tt=/bin/bash
           [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
