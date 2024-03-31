@@ -12,6 +12,9 @@ env:
   DEBIAN_FRONTEND: noninteractive
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
+  UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
+  UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
+  UPX_DEBUG_TEST_LIBC_QSORT: 1
 
 jobs:
   job-build-on-linux:
@@ -61,8 +64,8 @@ jobs:
         zig_dist_version:
           # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
           # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
-          # 2024-03-27 llvm-17.0.6; current llvm-17
-          - 0.12.0-dev.3457+341857e5c
+          # 2024-03-30 llvm-17.0.6; current llvm-17
+          - 0.12.0-dev.3496+a2df84d0f
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
