@@ -45,7 +45,7 @@ Noteworthy changes that did improve 'zig cc'
 - 2022-11-17 https://github.com/ziglang/zig/commit/88a0f3d windows: fix _tls_index
 - 2022-12-28 https://github.com/ziglang/zig/commit/7350f0d mingw: add missing vscprintf.c file
 - 2022-12-28 https://github.com/ziglang/zig/commit/34887cf powerpc does not have a red zone
-  - TODO: but this seems **WRONG**:
+  - TODO: this seems **WRONG** (but is probably harmless):
     - see https://github.com/torvalds/linux/commit/573ebfa6601f
     - see https://github.com/llvm/llvm-project/commit/660b0d7f7bba
 - 2023-01-21 https://github.com/ziglang/zig/pull/14397
@@ -78,7 +78,7 @@ Other noteworthy changes
       - libunwind needs `AcquireSRWLockShared()` (>= Windows Vista aka Windows 6)
       - on i386 libunwind also needs `EnumProcessModules()` from PSABI_VERSION 2, i.e >= Windows 7
   - 2024-01-xx: zig now targets `ucrt` instead of `msvcrt`, so Windows 7 is required anyway
-    - TODO: is this true?
+    - TODO: is this really true?
 
 
 Closed zig issues
