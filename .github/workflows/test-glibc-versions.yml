@@ -31,7 +31,7 @@ jobs:
           - i386-linux-gnu.2.4                  #
           - i386-linux-gnu.2.5                  # RHEL 5, manylinux1
           - i386-linux-gnu.2.7                  # Ubuntu 8.04 LTS
-          - i386-linux-gnu.2.11                 # SLES 11
+          - i386-linux-gnu.2.11                 # SLES 11, Fedora 12
           - i386-linux-gnu.2.12                 # RHEL 6, manylinux2010
           - i386-linux-gnu.2.15                 #
           - i386-linux-gnu.2.16                 # aligned_alloc()
@@ -49,7 +49,7 @@ jobs:
           - x86_64-linux-gnu.2.4                #
           - x86_64-linux-gnu.2.5                # RHEL 5, manylinux1
           - x86_64-linux-gnu.2.7                # Ubuntu 8.04 LTS
-          - x86_64-linux-gnu.2.11               # SLES 11
+          - x86_64-linux-gnu.2.11               # SLES 11, Fedora 12
           - x86_64-linux-gnu.2.12               # RHEL 6, manylinux2010
           - x86_64-linux-gnu.2.15               #
           - x86_64-linux-gnu.2.16               # aligned_alloc()
