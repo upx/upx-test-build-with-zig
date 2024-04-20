@@ -15,8 +15,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-04-19
-  ZIG_DIST_VERSION: 0.12.0-dev.3686+3adfaf91f
+  # 2024-04-20
+  ZIG_DIST_VERSION: 0.12.0
 
 jobs:
   job-build-on-macos:
