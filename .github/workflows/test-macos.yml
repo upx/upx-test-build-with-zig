@@ -32,11 +32,14 @@ jobs:
           - { os: macos-12, zig_target: x86_64-macos-none }
           - { os: macos-12, zig_target: x86_64-macos.11.0-none }
           - { os: macos-12, zig_target: x86_64-macos.12.0-none }
-          - { os: macos-12, zig_target: x86_64-macos.13.0-none }
           - { os: macos-13, zig_target: x86_64-macos-none }
           - { os: macos-13, zig_target: x86_64-macos.11.0-none }
+          - { os: macos-13, zig_target: x86_64-macos.12.0-none }
+          - { os: macos-13, zig_target: x86_64-macos.13.0-none }
           - { os: macos-14, zig_target: x86_64-macos-none }         # does not work??
           - { os: macos-14, zig_target: x86_64-macos.11.0-none }    # does not work??
+          - { os: macos-14, zig_target: x86_64-macos.12.0-none }    # does not work??
+          - { os: macos-14, zig_target: x86_64-macos.13.0-none }    # does not work??
           - { os: macos-14, zig_target: aarch64-macos-none }
           - { os: macos-14, zig_target: aarch64-macos.11.0-none }
           - { os: macos-14, zig_target: aarch64-macos.12.0-none }
@@ -134,12 +137,12 @@ jobs:
           name: ${{ env.artifact_name }}
           path: tmp/artifact
 
-      - name: 'Run basic tests - Release'
+      - name: 'Run ctest tests - Release'
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short
-          cmake --build build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release --target test
+          (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release && ctest)
 
-      - name: 'Run basic tests - Debug'
+      - name: 'Run ctest tests - Debug'
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug/upx --version-short
-          cmake --build build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug --target test
+          (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug && ctest)

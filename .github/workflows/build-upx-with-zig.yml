@@ -1,8 +1,9 @@
 # Copyright (C) Markus Franz Xaver Johannes Oberhumer
-# see also: zig targets | jq '.["libc"]'
+#   for current target status see https://github.com/ziglang/zig-bootstrap/
+#   also see: zig targets | jq '.["libc"]'
 
-# 108 build-on-linux targets (jobs)
-#  10 build-on-macos targets (jobs)
+# 71 build-on-linux targets (jobs)
+# 11 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform some basic runtime tests using QEMU.
 # All i386-windows and x86_64-windows targets also perform some basic
@@ -39,23 +40,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # linux-musl (statically linked, can use qemu-user for testing)
+          # Linux musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE }
-          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED }
-          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: arm-linux-musleabi, qemu: qemu-arm }
-          - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
+          # { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED }
+          # { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: arm-linux-musleabi, qemu: qemu-arm }
+          # { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb }
-          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
-          - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
-          - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
-          - { zig_target: i386-linux-musl, qemu: qemu-i386 }
-          - { zig_target: i386-linux-musl, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: armeb-linux-musleabi, qemu: qemu-armeb }
+          # { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
+          # { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
+          # { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
+          - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
+          - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # mips and mipsel: bad hard-float code generation(??); or QEMU bug; or UPX bug; see https://github.com/upx/upx/issues/788
           - { zig_target: mips-linux-musl, zig_flags: -msoft-float, qemu: qemu-mips }
           - { zig_target: mips-linux-musl, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
@@ -69,29 +70,30 @@ jobs:
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
           # powerpc64: obscure problem with C++ exceptions in UPX doctest checks when *NOT* using -fstack-protector
           - { zig_target: powerpc64-linux-musl, zig_flags: -fstack-protector, qemu: qemu-ppc64 }
-          # powerpc64: but works (i.e. no problem) when using -fPIE
+          # powerpc64: but WORKS (i.e. no problem) when using -fPIE
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
-          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
-          - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
-          - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
+          # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
+          # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
+          # { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
+          # { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
+          # { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIE }
-          # linux-gnu (glibc)
+
+          # Linux GNU (glibc)
           - { zig_target: aarch64-linux-gnu }
-          - { zig_target: aarch64_be-linux-gnu }
-          - { zig_target: arm-linux-gnueabi }
+          # { zig_target: aarch64_be-linux-gnu }
+          # { zig_target: arm-linux-gnueabi }
           - { zig_target: arm-linux-gnueabihf }
-          - { zig_target: armeb-linux-gnueabi }
-          - { zig_target: armeb-linux-gnueabihf }
-          - { zig_target: csky-linux-gnueabi }
-          - { zig_target: csky-linux-gnueabihf }
+          # { zig_target: armeb-linux-gnueabi }
+          # { zig_target: armeb-linux-gnueabihf }
+          # { zig_target: csky-linux-gnueabi }
+          # { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
           - { zig_target: i386-linux-gnu.2.3.4 }                    # RHEL 4
           - { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5
@@ -99,7 +101,7 @@ jobs:
           - { zig_target: i386-linux-gnu.2.11 }                     # SLES 11, Fedora 12
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7
           - { zig_target: i386-linux-gnu.2.38 }                     # latest glibc version supported by zig
-          - { zig_target: m68k-linux-gnu }
+          # { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
           - { zig_target: mipsel-linux-gnueabi }
@@ -107,16 +109,16 @@ jobs:
           - { zig_target: mips64-linux-gnuabi64 }
           - { zig_target: mips64el-linux-gnuabi64 }
           - { zig_target: powerpc-linux-gnueabi }
-          - { zig_target: powerpc-linux-gnueabi.2.11 }              # SLES 11, Fedora 12
+          # { zig_target: powerpc-linux-gnueabi.2.11 }              # SLES 11, Fedora 12; TODO later
           - { zig_target: powerpc64-linux-gnu }
-          - { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12
+          # { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12; TODO later
           - { zig_target: powerpc64le-linux-gnu }
-          - { zig_target: riscv64-linux-gnu }
-          - { zig_target: s390x-linux-gnu }
-          - { zig_target: sparc-linux-gnu }
-          - { zig_target: sparc64-linux-gnu }
-          - { zig_target: thumb-linux-gnueabi }
-          - { zig_target: thumb-linux-gnueabihf }
+          - { zig_target: riscv64-linux-gnu }                       # .cfi_label PROBLEM; see https://github.com/ziglang/zig-bootstrap/issues/115
+          # { zig_target: s390x-linux-gnu }
+          # { zig_target: sparc-linux-gnu }
+          # { zig_target: sparc64-linux-gnu }
+          # { zig_target: thumb-linux-gnueabi }
+          # { zig_target: thumb-linux-gnueabihf }
           - { zig_target: x86_64-linux-gnu }
           - { zig_target: x86_64-linux-gnu.2.3.4 }                  # RHEL 4
           - { zig_target: x86_64-linux-gnu.2.5 }                    # RHEL 5
@@ -126,32 +128,35 @@ jobs:
           - { zig_target: x86_64-linux-gnu.2.17 }                   # RHEL 7
           # { zig_target: x86_64-linux-gnu.2.23 }                   # Ubuntu 16.04
           # { zig_target: x86_64-linux-gnu.2.27 }                   # Ubuntu 18.04
-          # { zig_target: x86_64-linux-gnu.2.31 }                   # Ubuntu 18.04
+          # { zig_target: x86_64-linux-gnu.2.31 }                   # Ubuntu 20.04
           # { zig_target: x86_64-linux-gnu.2.34 }                   # RHEL 9
           # { zig_target: x86_64-linux-gnu.2.35 }                   # Ubuntu 22.04
           - { zig_target: x86_64-linux-gnu.2.38 }                   # latest glibc version supported by zig
-          # linux ILP32 on 64-bit archs
+
+          # Linux ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
           - { zig_target: mips64el-linux-gnuabin32 }
-          - { zig_target: x86_64-linux-gnux32 }
-          - { zig_target: x86_64-linux-muslx32 }                    # not supported by Zig ??
-          - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
-          # windows (can use Wine for testing)
+          # { zig_target: x86_64-linux-gnux32 }
+          # { zig_target: x86_64-linux-muslx32 }
+          # { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
+
+          # Windows (can use Wine for testing); also see https://github.com/mstorsjo/llvm-mingw
           - { zig_target: aarch64-windows-gnu }
-          - { zig_target: arm-windows-gnu }
-          - { zig_target: i386-windows-gnu, wine: wine32 }
-          - { zig_target: i386-windows.xp-gnu, wine: wine32 }
-          - { zig_target: i386-windows.vista-gnu, wine: wine32 }
-          - { zig_target: i386-windows.win7-gnu, wine: wine32 }
-          - { zig_target: i386-windows.win8-gnu, wine: wine32 }
-          - { zig_target: i386-windows.win10-gnu, wine: wine32 }
+          # { zig_target: arm-windows-gnu }                         # NOT WORKING: https://github.com/ziglang/zig-bootstrap/issues/105
+          - { zig_target: i386-windows-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          # { zig_target: i386-windows.xp-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          # { zig_target: i386-windows.vista-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          - { zig_target: i386-windows.win7-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          - { zig_target: i386-windows.win8-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          - { zig_target: i386-windows.win10-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
-          - { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
+          # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win7-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win8-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
-          # macos
+
+          # macOS
           - { zig_target: aarch64-macos-none }
           - { zig_target: aarch64-macos.11.0-none }
           - { zig_target: aarch64-macos.12.0-none }
@@ -160,6 +165,7 @@ jobs:
           - { zig_target: x86_64-macos.11.0-none }
           - { zig_target: x86_64-macos.12.0-none }
           - { zig_target: x86_64-macos.13.0-none }
+
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
           - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON' }
 
@@ -168,7 +174,7 @@ jobs:
       # zig is currently missing winpthreads; see https://github.com/ziglang/zig/issues/10989
       UPX_CONFIG_EXPECT_THREADS: ${{ contains(matrix.zig_target, '-windows-') && 'OFF' || 'ON' }}
       # for zig-cc wrapper scripts (see below):
-      ##ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # TODO later: enable this once other issues are fixed
+      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
@@ -192,8 +198,6 @@ jobs:
           echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
           # this seems to be needed when running in a container (beause of UID mismatch??)
           git config --global --add safe.directory '*'
-          # this seems to be needed for Wine when running in a container (beause of UID mismatch??)
-          mkdir -p -v ~/.wine
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
@@ -222,8 +226,8 @@ jobs:
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
-          # (INFO: it seems the zig driver does handle this automatically, so not really needed)
-          if [[ $ZIG_PIC == "-fPIE" ]]; then true;
+          # INFO: it seems the zig driver does handle this automatically(??), so not really needed
+          if test "$ZIG_PIC" = "-fPIE"; then true;
             echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
           fi
 
@@ -235,6 +239,9 @@ jobs:
           rev=$(git rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" || echo "UPX_CONFIG_DISABLE_SANITIZE=${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" >> $GITHUB_ENV
+          test -z "${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" >> $GITHUB_ENV
+          test -z "${{ matrix.UPX_CONFIG_DISABLE_RUN_PACKED_TEST }}" || echo "UPX_CONFIG_DISABLE_RUN_PACKED_TEST=${{ matrix.UPX_CONFIG_DISABLE_RUN_PACKED_TEST }}" >> $GITHUB_ENV
+          test -z "${{ matrix.tt }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV
 
       - name: 'Build with local clang and gcc'
         if: ${{ matrix.zig_target == 'x86_64-linux-gnu' }} # only do this once per Action
@@ -275,7 +282,7 @@ jobs:
           path: tmp/artifact
 
       - name: 'Install QEMU'
-        if: ${{ matrix.qemu != '' }}
+        if: ${{ matrix.qemu }}
         shell: bash
         run: |
           uname -a; pwd; id; umask
@@ -288,7 +295,7 @@ jobs:
           fi
 
       - name: 'Run basic tests under QEMU - Release'
-        if: ${{ matrix.qemu != '' }}
+        if: ${{ matrix.qemu }}
         shell: bash
         run: |
           set -ex -o pipefail
@@ -296,7 +303,6 @@ jobs:
           file ./upx
           qemu='${{ matrix.qemu }}'
           tt='${{ matrix.tt }}'
-          [[ $tt == UPX-BUG ]] && tt=/bin/bash
           [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
@@ -304,12 +310,12 @@ jobs:
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
-          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
+          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           true
 
       - name: 'Run basic tests under QEMU - Debug'
-        if: ${{ matrix.qemu != '' }}
+        if: ${{ matrix.qemu }}
         shell: bash
         run: |
           set -ex -o pipefail
@@ -317,7 +323,6 @@ jobs:
           file ./upx
           qemu='${{ matrix.qemu }}'
           tt='${{ matrix.tt }}'
-          [[ $tt == UPX-BUG ]] && tt=/bin/bash
           [[ $tt == UPX-UNSUPPORTED ]] && tt=/bin/bash
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
@@ -325,17 +330,29 @@ jobs:
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
-          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
+          [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           true
 
+      - name: ${{ format('Mimic ctest tests with QEMU {0} - Release', matrix.qemu) }}
+        if: ${{ matrix.qemu }}
+        run: |
+          export upx_exe_runner="${{ matrix.qemu }}"
+          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/release bash "$PWD"/misc/testsuite/mimic_ctest.sh
+
+      - name: ${{ format('Mimic ctest tests with QEMU {0} - Debug', matrix.qemu) }}
+        if: ${{ matrix.qemu }}
+        run: |
+          export upx_exe_runner="${{ matrix.qemu }}"
+          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug   bash "$PWD"/misc/testsuite/mimic_ctest.sh
+
       - name: 'Install Wine'
-        if: ${{ matrix.wine != '' }}
+        if: ${{ matrix.wine }}
         shell: bash
         run: |
           uname -a; pwd; id; umask
           if test -f /etc/alpine-release; then
-            # wine-8 can run win32 programs in wow64 mode under pure 64-bit Alpine Linux
+            # Wine >= 8.0 can run i686 win32 programs in WOW64 mode under pure 64-bit Alpine Linux
             apk add wine
           else
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo dpkg --add-architecture i386
@@ -343,10 +360,12 @@ jobs:
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
             [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine wine64
           fi
-          true
+          # this seems to be needed for Wine when running in a container (beause of UID mismatch??)
+          mkdir -p -v ~/.wine
+          wineboot --init
 
       - name: 'Run basic tests under Wine - Release'
-        if: ${{ matrix.wine != '' }}
+        if: ${{ matrix.wine }}
         shell: bash
         run: |
           set -ex -o pipefail
@@ -360,11 +379,11 @@ jobs:
           $wine ./upx.exe -l tt.packed.exe
           $wine ./upx.exe -t tt.packed.exe
           $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
-          $wine ./tt.packed.exe --version-short
           $wine ./tt.unpacked.exe --version-short
+          [[ $UPX_CONFIG_DISABLE_RUN_PACKED_TEST == ON ]] || $wine ./tt.packed.exe --version-short
 
       - name: 'Run basic tests under Wine - Debug'
-        if: ${{ matrix.wine != '' }}
+        if: ${{ matrix.wine }}
         shell: bash
         run: |
           set -ex -o pipefail
@@ -378,8 +397,22 @@ jobs:
           $wine ./upx.exe -l tt.packed.exe
           $wine ./upx.exe -t tt.packed.exe
           $wine ./upx.exe -d tt.packed.exe -o tt.unpacked.exe
-          $wine ./tt.packed.exe --version-short
           $wine ./tt.unpacked.exe --version-short
+          [[ $UPX_CONFIG_DISABLE_RUN_PACKED_TEST == ON ]] || $wine ./tt.packed.exe --version-short
+
+      - name: 'Mimic ctest tests under Wine - Release'
+        if: ${{ matrix.wine }}
+        run: |
+          export upx_exe_runner=wine
+          export upx_exe=./upx.exe
+          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/release bash "$PWD"/misc/testsuite/mimic_ctest.sh
+
+      - name: 'Mimic ctest tests under Wine - Debug'
+        if: ${{ matrix.wine }}
+        run: |
+          export upx_exe_runner=wine
+          export upx_exe=./upx.exe
+          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug   bash "$PWD"/misc/testsuite/mimic_ctest.sh
 
   job-build-on-macos:
     if: github.repository_owner == 'upx'
@@ -394,15 +427,18 @@ jobs:
           - { os: macos-12, zig_target: x86_64-macos-none }
           - { os: macos-12, zig_target: x86_64-macos.11.0-none }
           - { os: macos-12, zig_target: x86_64-macos.12.0-none }
-          - { os: macos-12, zig_target: x86_64-macos.13.0-none }
           - { os: macos-13, zig_target: x86_64-macos-none }
           - { os: macos-13, zig_target: x86_64-macos.11.0-none }
+          # { os: macos-13, zig_target: x86_64-macos.12.0-none }
+          - { os: macos-13, zig_target: x86_64-macos.13.0-none }
           # { os: macos-14, zig_target: x86_64-macos-none }
           # { os: macos-14, zig_target: x86_64-macos.11.0-none }
+          # { os: macos-14, zig_target: x86_64-macos.12.0-none }
+          # { os: macos-14, zig_target: x86_64-macos.13.0-none }
           - { os: macos-14, zig_target: aarch64-macos-none }
           - { os: macos-14, zig_target: aarch64-macos.11.0-none }
           # { os: macos-14, zig_target: aarch64-macos.12.0-none }
-          # { os: macos-14, zig_target: aarch64-macos.13.0-none }
+          - { os: macos-14, zig_target: aarch64-macos.13.0-none }
 
     env:
       UPX_CONFIG_EXPECT_THREADS: 'ON'
@@ -496,12 +532,12 @@ jobs:
           name: ${{ env.artifact_name }}
           path: tmp/artifact
 
-      - name: 'Run basic tests - Release'
+      - name: 'Run ctest tests - Release'
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short
-          cmake --build build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release --target test
+          (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release && ctest)
 
-      - name: 'Run basic tests - Debug'
+      - name: 'Run ctest tests - Debug'
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug/upx --version-short
-          cmake --build build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug --target test
+          (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug && ctest)
