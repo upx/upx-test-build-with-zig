@@ -68,8 +68,8 @@ jobs:
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
-          # powerpc64: obscure problem with C++ exceptions in UPX doctest checks when *NOT* using -fstack-protector
-          - { zig_target: powerpc64-linux-musl, zig_flags: -fstack-protector, qemu: qemu-ppc64 }
+          # powerpc64: obscure problem with C++ exceptions in UPX doctest checks; use -fPIC to work-around
+          - { zig_target: powerpc64-linux-musl, zig_flags: -fPIC, qemu: qemu-ppc64 }
           # powerpc64: but WORKS (i.e. no problem) when using -fPIE
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
