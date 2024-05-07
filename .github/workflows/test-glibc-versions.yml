@@ -79,7 +79,7 @@ jobs:
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
       UPX_REF_NAME: devel
-      # for running the basic tests
+      # for running the tests
       UPX: --no-color --no-progress
       UPX_DEBUG_DISABLE_GITREV_WARNING: 1
       UPX_DEBUG_DOCTEST_VERBOSE: 0
@@ -112,6 +112,7 @@ jobs:
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           #
+          mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
           if [[ $ZIG_TARGET == *-linux-gnu.2.3.3 ]]; then true;
             # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
@@ -122,7 +123,6 @@ jobs:
         run: |
           git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx .
           git submodule update --init
-          # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
           rev=$(git rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
 
@@ -136,7 +136,7 @@ jobs:
         if: success() || failure() # run this step even if the previous step failed
         run: |
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/debug \
-           CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
           file build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx*
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
@@ -147,7 +147,6 @@ jobs:
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
-          # GitHub Actions magic: set "artifact_name" environment value for use in next step
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
@@ -156,10 +155,9 @@ jobs:
           name: ${{ env.artifact_name }}
           path: tmp/artifact
 
-      - name: 'Run basic tests'
+      - name: 'Run ctest tests'
         # info: glibc-2.38 cannot run on Ubuntu-22.04 GitHub runner host (glibc-2.35)
         if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.38') }}
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -v
-          make -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug test
-          make -C build/zig/${ZIG_TARGET}${ZIG_PIC}/release test
+          make build/zig/${ZIG_TARGET}${ZIG_PIC}/all+test

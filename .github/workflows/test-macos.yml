@@ -15,8 +15,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-04-26
-  ZIG_DIST_VERSION: 0.13.0-dev.46+3648d7df1
+  # 2024-05-05
+  ZIG_DIST_VERSION: 0.13.0-dev.73+db890dbae
 
 jobs:
   job-build-on-macos:
@@ -54,7 +54,7 @@ jobs:
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
       UPX_REF_NAME: devel
-      # for running the basic tests:
+      # for running the tests:
       UPX: --no-color --no-progress
       UPX_DEBUG_DISABLE_GITREV_WARNING: 1
       UPX_DEBUG_DOCTEST_VERBOSE: 0
@@ -93,21 +93,20 @@ jobs:
         run: |
           git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx .
           git submodule update --init
-          # GitHub Actions magic: set "UPX_GITREV_SHORT" environment value for use in steps below
           rev=$(git rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
           #
+          mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
+          echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV
           case "${{ matrix.os }}" in
-            macos-11 | macos-12) echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV ;;
-            # FIXME: UPX on macos-13+ is broken => disable self-test for now
+            # TODO FIXME: UPX on macos-13+ is broken => disable run-packed for now
             macos-13 | macos-14) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
           esac
 
       - name: 'Build with local clang'
         if: ${{ endsWith(matrix.zig_target,'-macos-none') }} # only do this once per Action
         run: |
-          make build/extra/clang/release && make -C build/extra/clang/release test
-          make build/extra/clang/debug   && make -C build/extra/clang/debug test
+          make build/extra/clang/all+test
 
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
@@ -128,7 +127,6 @@ jobs:
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
           (cd tmp/artifact && gtar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
-          # GitHub Actions magic: set "artifact_name" environment value for use in next step
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
@@ -140,9 +138,9 @@ jobs:
       - name: 'Run ctest tests - Release'
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short
-          (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release && ctest)
+          make build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release+test
 
       - name: 'Run ctest tests - Debug'
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug/upx --version-short
-          (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug && ctest)
+          make build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug+test

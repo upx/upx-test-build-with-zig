@@ -32,7 +32,7 @@ Noteworthy open zig issues
 ==========================
 
 - https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
-  - this means that Windows currently cannot use multi-threading; **major blocker**
+  - **MAJOR BLOCKER**: this means that Windows currently cannot use multi-threading
   - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/13385
 - TODO zig: libcxx should be upgraded from 17.0.0 to 17.0.6
@@ -59,19 +59,6 @@ Noteworthy changes that did improve 'zig cc'
 Other noteworthy changes
 ========================
 
-- glibc issues
-  - 2023-04-09: 0.11.0-dev.2470+c22a30ac9 glibc-2.7 and glibc-2.11 targets stopped working
-    - 0.11.0-dev.2401+348751462 works
-  - probably caused by llvm-15 => llvm-16 upgrade; have to check libc++
-  - 2024-01-05 https://github.com/ziglang/zig/commit/c22d1c0 minimum required glibc is v2.17
-  - 2024-01-xx: glibc-2.7 and glibc-2.11 work again
-  - 2024-03-26: https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
-
-- mips64-linux-gnuabin32 and mips64el-linux-gnuabin32
-  - 2023-06-11: 0.11.0-dev.3395+1e7dcaa3a mips64-linux-gnuabin32 and mips64el-linux-gnuabin32 stopped working
-    - 0.11.0-dev.3301+230ea411f works
-  - 2024-01-06: 0.12.0-dev.2059+42389cb9c now works again
-
 - older Windows versions (XP and Vista)
   - 2023-10-02 https://github.com/ziglang/zig/commit/15ce965 define _WIN32_WINNT based on target
     - INFO: this reveals that libunwind cannot be compiled for XP and Vista (i386 only)
@@ -92,3 +79,4 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
 - https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
 - https://github.com/ziglang/zig/issues/19206 zig cc -target x86_64-macos-none stopped working
+- https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
