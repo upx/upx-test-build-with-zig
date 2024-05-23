@@ -24,8 +24,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-05-21
-  ZIG_DIST_VERSION: 0.13.0-dev.230+50a141945
+  # 2024-05-23
+  ZIG_DIST_VERSION: 0.13.0-dev.249+ed75f6256
 
 jobs:
   job-build-on-linux:
@@ -55,6 +55,7 @@ jobs:
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # mips and mipsel: bad hard-float code generation(??); or QEMU bug; or UPX bug; see https://github.com/upx/upx/issues/788
+          #   TODO later: check if the upgrade to llvm-18 has fixed the problem
           - { zig_target: mips-linux-musl, zig_flags: -msoft-float, qemu: qemu-mips }
           - { zig_target: mips-linux-musl, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musl, zig_flags: -msoft-float, qemu: qemu-mipsel }
@@ -66,6 +67,7 @@ jobs:
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
           # powerpc64: obscure problem with C++ exceptions in UPX doctest checks; use -fPIC to work-around
+          #   TODO later: check if the upgrade to llvm-18 has fixed the problem
           - { zig_target: powerpc64-linux-musl, zig_flags: -fPIC, qemu: qemu-ppc64 }
           # powerpc64: but WORKS (i.e. no problem) when using -fPIE
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
@@ -159,6 +161,7 @@ jobs:
           - { zig_target: x86_64-macos.13.0-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
+          #   TODO later: this got broken with the llvm-18 upgrade; examine why
           - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON' }
 
     env:
@@ -482,7 +485,7 @@ jobs:
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
           echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV
           case "${{ matrix.os }}" in
-            # TODO FIXME: UPX on macos-13+ is broken => disable run-packed for now
+            # TODO FIXME: UPX problem: UPX on macos-13+ is broken => disable run-packed for now
             macos-13 | macos-14) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
           esac
 

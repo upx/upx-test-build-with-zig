@@ -20,7 +20,7 @@ jobs:
   job-build-on-linux:
     # if: github.repository_owner == 'upx'
     name: ${{ format('{0} / {1}', matrix.zig_target, matrix.zig_dist_version) }}
-    runs-on: ubuntu-latest # this is currently ubuntu-22.04 with host glibc-2.35
+    runs-on: ubuntu-22.04 # host glibc-2.35
     strategy:
       fail-fast: false
       matrix:
@@ -66,8 +66,8 @@ jobs:
           # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
           # 0.12.0                              # 2024-04-20 llvm-17.0.6
           # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
-          # 2024-05-14 llvm-18.1.5; current llvm-18
-          - 0.13.0-dev.211+6a65561e3
+          # 2024-05-23 llvm-18.1.6; current llvm-18
+          - 0.13.0-dev.249+ed75f6256
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}

@@ -35,7 +35,7 @@ Noteworthy open zig issues
   - **MAJOR BLOCKER**: this means that Windows currently cannot use multi-threading
   - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/13385
-- TODO zig: libcxx should be upgraded from 17.0.0 to 17.0.6
+- TODO zig-0.12.x branch: libcxx should be upgraded from 17.0.0 to 17.0.6
 - TODO zig: musl libc should be upgraded from 1.2.4 to 1.2.5
 
 
