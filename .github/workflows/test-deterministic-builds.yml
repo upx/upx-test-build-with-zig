@@ -1,0 +1,191 @@
+# Copyright (C) Markus Franz Xaver Johannes Oberhumer
+
+# test that zig yields deterministic (reproducible) builds
+#   - build in a container (Alpine Linux)
+#   - use identical file paths
+#   - compare results after building with zig-linux-x86 vs. zig-linux-x86_64
+
+name: 'Test deterministic builds'
+
+on: [workflow_dispatch]
+
+env:
+  CMAKE_REQUIRED_QUIET: 'OFF'
+  CMAKE_VERBOSE_MAKEFILE: 'ON'
+  CTEST_OUTPUT_ON_FAILURE: 'ON'
+  DEBIAN_FRONTEND: noninteractive
+  NO_COLOR: 1
+  UPX_CMAKE_BUILD_FLAGS: --verbose
+  UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
+  # 2024-05-30
+  ZIG_DIST_VERSION: 0.13.0-dev.343+2008d0f7c
+
+jobs:
+  job-build-on-linux:
+    name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
+    runs-on: ubuntu-latest
+    container: 'alpine:3.20'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux musl
+          - { zig_target: aarch64-linux-musl }
+          - { zig_target: aarch64-linux-musl, zig_pic: -fPIE }
+          - { zig_target: arm-linux-musleabihf }
+          - { zig_target: arm-linux-musleabihf, zig_pic: -fPIE }
+          - { zig_target: mips-linux-musl, zig_flags: -msoft-float }
+          - { zig_target: mipsel-linux-musl, zig_flags: -msoft-float }
+          - { zig_target: mips64-linux-musl }
+          - { zig_target: mips64el-linux-musl }
+          - { zig_target: powerpc-linux-musl }
+          - { zig_target: powerpc-linux-musl, zig_pic: -fPIE }
+          - { zig_target: powerpc64-linux-musl }
+          - { zig_target: powerpc64-linux-musl, zig_pic: -fPIE }
+          - { zig_target: powerpc64le-linux-musl }
+          - { zig_target: powerpc64le-linux-musl, zig_pic: -fPIE }
+          - { zig_target: riscv64-linux-musl }
+          - { zig_target: riscv64-linux-musl, zig_pic: -fPIE }
+          - { zig_target: x86-linux-musl, zig_flags: -march=i586 }
+          - { zig_target: x86-linux-musl, zig_flags: -march=i586, zig_pic: -fPIE }
+          - { zig_target: x86_64-linux-musl }
+          - { zig_target: x86_64-linux-musl, zig_pic: -fPIE }
+
+          # Linux GNU (glibc)
+          - { zig_target: aarch64-linux-gnu }
+          - { zig_target: arm-linux-gnueabihf }
+          - { zig_target: powerpc64le-linux-gnu }
+          - { zig_target: x86-linux-gnu }
+          - { zig_target: x86_64-linux-gnu }
+
+          # Windows (MinGW)
+          - { zig_target: aarch64-windows-gnu }
+          - { zig_target: x86-windows-gnu }
+          - { zig_target: x86_64-windows-gnu }
+
+          # macOS
+          - { zig_target: aarch64-macos-none }
+          - { zig_target: x86_64-macos-none }
+
+    env:
+      # for zig-cc wrapper scripts (see below):
+      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
+      ZIG_FLAGS: ${{ matrix.zig_flags }}
+      ZIG_PIC: ${{ matrix.zig_pic }}
+      ZIG_TARGET: ${{ matrix.zig_target }}
+      # for upx.git cloning:
+      UPX_REF_NAME: devel
+
+    steps:
+      - name: ${{ format('Install packages {0}', 'alpine:3.20') }}
+        shell: sh
+        run: |
+          cat /etc/alpine-release
+          apk update && apk upgrade && apk add bash cmake coreutils curl file git make tar xz
+          # set PATH like in Ubuntu
+          echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+          git config --global --add safe.directory '*' # needed when running in a container
+
+      # note that ~/.local/bin is included in the default $PATH on Ubuntu
+      - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
+        shell: bash
+        run: |
+          mkdir -p -v ~/.local/bin
+          cd ~/.local/bin
+          # download and unpack zig-linux-x86 & zig-linux-x86_64
+          for arch in x86 x86_64; do
+            ZIG_DIST_NAME=zig-linux-${arch}-${ZIG_DIST_VERSION}
+            curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+            ls -l ${ZIG_DIST_NAME}.tar.xz
+            tar -xoaf ${ZIG_DIST_NAME}.tar.xz
+            rm ${ZIG_DIST_NAME}.tar.xz
+            mv -v ${ZIG_DIST_NAME} zig-linux-${arch}
+          done
+          # create wrapper scripts (needed for CMake)
+          log=
+          log='set -x\n'
+          echo -e '#!/bin/sh\n'$log'exec zig ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\n'$log'exec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\n'$log'exec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
+          chmod +x zig-ar zig-cc zig-cxx zig-ranlib
+          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+          # -fPIE is for compilation only => also use the correct linker flag "-pie"
+          # INFO: it seems the zig driver does handle this automatically(??), so not really needed
+          if test "$ZIG_PIC" = "-fPIE"; then true;
+            echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
+          fi
+
+      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+        run: |
+          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx .
+          git submodule update --init
+          rev=$(git rev-parse --short=7 HEAD)
+          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+
+      - name: ${{ format('Build x86 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          # prepare zig-host directory (for identical location of host tools)
+          (cd ~/.local/bin && rm -rf ./zig ./zig-host && mv -v zig-linux-x86 zig-host && ln -s zig-host/zig zig)
+          command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
+          echo -n 'zig version: '; zig version
+          rm -rf ~/.cache/zig # remove cache
+          # build debug+release
+          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
+          # move result away
+          mv -v build/zig build/zig-with-x86
+
+      - name: ${{ format('Build x86_64 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          # prepare zig-host directory (for identical location of host tools)
+          (cd ~/.local/bin && rm -rf ./zig ./zig-host && mv -v zig-linux-x86_64 zig-host && ln -s zig-host/zig zig)
+          command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
+          echo -n 'zig version: '; zig version
+          rm -rf ~/.cache/zig # remove cache
+          # build debug+release
+          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
+          # move result away
+          mv -v build/zig build/zig-with-x86_64
+
+      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+        shell: bash
+        run: |
+          N=$(echo "upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
+          xbuild=$(echo "build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
+          mkdir -p "tmp/artifact/$N/$xbuild"
+          (cd build && shopt -s nullglob && cp -ai --parents */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
+          (cd tmp/artifact/$N/$xbuild && find . -type f | LC_ALL=C sort | xargs -r file)
+          (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          echo "artifact_name=$N" >> $GITHUB_ENV
+
+      - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.artifact_name }}
+          path: tmp/artifact
+
+      - name: Verify deterministic build
+        shell: bash
+        run: |
+          shopt -s nullglob
+          ls -l     build/*/*/*/upx{,.exe}
+          echo
+          file      build/*/*/*/upx{,.exe}
+          echo
+          sha256sum build/*/*/*/upx{,.exe}
+          echo
+          # compare
+          exit_code=0
+          for build_type in debug release; do
+            a=( build/zig-with-x86_64/*/$build_type/upx{,.exe} )
+            b=( build/zig-with-x86/*/$build_type/upx{,.exe} )
+            if ! cmp -s $a $b; then
+              echo "ERROR: files $a and $b differ"
+              exit_code=1
+            fi
+          done
+          exit $exit_code
