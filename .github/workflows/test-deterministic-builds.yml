@@ -7,7 +7,7 @@
 
 name: 'Test deterministic builds'
 
-on: [workflow_dispatch]
+on: [push, workflow_dispatch]
 
 env:
   CMAKE_REQUIRED_QUIET: 'OFF'
@@ -72,6 +72,7 @@ jobs:
       ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
+      ZIG_QEMU: ''
       ZIG_TARGET: ${{ matrix.zig_target }}
       # for upx.git cloning:
       UPX_REF_NAME: devel
@@ -92,8 +93,8 @@ jobs:
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
-          # download and unpack zig-linux-x86 & zig-linux-x86_64
-          for arch in x86 x86_64; do
+          # download and unpack zig-linux
+          for arch in aarch64 x86 x86_64; do
             ZIG_DIST_NAME=zig-linux-${arch}-${ZIG_DIST_VERSION}
             curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
             ls -l ${ZIG_DIST_NAME}.tar.xz
@@ -103,18 +104,23 @@ jobs:
           done
           # create wrapper scripts (needed for CMake)
           log=
+          echo -e '#!/bin/sh\n'$log'exec $ZIG_QEMU "$HOME/.local/bin/zig-host/zig" "$@"' > zig
+          echo -e '#!/bin/sh\n'$log'exec $ZIG_QEMU "$HOME/.local/bin/zig-host/zig" cc -target $ZIG_TARGET -x assembler "$@"' > zig-as
           log='set -x\n'
-          echo -e '#!/bin/sh\n'$log'exec zig ar "$@"' > zig-ar
-          echo -e '#!/bin/sh\n'$log'exec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
-          echo -e '#!/bin/sh\n'$log'exec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
-          echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
-          chmod +x zig-ar zig-cc zig-cxx zig-ranlib
-          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+          echo -e '#!/bin/sh\n'$log'exec $ZIG_QEMU "$HOME/.local/bin/zig-host/zig" ar "$@"' > zig-ar
+          echo -e '#!/bin/sh\n'$log'exec $ZIG_QEMU "$HOME/.local/bin/zig-host/zig" cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
+          echo -e '#!/bin/sh\n'$log'exec $ZIG_QEMU "$HOME/.local/bin/zig-host/zig" c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\n'$log'exec $ZIG_QEMU "$HOME/.local/bin/zig-host/zig" ranlib "$@"' > zig-ranlib
+          chmod +x zig zig-ar zig-as zig-cc zig-cxx zig-ranlib
+          ls -la; head zig zig-ar zig-as zig-cc zig-cxx zig-ranlib
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
           if test "$ZIG_PIC" = "-fPIE"; then true;
             echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
           fi
+          # needed for -fno-integrated-as
+          # TODO later: this does not work yet
+          ln -s zig-as as
 
       - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
         run: |
@@ -123,11 +129,59 @@ jobs:
           rev=$(git rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
 
+      - name: ${{ format('Build aarch64-qemu with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          apk add qemu-aarch64; export ZIG_QEMU="qemu-aarch64"
+          # prepare zig-host directory (for identical location of host tools)
+          (cd ~/.local/bin && rm -rf ./zig-host && cp -ai zig-linux-aarch64 zig-host)
+          command -v zig; ls -l "$(command -v zig)"; ls -l ~/.local/bin/zig-host/zig; file ~/.local/bin/zig-host/zig
+          echo -n 'zig version: '; zig version
+          rm -rf ~/.cache/zig # remove cache
+          # build debug+release
+          unset CC CXX
+          export UPX_CMAKE_CONFIG_FLAGS="$UPX_CMAKE_CONFIG_FLAGS -D CMAKE_C_COMPILER=$HOME/.local/bin/zig-cc -D CMAKE_CXX_COMPILER=$HOME/.local/bin/zig-cxx -D CMAKE_AR=$HOME/.local/bin/zig-ar -D CMAKE_RANLIB=$HOME/.local/bin/zig-ranlib"
+          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all
+          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
+          # move result away
+          mv -v build/zig build/zig-with-aarch64-and-qemu
+
+      - name: ${{ format('Build x86_64-qemu with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        if: false # TODO later
+        run: |
+          apk add qemu-x86_64; export ZIG_QEMU="qemu-x86_64 -cpu Nehalem"
+          # prepare zig-host directory (for identical location of host tools)
+          (cd ~/.local/bin && rm -rf ./zig-host && cp -ai zig-linux-x86_64 zig-host)
+          command -v zig; ls -l "$(command -v zig)"; ls -l ~/.local/bin/zig-host/zig; file ~/.local/bin/zig-host/zig
+          echo -n 'zig version: '; zig version
+          rm -rf ~/.cache/zig # remove cache
+          # build debug+release
+          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
+          # move result away
+          mv -v build/zig build/zig-with-x86_64-and-qemu
+
+      - name: ${{ format('Build x86_64-no-integrated-as with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        if: false # TODO later: check how we should use "as"
+        run: |
+          export ZIG_FLAGS="$ZIG_FLAGS -fno-integrated-as"
+          # prepare zig-host directory (for identical location of host tools)
+          (cd ~/.local/bin && rm -rf ./zig-host && cp -ai zig-linux-x86_64 zig-host)
+          command -v zig; ls -l "$(command -v zig)"; ls -l ~/.local/bin/zig-host/zig; file ~/.local/bin/zig-host/zig
+          echo -n 'zig version: '; zig version
+          rm -rf ~/.cache/zig # remove cache
+          # build debug+release
+          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
+          # move result away
+          mv -v build/zig build/zig-with-x86_64-no-integrated-as
+
       - name: ${{ format('Build x86 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           # prepare zig-host directory (for identical location of host tools)
-          (cd ~/.local/bin && rm -rf ./zig ./zig-host && mv -v zig-linux-x86 zig-host && ln -s zig-host/zig zig)
-          command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
+          (cd ~/.local/bin && rm -rf ./zig-host && cp -ai zig-linux-x86 zig-host)
+          command -v zig; ls -l "$(command -v zig)"; ls -l ~/.local/bin/zig-host/zig; file ~/.local/bin/zig-host/zig
           echo -n 'zig version: '; zig version
           rm -rf ~/.cache/zig # remove cache
           # build debug+release
@@ -140,8 +194,8 @@ jobs:
       - name: ${{ format('Build x86_64 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           # prepare zig-host directory (for identical location of host tools)
-          (cd ~/.local/bin && rm -rf ./zig ./zig-host && mv -v zig-linux-x86_64 zig-host && ln -s zig-host/zig zig)
-          command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
+          (cd ~/.local/bin && rm -rf ./zig-host && cp -ai zig-linux-x86_64 zig-host)
+          command -v zig; ls -l "$(command -v zig)"; ls -l ~/.local/bin/zig-host/zig; file ~/.local/bin/zig-host/zig
           echo -n 'zig version: '; zig version
           rm -rf ~/.cache/zig # remove cache
           # build debug+release
@@ -182,10 +236,11 @@ jobs:
           exit_code=0
           for build_type in debug release; do
             a=( build/zig-with-x86_64/*/$build_type/upx{,.exe} )
-            b=( build/zig-with-x86/*/$build_type/upx{,.exe} )
-            if ! cmp -s $a $b; then
-              echo "ERROR: files $a and $b differ"
-              exit_code=1
+            for b in build/zig-with-*/*/$build_type/upx{,.exe}; do
+              if ! cmp -s $a $b; then
+                echo "ERROR: files $a and $b differ"
+                exit_code=1
+              fi
             fi
           done
           exit $exit_code

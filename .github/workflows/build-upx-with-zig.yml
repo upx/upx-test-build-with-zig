@@ -12,7 +12,7 @@
 
 name: 'Build UPX with zig cc'
 
-on: [push, workflow_dispatch]
+on: [workflow_dispatch]
 
 env:
   CMAKE_REQUIRED_QUIET: 'OFF'
