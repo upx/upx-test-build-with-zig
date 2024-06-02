@@ -17,8 +17,8 @@ env:
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
-  # 2024-05-30
-  ZIG_DIST_VERSION: 0.13.0-dev.343+2008d0f7c
+  # 2024-06-01
+  ZIG_DIST_VERSION: 0.13.0-dev.351+64ef45eb0
 
 jobs:
   job-build-on-linux:
