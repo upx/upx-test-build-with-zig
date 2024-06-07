@@ -20,11 +20,12 @@ jobs:
   job-build-on-linux:
     # if: github.repository_owner == 'upx'
     name: ${{ format('{0} / {1}', matrix.zig_target, matrix.zig_dist_version) }}
-    runs-on: ubuntu-22.04 # host glibc-2.35
+    runs-on: ubuntu-22.04 # host glibc-2.35 # TODO later: upgrade to ubuntu-24.04 once that is stable
     strategy:
       fail-fast: false
       matrix:
         zig_target:
+          # TODO later: add glibc-2.39 targets
           # i386-linux-gnu
           - i386-linux-gnu.2.3.3                # oldest glibc version that works with current libc++
           - i386-linux-gnu.2.3.4                # RHEL 4
@@ -66,8 +67,9 @@ jobs:
           # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
           # 0.12.0                              # 2024-04-20 llvm-17.0.6
           # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
-          # 2024-06-06 llvm-18.1.6; current llvm-18
-          - 0.13.0-dev.386+3964b2a31
+          # 0.13.0                              # 2024-06-07 llvm-18.1.6
+          # 2024-06-07 llvm-18.1.6; current llvm-18
+          - 0.13.0
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
@@ -117,6 +119,7 @@ jobs:
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
           if [[ $ZIG_TARGET == *-linux-gnu.2.3.3 ]]; then true;
             # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
+            # TODO later: check if this work-around is still needed with zig-0.13
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
             echo "ZIG_FLAGS=$ZIG_FLAGS -fno-sanitize=all" >> $GITHUB_ENV
           fi
