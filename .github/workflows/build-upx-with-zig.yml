@@ -2,8 +2,8 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 71 build-on-linux targets (jobs)
-# 11 build-on-macos targets (jobs)
+# 79 build-on-linux targets (jobs)
+#  9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
 #   runtime tests using QEMU.
@@ -24,8 +24,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-06-09
-  ZIG_DIST_VERSION: 0.14.0-dev.14+ec337051a
+  # 2024-06-17
+  ZIG_DIST_VERSION: 0.14.0-dev.43+96501d338
 
 jobs:
   job-build-on-linux:
@@ -54,16 +54,22 @@ jobs:
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          # mips and mipsel: bad hard-float code generation(??); or QEMU bug; or UPX bug; see https://github.com/upx/upx/issues/788
-          #   TODO later: check if the upgrade to llvm-18 has fixed the problem
-          - { zig_target: mips-linux-musl, zig_flags: -msoft-float, qemu: qemu-mips }
-          - { zig_target: mips-linux-musl, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
-          - { zig_target: mipsel-linux-musl, zig_flags: -msoft-float, qemu: qemu-mipsel }
-          - { zig_target: mipsel-linux-musl, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE }
+          - { zig_target: mips-linux-musl, qemu: qemu-mips }
+          - { zig_target: mips-linux-musl, qemu: qemu-mips, zig_pic: -fPIE }
+          - { zig_target: mips-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips }
+          - { zig_target: mips-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
+          - { zig_target: mipsel-linux-musl, qemu: qemu-mipsel }
+          - { zig_target: mipsel-linux-musl, qemu: qemu-mipsel, zig_pic: -fPIE }
+          - { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mipsel }
+          - { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: mips64-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: mips64el-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64el-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
           # powerpc64: obscure problem with C++ exceptions in UPX doctest checks; use -fPIC to work-around
@@ -217,8 +223,9 @@ jobs:
           echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
-          # update ZIG_TARGET (i386 => x86)
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
+          # update ZIG_TARGET
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}  # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/muslsf/musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
@@ -413,8 +420,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-11, zig_target: x86_64-macos-none }
-          - { os: macos-11, zig_target: x86_64-macos.11.0-none }
+          # { os: macos-11, zig_target: x86_64-macos-none }
+          # { os: macos-11, zig_target: x86_64-macos.11.0-none }
           - { os: macos-12, zig_target: x86_64-macos-none }
           - { os: macos-12, zig_target: x86_64-macos.11.0-none }
           - { os: macos-12, zig_target: x86_64-macos.12.0-none }
@@ -448,14 +455,14 @@ jobs:
       BUILD_SUBDIR: zig-on-${{ matrix.os }}
 
     steps:
-      # note that ~/bin is included in the default $PATH on macOS-11 and macOS-12
+      # note that ~/bin is included in the default $PATH on macos-11/12/13/14 runners
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
         run: |
           uname -a; pwd; id; umask
           mkdir -p -v ~/bin
           cd ~/bin
           ZIG_DIST_NAME=zig-macos-aarch64-${ZIG_DIST_VERSION}
-          case ${{ matrix.os }} in
+          case "${{ matrix.os }}" in
             *-1[0-3]) ZIG_DIST_NAME=zig-macos-x86_64-${ZIG_DIST_VERSION} ;;
           esac
           wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz

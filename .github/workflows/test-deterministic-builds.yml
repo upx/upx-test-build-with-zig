@@ -17,8 +17,8 @@ env:
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
-  # 2024-06-09
-  ZIG_DIST_VERSION: 0.14.0-dev.14+ec337051a
+  # 2024-06-17
+  ZIG_DIST_VERSION: 0.14.0-dev.43+96501d338
 
 jobs:
   job-build-on-linux:
@@ -34,8 +34,10 @@ jobs:
           - { zig_target: aarch64-linux-musl, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf }
           - { zig_target: arm-linux-musleabihf, zig_pic: -fPIE }
-          - { zig_target: mips-linux-musl, zig_flags: -msoft-float }
-          - { zig_target: mipsel-linux-musl, zig_flags: -msoft-float }
+          - { zig_target: mips-linux-musl }
+          - { zig_target: mips-linux-muslsf, zig_flags: -msoft-float }
+          - { zig_target: mipsel-linux-musl }
+          - { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float }
           - { zig_target: mips64-linux-musl }
           - { zig_target: mips64el-linux-musl }
           - { zig_target: powerpc-linux-musl }
@@ -110,6 +112,10 @@ jobs:
           echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+          # update ZIG_TARGET
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}  # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/muslsf/musl} # muslsf => musl
+          echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
           if test "$ZIG_PIC" = "-fPIE"; then true;

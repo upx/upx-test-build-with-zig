@@ -112,8 +112,9 @@ jobs:
           echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
-          # update ZIG_TARGET (i386 => x86)
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}
+          # update ZIG_TARGET
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}  # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/muslsf/musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           #
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
