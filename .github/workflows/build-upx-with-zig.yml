@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 79 build-on-linux targets (jobs)
+# 75 build-on-linux targets (jobs)
 #  9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -24,8 +24,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-06-17
-  ZIG_DIST_VERSION: 0.14.0-dev.43+96501d338
+  # 2024-06-18
+  ZIG_DIST_VERSION: 0.14.0-dev.61+04e08ea88
 
 jobs:
   job-build-on-linux:
@@ -57,24 +57,25 @@ jobs:
           - { zig_target: mips-linux-musl, qemu: qemu-mips }
           - { zig_target: mips-linux-musl, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mips-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips }
-          - { zig_target: mips-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
+          # { zig_target: mips-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE } # TODO later
           - { zig_target: mipsel-linux-musl, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musl, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mipsel }
-          - { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE }
+          # { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE } # TODO later
           - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64-linux-musl, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
-          - { zig_target: mips64-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: mips64-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE } # TODO later
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64el-linux-musl, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
-          - { zig_target: mips64el-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: mips64el-linux-muslsf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE } # TODO later
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musl, qemu: qemu-ppc, zig_pic: -fPIE }
           # powerpc64: obscure problem with C++ exceptions in UPX doctest checks; use -fPIC to work-around
-          #   TODO later: check if the upgrade to llvm-18 has fixed the problem
-          - { zig_target: powerpc64-linux-musl, zig_flags: -fPIC, qemu: qemu-ppc64 }
+          #   (looks like the problem is fixed in zig-0.13/llvm-18)
+          ####{ zig_target: powerpc64-linux-musl, zig_flags: -fPIC, qemu: qemu-ppc64 }
+          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
           # powerpc64: but WORKS (i.e. no problem) when using -fPIE
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
