@@ -15,8 +15,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-06-18
-  ZIG_DIST_VERSION: 0.14.0-dev.61+04e08ea88
+  # 2024-06-19
+  ZIG_DIST_VERSION: 0.14.0-dev.65+5f2bdafa3
 
 jobs:
   job-build-on-macos:
@@ -27,8 +27,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # { os: macos-11, zig_target: x86_64-macos-none }
-          # { os: macos-11, zig_target: x86_64-macos.11.0-none }
+          # { os: macos-11, zig_target: x86_64-macos-none }         # macos-11 is EOL
+          # { os: macos-11, zig_target: x86_64-macos.11.0-none }    # macos-11 is EOL
           - { os: macos-12, zig_target: x86_64-macos-none }
           - { os: macos-12, zig_target: x86_64-macos.11.0-none }
           - { os: macos-12, zig_target: x86_64-macos.12.0-none }
