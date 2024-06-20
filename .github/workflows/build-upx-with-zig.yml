@@ -24,8 +24,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  # 2024-06-19
-  ZIG_DIST_VERSION: 0.14.0-dev.65+5f2bdafa3
+  # 2024-06-20
+  ZIG_DIST_VERSION: 0.14.0-dev.91+a154d8da8
 
 jobs:
   job-build-on-linux:
@@ -229,6 +229,11 @@ jobs:
           if test "X$ZIG_PIC" = "X-fPIE"; then true;
             echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
           fi
+
+      - run: zig-cc --version; zig-cxx --version
+      # list predefined macros
+      - run: zig-cc  -E -x c   -dM /dev/null
+      - run: zig-cxx -E -x c++ -dM /dev/null
 
       - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
         run: |
