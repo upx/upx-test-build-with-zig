@@ -25,7 +25,7 @@ env:
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
   # 2024-06-24
-  ZIG_DIST_VERSION: 0.14.0-dev.119+e73ae94b3
+  ZIG_DIST_VERSION: 0.14.0-dev.121+ab4c461b7
 
 jobs:
   job-build-on-linux:
@@ -37,6 +37,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+
           # Linux musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE }
@@ -164,7 +165,6 @@ jobs:
           - { zig_target: x86_64-macos.13.0-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
-          #   TODO later: this got broken with the llvm-18 upgrade; examine why
           - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON' }
 
     env:
@@ -260,7 +260,7 @@ jobs:
       - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/debug \
-           CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
           file build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx*
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
