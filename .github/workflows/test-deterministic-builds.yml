@@ -17,8 +17,12 @@ env:
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
-  # 2024-07-07
-  ZIG_DIST_VERSION: 0.14.0-dev.185+c40708a2c
+  # for upx.git cloning:
+  REMOTE_REF_NAME: test-threads
+  REMOTE_REPOSITORY: upx/upx-test-threads
+  REMOTE_SERVER_URL: https://github.com
+  # 2024-07-10
+  ZIG_DIST_VERSION: 0.14.0-dev.211+0cc42d090
 
 jobs:
   job-build-on-linux:
@@ -75,8 +79,6 @@ jobs:
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
-      # for upx.git cloning:
-      UPX_REF_NAME: devel
 
     steps:
       - name: ${{ format('Install packages {0}', 'alpine:3.20') }}
@@ -122,9 +124,9 @@ jobs:
             echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
           fi
 
-      - name: ${{ format('Check out UPX {0} source code', env.UPX_REF_NAME) }}
+      - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |
-          git clone --branch $UPX_REF_NAME --depth 1 https://github.com/upx/upx .
+          git clone --branch "$REMOTE_REF_NAME" --depth 1 "$REMOTE_SERVER_URL/$REMOTE_REPOSITORY" .
           git submodule update --init
           rev=$(git rev-parse --short=7 HEAD)
           echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
@@ -157,11 +159,11 @@ jobs:
           # move result away
           mv -v build/zig build/zig-with-x86_64
 
-      - name: ${{ format('Make artifact from upx-{0}-{1}', env.UPX_REF_NAME, env.UPX_GITREV_SHORT) }}
+      - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
         shell: bash
         run: |
           N=$(echo "upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
-          xbuild=$(echo "build-upx-${UPX_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
+          xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact/$N/$xbuild && find . -type f | LC_ALL=C sort | xargs -r file)
