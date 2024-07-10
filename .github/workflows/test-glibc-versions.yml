@@ -74,8 +74,8 @@ jobs:
           # 0.12.0                              # 2024-04-20 llvm-17.0.6
           # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
           # 0.13.0                              # 2024-06-07 llvm-18.1.6
-          # 2024-07-07 llvm-18.1.7; current llvm-18
-          - 0.14.0-dev.185+c40708a2c
+          # 2024-07-10 llvm-18.1.7; current llvm-18
+          - 0.14.0-dev.218+b3b923e51
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
@@ -166,8 +166,8 @@ jobs:
           path: tmp/artifact
 
       - name: 'Run ctest tests'
-        # info: glibc-2.38 cannot run on Ubuntu-22.04 GitHub runner host (glibc-2.35)
-        if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.38') }}
+        # info: glibc-2.39 cannot run on Ubuntu-22.04 GitHub runner host (glibc-2.35)
+        if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.39') }}
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -v
           make build/zig/${ZIG_TARGET}${ZIG_PIC}/all+test
