@@ -28,8 +28,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-12
-  ZIG_DIST_VERSION: 0.14.0-dev.225+45be80364
+  # 2024-07-13
+  ZIG_DIST_VERSION: 0.14.0-dev.244+0d79aa017
 
 jobs:
   job-build-on-linux:
@@ -49,8 +49,9 @@ jobs:
           # { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: arm-linux-musleabi, qemu: qemu-arm }
           # { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
-          - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
+          # zig bug TODO later: need -mcpu=cortex_a5 because of problems when using -save-temps
+          - { zig_target: arm-linux-musleabihf, zig_flags: -mcpu=cortex_a5, qemu: qemu-arm }
+          - { zig_target: arm-linux-musleabihf, zig_flags: -mcpu=cortex_a5, qemu: qemu-arm, zig_pic: -fPIE }
           # { zig_target: armeb-linux-musleabi, qemu: qemu-armeb }
           # { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
           # { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
@@ -96,9 +97,10 @@ jobs:
           - { zig_target: aarch64-linux-gnu }
           # { zig_target: aarch64_be-linux-gnu }
           # { zig_target: arm-linux-gnueabi }
-          - { zig_target: arm-linux-gnueabihf }
+          # zig bug TODO later: need -mcpu=cortex_a5 because of problems when using -save-temps
+          - { zig_target: arm-linux-gnueabihf, zig_flags: -mcpu=cortex_a5 }
           # { zig_target: armeb-linux-gnueabi }
-          # { zig_target: armeb-linux-gnueabihf }
+          # { zig_target: armeb-linux-gnueabihf, zig_flags: -mcpu=cortex_a5 }
           # { zig_target: csky-linux-gnueabi }
           # { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
