@@ -21,8 +21,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-13
-  ZIG_DIST_VERSION: 0.14.0-dev.244+0d79aa017
+  # 2024-07-16
+  ZIG_DIST_VERSION: 0.14.0-dev.318+e5c974fa5
 
 jobs:
   job-build-on-linux:
@@ -118,11 +118,13 @@ jobs:
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}  # i386 => x86
           ZIG_TARGET=${ZIG_TARGET/muslsf/musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
+          # update ZIG_FLAGS
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
-          if test "$ZIG_PIC" = "-fPIE"; then true;
-            echo "ZIG_FLAGS=$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments" >> $GITHUB_ENV
+          if test "X$ZIG_PIC" = "X-fPIE"; then true;
+            ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
           fi
+          echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |
