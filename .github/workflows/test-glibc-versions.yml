@@ -128,6 +128,10 @@ jobs:
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
             echo "ZIG_FLAGS=$ZIG_FLAGS -fno-sanitize=all" >> $GITHUB_ENV
           fi
+          if [[ $ZIG_TARGET == x86-linux-gnu.2.3.* ]]; then true;
+             # i386 glibc-2.3.x: problems when linking shared libray in Debug build
+             echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # zig problem
+          fi
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |

@@ -28,8 +28,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-16
-  ZIG_DIST_VERSION: 0.14.0-dev.318+e5c974fa5
+  # 2024-07-18
+  ZIG_DIST_VERSION: 0.14.0-dev.363+c3faae6bf
 
 jobs:
   job-build-on-linux:
@@ -104,7 +104,7 @@ jobs:
           # { zig_target: csky-linux-gnueabi }
           # { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
-          - { zig_target: i386-linux-gnu.2.3.4 }                    # RHEL 4
+          - { zig_target: i386-linux-gnu.2.3.4, UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
           - { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5, manylinux1
           - { zig_target: i386-linux-gnu.2.7 }                      # Ubuntu 8.04 LTS
           - { zig_target: i386-linux-gnu.2.11 }                     # SLES 11, Fedora 12
@@ -211,6 +211,7 @@ jobs:
           test -z "${{ matrix.UPX_CONFIG_DISABLE_RUN_PACKED_TEST }}" || echo "UPX_CONFIG_DISABLE_RUN_PACKED_TEST=${{ matrix.UPX_CONFIG_DISABLE_RUN_PACKED_TEST }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" || echo "UPX_CONFIG_DISABLE_SANITIZE=${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" >> $GITHUB_ENV
+          test -z "${{ matrix.UPX_CONFIG_DISABLE_SHARED_LIBS }}" || echo "UPX_CONFIG_DISABLE_SHARED_LIBS=${{ matrix.UPX_CONFIG_DISABLE_SHARED_LIBS }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_EXPECT_THREADS }}" || echo "UPX_CONFIG_EXPECT_THREADS=${{ matrix.UPX_CONFIG_EXPECT_THREADS }}" >> $GITHUB_ENV
           test -z "${{ matrix.tt }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV
 
@@ -246,6 +247,7 @@ jobs:
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
           if test "X$ZIG_PIC" = "X-fPIE"; then true;
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
+            echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
           # clang bug TODO later: bogus warnings when using -save-temps
           ##ZIG_FLAGS="$ZIG_FLAGS -save-temps -Wno-parentheses-equality -Wno-self-assign"
