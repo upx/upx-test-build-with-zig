@@ -74,8 +74,8 @@ jobs:
           # 0.12.0                              # 2024-04-20 llvm-17.0.6
           # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
           # 0.13.0                              # 2024-06-07 llvm-18.1.6
-          # 2024-07-10 llvm-18.1.7; current llvm-18
-          - 0.14.0-dev.218+b3b923e51
+          # 2024-07-19 llvm-18.1.7; current llvm-18
+          - 0.14.0-dev.367+a57479afc
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
