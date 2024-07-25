@@ -28,8 +28,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-19
-  ZIG_DIST_VERSION: 0.14.0-dev.367+a57479afc
+  # 2024-07-25
+  ZIG_DIST_VERSION: 0.14.0-dev.560+fa95c89a7
 
 jobs:
   job-build-on-linux:
@@ -239,8 +239,8 @@ jobs:
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}  # i386 => x86
-          ZIG_TARGET=${ZIG_TARGET/muslsf/musl} # muslsf => musl
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/-muslsf/-musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # update ZIG_FLAGS
           # -fPIE is for compilation only => also use the correct linker flag "-pie"

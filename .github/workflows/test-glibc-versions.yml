@@ -74,8 +74,8 @@ jobs:
           # 0.12.0                              # 2024-04-20 llvm-17.0.6
           # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
           # 0.13.0                              # 2024-06-07 llvm-18.1.6
-          # 2024-07-19 llvm-18.1.7; current llvm-18
-          - 0.14.0-dev.367+a57479afc
+          # 2024-07-25 llvm-18.1.7; current llvm-18
+          - 0.14.0-dev.560+fa95c89a7
 
     env:
       ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
@@ -117,8 +117,8 @@ jobs:
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}  # i386 => x86
-          ZIG_TARGET=${ZIG_TARGET/muslsf/musl} # muslsf => musl
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/-muslsf/-musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           #
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
