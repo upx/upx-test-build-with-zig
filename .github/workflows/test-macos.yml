@@ -15,12 +15,13 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
+  ZSTD_CLEVEL: 9
   # for upx.git cloning:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-28
-  ZIG_DIST_VERSION: 0.14.0-dev.653+91c17979f
+  # 2024-07-30
+  ZIG_DIST_VERSION: 0.14.0-dev.716+38e0f049c
 
 jobs:
   job-build-on-macos:

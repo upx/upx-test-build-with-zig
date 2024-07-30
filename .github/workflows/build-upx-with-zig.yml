@@ -24,12 +24,13 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
+  ZSTD_CLEVEL: 9
   # for upx.git cloning:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-28
-  ZIG_DIST_VERSION: 0.14.0-dev.653+91c17979f
+  # 2024-07-30
+  ZIG_DIST_VERSION: 0.14.0-dev.716+38e0f049c
 
 jobs:
   job-build-on-linux:
@@ -192,7 +193,7 @@ jobs:
         if: ${{ job.container }}
         shell: sh
         run: |
-          apk update && apk upgrade && apk add bash cmake coreutils file git make parallel tar xz
+          apk update && apk upgrade && apk add bash cmake coreutils file git make parallel tar util-linux xz zstd
           if test '${{ matrix.zig_target }}' = 'x86_64-linux-gnu'; then # only do this once per Action
             apk add clang g++
           fi
@@ -283,7 +284,8 @@ jobs:
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */upx{,.exe} */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact/$N/$xbuild && find . -type f | LC_ALL=C sort | xargs -r file)
-          (cd tmp/artifact && tar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          if command -v hardlink >/dev/null; then (cd "tmp/artifact/$N" && hardlink .) fi
+          (cd tmp/artifact && tar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la)
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
