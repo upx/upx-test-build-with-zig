@@ -15,7 +15,7 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  ZSTD_CLEVEL: 9
+  ZSTD_CLEVEL: 17
   # for upx.git cloning:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads

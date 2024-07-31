@@ -24,13 +24,13 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
-  ZSTD_CLEVEL: 9
+  ZSTD_CLEVEL: 17
   # for upx.git cloning:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-30
-  ZIG_DIST_VERSION: 0.14.0-dev.716+38e0f049c
+  # 2024-07-31
+  ZIG_DIST_VERSION: 0.14.0-dev.737+30b4a87db
 
 jobs:
   job-build-on-linux:
@@ -282,6 +282,13 @@ jobs:
           N=$(echo "upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           mkdir -p "tmp/artifact/$N/$xbuild"
+          if [[ "${{ matrix.zig_target }}" == *-linux* ]]; then
+            dirs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+            for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdir/$d" cmake --install build/zig/$d; done
+            for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdirAndStrip/$d" cmake --install build/zig/$d --strip; done
+            for d in $dirs; do cmake --install build/zig/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$d"; done
+            for d in $dirs; do cmake --install build/zig/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$d" --strip; done
+          fi
           (cd build && shopt -s nullglob && cp -ai --parents */upx{,.exe} */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact/$N/$xbuild && find . -type f | LC_ALL=C sort | xargs -r file)
           if command -v hardlink >/dev/null; then (cd "tmp/artifact/$N" && hardlink .) fi
@@ -535,8 +542,13 @@ jobs:
           N=$(echo "upx-zigcc-${{ matrix.os }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           mkdir -p "tmp/artifact/$N/$xbuild"
+          dirs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdir/$BUILD_SUBDIR/$d" cmake --install build/$BUILD_SUBDIR/$d; done
+          for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdirAndStrip/$BUILD_SUBDIR/$d" cmake --install build/$BUILD_SUBDIR/$d --strip; done
+          for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$BUILD_SUBDIR/$d"; done
+          for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$BUILD_SUBDIR/$d" --strip; done
           (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
-          (cd tmp/artifact && gtar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          (cd tmp/artifact && gtar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la)
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
