@@ -20,8 +20,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-31
-  ZIG_DIST_VERSION: 0.14.0-dev.737+30b4a87db
+  # 2024-08-02
+  ZIG_DIST_VERSION: 0.14.0-dev.823+624fa8523
 
 jobs:
   job-build-on-macos:
@@ -51,7 +51,6 @@ jobs:
           - { os: macos-14, zig_target: aarch64-macos.13.0-none }
 
     env:
-      UPX_CONFIG_EXPECT_THREADS: 'ON'
       # for zig-cc wrapper scripts (see below):
       ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # (enabled on macOS by default)
       ZIG_FLAGS: ${{ matrix.zig_flags }}

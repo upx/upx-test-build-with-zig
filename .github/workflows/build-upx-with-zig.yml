@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-07-31
-  ZIG_DIST_VERSION: 0.14.0-dev.737+30b4a87db
+  # 2024-08-02
+  ZIG_DIST_VERSION: 0.14.0-dev.823+624fa8523
 
 jobs:
   job-build-on-linux:
@@ -175,7 +175,6 @@ jobs:
           - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON', UPX_CONFIG_EXPECT_THREADS: 'OFF' }
 
     env:
-      ##UPX_CONFIG_EXPECT_THREADS: 'ON'
       # zig is currently missing winpthreads; see https://github.com/ziglang/zig/issues/10989
       UPX_CONFIG_EXPECT_THREADS: ${{ contains(matrix.zig_target, '-windows') && 'OFF' || 'ON' }}
       # for zig-cc wrapper scripts (see below):
@@ -461,7 +460,6 @@ jobs:
           - { os: macos-14, zig_target: aarch64-macos.13.0-none }
 
     env:
-      UPX_CONFIG_EXPECT_THREADS: 'ON'
       # for zig-cc wrapper scripts (see below):
       ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # (enabled on macOS by default)
       ZIG_FLAGS: ${{ matrix.zig_flags }}
