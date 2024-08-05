@@ -30,7 +30,6 @@ jobs:
       fail-fast: false
       matrix:
         zig_target:
-          # TODO later: add glibc-2.39 targets
           # i386-linux-gnu
           - i386-linux-gnu.2.3.3                # oldest glibc version that works with current libc++
           - i386-linux-gnu.2.3.4                # RHEL 4
@@ -43,7 +42,7 @@ jobs:
           - i386-linux-gnu.2.16                 # aligned_alloc()
           - i386-linux-gnu.2.17                 # RHEL 7, manylinux2014
           - i386-linux-gnu.2.18                 # __cxa_thread_atexit_impl (needed for libc++ multithreading)
-          - i386-linux-gnu.2.24                 # Debian 9
+          - i386-linux-gnu.2.24                 # Debian 9, manylinux_2_24
           - i386-linux-gnu.2.28                 # RHEL 8, Debian 10, manylinux_2_28
           - i386-linux-gnu.2.31                 # Debian 11, Ubuntu 20.04 LTS
           - i386-linux-gnu.2.34                 # RHEL 9
@@ -62,7 +61,7 @@ jobs:
           - x86_64-linux-gnu.2.16               # aligned_alloc()
           - x86_64-linux-gnu.2.17               # RHEL 7, manylinux2014
           - x86_64-linux-gnu.2.18               # __cxa_thread_atexit_impl (needed for libc++ multithreading)
-          - x86_64-linux-gnu.2.24               # Debian 9
+          - x86_64-linux-gnu.2.24               # Debian 9, manylinux_2_24
           - x86_64-linux-gnu.2.28               # RHEL 8, Debian 10, manylinux_2_28
           - x86_64-linux-gnu.2.31               # Debian 11, Ubuntu 20.04 LTS
           - x86_64-linux-gnu.2.34               # RHEL 9
