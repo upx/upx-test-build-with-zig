@@ -21,7 +21,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2024-08-08
-  ZIG_DIST_VERSION: 0.14.0-dev.909+f9f894200
+  ZIG_DIST_VERSION: 0.14.0-dev.944+0e99f517f
 
 jobs:
   job-build-on-macos:
@@ -132,7 +132,9 @@ jobs:
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
-          (cd tmp/artifact && gtar --sort=name -czf "$N.tar.gz" "$N" && rm -rf "./$N")
+          hardlink="$HOMEBREW_PREFIX/opt/util-linux/bin/hardlink"
+          if test -f "$hardlink"; then (cd "tmp/artifact/$N" && "$hardlink" .) fi
+          (cd tmp/artifact && gtar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la && zstd -tq "$N.tar.zst")
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}

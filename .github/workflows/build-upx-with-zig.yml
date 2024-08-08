@@ -30,7 +30,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2024-08-08
-  ZIG_DIST_VERSION: 0.14.0-dev.909+f9f894200
+  ZIG_DIST_VERSION: 0.14.0-dev.944+0e99f517f
 
 jobs:
   job-build-on-linux:
@@ -300,7 +300,7 @@ jobs:
           (cd build && shopt -s nullglob && cp -ai --parents */upx{,.exe} */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact/$N/$xbuild && find . -type f | LC_ALL=C sort | xargs -r file)
           if command -v hardlink >/dev/null; then (cd "tmp/artifact/$N" && hardlink .) fi
-          (cd tmp/artifact && tar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la)
+          (cd tmp/artifact && tar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la && zstd -tq "$N.tar.zst")
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
@@ -555,7 +555,9 @@ jobs:
           for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$BUILD_SUBDIR/$d"; done
           for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$BUILD_SUBDIR/$d" --strip; done
           (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
-          (cd tmp/artifact && gtar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la)
+          hardlink="$HOMEBREW_PREFIX/opt/util-linux/bin/hardlink"
+          if test -f "$hardlink"; then (cd "tmp/artifact/$N" && "$hardlink" .) fi
+          (cd tmp/artifact && gtar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la && zstd -tq "$N.tar.zst")
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}

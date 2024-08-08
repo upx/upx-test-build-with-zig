@@ -161,7 +161,7 @@ jobs:
           mkdir -p "tmp/artifact/$N/$xbuild"
           (cd build && shopt -s nullglob && cp -ai --parents */upx* zig/*/*/upx* "../tmp/artifact/$N/$xbuild")
           if command -v hardlink >/dev/null; then (cd "tmp/artifact/$N" && hardlink .) fi
-          (cd tmp/artifact && tar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la)
+          (cd tmp/artifact && tar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la && zstd -tq "$N.tar.zst")
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
