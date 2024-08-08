@@ -13,6 +13,7 @@ env:
   NO_COLOR: 1
   UPX_CMAKE_BUILD_FLAGS: --verbose
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
+  UPX_CONFIG_HAVE_WORKING_BUILD_RPATH: 'ON'
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
   UPX_DEBUG_TEST_LIBC_QSORT: 1
   ZSTD_CLEVEL: 17
@@ -25,7 +26,7 @@ jobs:
   job-build-on-linux:
     # if: github.repository_owner == 'upx'
     name: ${{ format('{0} / {1}', matrix.zig_target, matrix.zig_dist_version) }}
-    runs-on: ubuntu-22.04 # host glibc-2.35 # TODO later: upgrade to ubuntu-24.04 once that is stable
+    runs-on: ubuntu-22.04 # host glibc-2.35 # TODO later: use ubuntu-24.04 once that is stable
     strategy:
       fail-fast: false
       matrix:
