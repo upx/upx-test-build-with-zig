@@ -21,11 +21,18 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
+  # 2024-08-11
+  ZIG_DIST_VERSION: 0.14.0-dev.1012+b7c01120b
+  # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
+  # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
+  # 0.12.0                              # 2024-04-20 llvm-17.0.6
+  # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
+  # 0.13.0                              # 2024-06-07 llvm-18.1.6
 
 jobs:
   job-build-on-linux:
     # if: github.repository_owner == 'upx'
-    name: ${{ format('{0} / {1}', matrix.zig_target, matrix.zig_dist_version) }}
+    name: ${{ format('{0}', matrix.zig_target) }}
     runs-on: ubuntu-22.04 # host glibc-2.35 # TODO later: use ubuntu-24.04 once that is stable
     strategy:
       fail-fast: false
@@ -49,7 +56,8 @@ jobs:
           - i386-linux-gnu.2.34                 # RHEL 9
           - i386-linux-gnu.2.35                 # Ubuntu 22.04 LTS
           - i386-linux-gnu.2.36                 # Debian 12
-          - i386-linux-gnu.2.39                 # latest glibc version supported by zig
+          - i386-linux-gnu.2.39                 # Ubuntu 24.04 LTS
+          - i386-linux-gnu.2.40                 # latest glibc version supported by zig
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.3              # oldest glibc version that works with current libc++
           - x86_64-linux-gnu.2.3.4              # RHEL 4
@@ -68,22 +76,14 @@ jobs:
           - x86_64-linux-gnu.2.34               # RHEL 9
           - x86_64-linux-gnu.2.35               # Ubuntu 22.04 LTS
           - x86_64-linux-gnu.2.36               # Debian 12
-          - x86_64-linux-gnu.2.39               # latest glibc version supported by zig
-        zig_dist_version:
-          # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
-          # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
-          # 0.12.0                              # 2024-04-20 llvm-17.0.6
-          # 0.13.0-dev.75+5c9eb4081             # 2024-05-08 llvm-17.0.6; last llvm-17
-          # 0.13.0                              # 2024-06-07 llvm-18.1.6
-          # 2024-08-10 llvm-18.1.7; current llvm-18
-          - 0.14.0-dev.1002+71a27ebd8
+          - x86_64-linux-gnu.2.39               # Ubuntu 24.04 LTS
+          - x86_64-linux-gnu.2.40               # latest glibc version supported by zig
 
     env:
-      ZIG_DIST_VERSION: ${{ matrix.zig_dist_version }}
       # for zig-cc wrapper scripts (see below):
       CC: zig-cc
       CXX: zig-cxx
-      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING # (enabled on glibc by default)
+      ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
       ZIG_FLAGS: ${{ matrix.zig_flags }}
       ZIG_PIC: ${{ matrix.zig_pic }}
       ZIG_TARGET: ${{ matrix.zig_target }}
@@ -172,7 +172,7 @@ jobs:
 
       - name: 'Run ctest tests'
         # info: glibc-2.39 cannot run on Ubuntu-22.04 GitHub runner host (glibc-2.35)
-        if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.39') }}
+        if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.39') && !endsWith(matrix.zig_target, '-linux-gnu.2.40') }}
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -v
           make build/zig/${ZIG_TARGET}${ZIG_PIC}/all+test
