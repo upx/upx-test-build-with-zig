@@ -30,7 +30,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2024-08-14
-  ZIG_DIST_VERSION: 0.14.0-dev.1052+d6f997259
+  ZIG_DIST_VERSION: 0.14.0-dev.1057+76f062690
 
 jobs:
   job-build-on-linux:
@@ -181,6 +181,47 @@ jobs:
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
           - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON', UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON', UPX_CONFIG_EXPECT_THREADS: 'OFF' }
 
+          # just for testing: MIPS extra -march tests
+          #   - mips32 is based on mips2; it looks like mips32 is the default arch for zig
+          #   - mips1 is experimental (not fully supported) by clang/llvm
+          #   - mips32r4 is not supported by clang/llvm/gcc
+          #   - zig bug: mips3 and mips4 do not work (need extra flags)
+          #   - zig bug: mips32r6 needs UPX_CONFIG_DISABLE_SAVE_TEMPS
+          # ====== working
+          # { zig_target: mips2-linux-musl,        zig_flags: -march=mips2,                 qemu: qemu-mips }
+          # { zig_target: mips2-linux-muslsf,      zig_flags: -march=mips2 -msoft-float,    qemu: qemu-mips }
+          # { zig_target: mipsel2-linux-musl,      zig_flags: -march=mips2,                 qemu: qemu-mipsel }
+          # { zig_target: mipsel2-linux-muslsf,    zig_flags: -march=mips2 -msoft-float,    qemu: qemu-mipsel }
+          # { zig_target: mips32-linux-musl,       zig_flags: -march=mips32,                qemu: qemu-mips }
+          # { zig_target: mips32-linux-muslsf,     zig_flags: -march=mips32 -msoft-float,   qemu: qemu-mips }
+          # { zig_target: mipsel32-linux-musl,     zig_flags: -march=mips32,                qemu: qemu-mipsel }
+          # { zig_target: mipsel32-linux-muslsf,   zig_flags: -march=mips32 -msoft-float,   qemu: qemu-mipsel }
+          # { zig_target: mips32r2-linux-musl,     zig_flags: -march=mips32r2,              qemu: qemu-mips }
+          # { zig_target: mips32r2-linux-muslsf,   zig_flags: -march=mips32r2 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mipsel32r2-linux-musl,   zig_flags: -march=mips32r2,              qemu: qemu-mipsel }
+          # { zig_target: mipsel32r2-linux-muslsf, zig_flags: -march=mips32r2 -msoft-float, qemu: qemu-mipsel }
+          # { zig_target: mips32r3-linux-musl,     zig_flags: -march=mips32r3,              qemu: qemu-mips }
+          # { zig_target: mips32r3-linux-muslsf,   zig_flags: -march=mips32r3 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mipsel32r3-linux-musl,   zig_flags: -march=mips32r3,              qemu: qemu-mipsel }
+          # { zig_target: mipsel32r3-linux-muslsf, zig_flags: -march=mips32r3 -msoft-float, qemu: qemu-mipsel }
+          # { zig_target: mips32r5-linux-musl,     zig_flags: -march=mips32r5,              qemu: qemu-mips }
+          # { zig_target: mips32r5-linux-muslsf,   zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mipsel32r5-linux-musl,   zig_flags: -march=mips32r5,              qemu: qemu-mipsel }
+          # { zig_target: mipsel32r5-linux-muslsf, zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mipsel }
+          # ====== these currently do not work with zig
+          # { zig_target: mips3-linux-musl,        zig_flags: -march=mips3,                 qemu: qemu-mips }
+          # { zig_target: mips3-linux-muslsf,      zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mips }
+          # { zig_target: mipsel3-linux-musl,      zig_flags: -march=mips3,                 qemu: qemu-mipsel }
+          # { zig_target: mipsel3-linux-muslsf,    zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mipsel }
+          # { zig_target: mips4-linux-musl,        zig_flags: -march=mips4,                 qemu: qemu-mips }
+          # { zig_target: mips4-linux-muslsf,      zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mips }
+          # { zig_target: mipsel4-linux-musl,      zig_flags: -march=mips4,                 qemu: qemu-mipsel }
+          # { zig_target: mipsel4-linux-muslsf,    zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mipsel }
+          # { zig_target: mips32r6-linux-musl,     zig_flags: -march=mips32r6,              qemu: qemu-mips,   UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+          # { zig_target: mips32r6-linux-muslsf,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips,   UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+          # { zig_target: mipsel32r6-linux-musl,   zig_flags: -march=mips32r6,              qemu: qemu-mipsel, UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+          # { zig_target: mipsel32r6-linux-muslsf, zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel, UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+
     env:
       # zig problem on Windows with CMake WINDOWS_EXPORT_ALL_SYMBOLS and duplicate __chkstk/___chkstk_ms; seems fixed in 0.14.0-dev
       ####UPX_CONFIG_DISABLE_SHARED_LIBS: ${{ contains(matrix.zig_target, '-windows') && 'ON' || 'OFF' }}
@@ -219,6 +260,7 @@ jobs:
           # allow matrix to override env vars
           test -z "${{ matrix.UPX_CONFIG_DISABLE_RUN_PACKED_TEST }}" || echo "UPX_CONFIG_DISABLE_RUN_PACKED_TEST=${{ matrix.UPX_CONFIG_DISABLE_RUN_PACKED_TEST }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" || echo "UPX_CONFIG_DISABLE_SANITIZE=${{ matrix.UPX_CONFIG_DISABLE_SANITIZE }}" >> $GITHUB_ENV
+          test -z "${{ matrix.UPX_CONFIG_DISABLE_SAVE_TEMPS }}" || echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=${{ matrix.UPX_CONFIG_DISABLE_SAVE_TEMPS }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SHARED_LIBS }}" || echo "UPX_CONFIG_DISABLE_SHARED_LIBS=${{ matrix.UPX_CONFIG_DISABLE_SHARED_LIBS }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_EXPECT_THREADS }}" || echo "UPX_CONFIG_EXPECT_THREADS=${{ matrix.UPX_CONFIG_EXPECT_THREADS }}" >> $GITHUB_ENV
@@ -251,6 +293,14 @@ jobs:
           # update ZIG_TARGET
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
           ZIG_TARGET=${ZIG_TARGET/-muslsf/-musl} # muslsf => musl
+          ZIG_TARGET=${ZIG_TARGET/mips2-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel2-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips3-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel3-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips4-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel4-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips32-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel32-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips32r2-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel32r2-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips32r3-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel32r3-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips32r5-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel32r5-/mipsel-}
+          ZIG_TARGET=${ZIG_TARGET/mips32r6-/mips-}; ZIG_TARGET=${ZIG_TARGET/mipsel32r6-/mipsel-}
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # update ZIG_FLAGS
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
@@ -259,8 +309,9 @@ jobs:
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
             echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
-          # clang/zig bug TODO later: need -mcpu=cortex_a5 because of problems when using -save-temps
+          # zig bug TODO later: need -mcpu=cortex_a5 because of problems when using -save-temps
           case "$ZIG_TARGET" in
+            # note: could also use UPX_CONFIG_DISABLE_SAVE_TEMPS
             arm-linux-gnueabi*   | arm-linux-musleabi*)   ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
             armeb-linux-gnueabi* | armeb-linux-musleabi*) ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
             thumb-linux-gnueabi* | thumb-linux-musleabi*) ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
