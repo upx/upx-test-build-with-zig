@@ -29,15 +29,15 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-08-13
-  ZIG_DIST_VERSION: 0.14.0-dev.1033+25096ed89
+  # 2024-08-14
+  ZIG_DIST_VERSION: 0.14.0-dev.1038+87ec4e11c
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: 'alpine:edge'
+    container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || 'alpine:edge' }} # qemu-armeb bug
     strategy:
       fail-fast: false
       matrix:
@@ -52,11 +52,10 @@ jobs:
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          # PRIORITY 1: armeb test crashes - possible qemu bug or bad codegen
-          - { zig_target: armeb-linux-musleabi, NO_qemu: qemu-armeb }
-          - { zig_target: armeb-linux-musleabi, NO_qemu: qemu-armeb, zig_pic: -fPIE }
-          - { zig_target: armeb-linux-musleabihf, NO_qemu: qemu-armeb }
-          - { zig_target: armeb-linux-musleabihf, NO_qemu: qemu-armeb, zig_pic: -fPIE }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE, UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
+          - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
+          - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
@@ -94,6 +93,11 @@ jobs:
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabihf, NO_qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
+          # thumbeb: clang/zig bug: "error: write to reserved register 'R7'"
+          # { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb }
+          # { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
+          # { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb }
+          # { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIE }
 
@@ -129,8 +133,10 @@ jobs:
           # { zig_target: s390x-linux-gnu }
           # { zig_target: sparc-linux-gnu }
           # { zig_target: sparc64-linux-gnu }
-          # { zig_target: thumb-linux-gnueabi }
-          # { zig_target: thumb-linux-gnueabihf }                   # does not compile, glibc header problem?
+          # { zig_target: thumb-linux-gnueabi }                     # glibc header problem
+          # { zig_target: thumb-linux-gnueabihf }                   # glibc header problem
+          # { zig_target: thumbeb-linux-gnueabi }                   # glibc header problem
+          # { zig_target: thumbeb-linux-gnueabihf }                 # glibc header problem
           - { zig_target: x86_64-linux-gnu }
           - { zig_target: x86_64-linux-gnu.2.3.4 }                  # RHEL 4
           - { zig_target: x86_64-linux-gnu.2.5 }                    # RHEL 5, manylinux1
@@ -216,6 +222,7 @@ jobs:
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=${{ matrix.UPX_CONFIG_DISABLE_SELF_PACK_TEST }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_DISABLE_SHARED_LIBS }}" || echo "UPX_CONFIG_DISABLE_SHARED_LIBS=${{ matrix.UPX_CONFIG_DISABLE_SHARED_LIBS }}" >> $GITHUB_ENV
           test -z "${{ matrix.UPX_CONFIG_EXPECT_THREADS }}" || echo "UPX_CONFIG_EXPECT_THREADS=${{ matrix.UPX_CONFIG_EXPECT_THREADS }}" >> $GITHUB_ENV
+          test -z "${{ matrix.UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO }}" || echo "UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO=${{ matrix.UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO }}" >> $GITHUB_ENV
           test -z "${{ matrix.tt }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
