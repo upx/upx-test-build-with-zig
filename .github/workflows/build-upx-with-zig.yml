@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 84 build-on-linux targets (jobs)
+# 86 build-on-linux targets (jobs)
 #  9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-08-16
-  ZIG_DIST_VERSION: 0.14.0-dev.1084+72bcc3b7a
+  # 2024-08-17
+  ZIG_DIST_VERSION: 0.14.0-dev.1158+90989be0e
 
 jobs:
   job-build-on-linux:
@@ -86,8 +86,8 @@ jobs:
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
-          # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # PRIORITY 1: thumb test crashes - possible qemu bug or bad codegen; but -fPIE works!
           - { zig_target: thumb-linux-musleabi, NO_qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
