@@ -82,3 +82,6 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
 - https://github.com/ziglang/zig/issues/19206 zig cc -target x86_64-macos-none stopped working
 - https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
+- https://github.com/ziglang/zig/pull/20389 Some riscv32-linux porting work
+
+- https://github.com/llvm/llvm-project/issues/97222 [MC] Support .cfi_label
