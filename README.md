@@ -34,8 +34,10 @@ Noteworthy open zig issues
 - https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
   - **MAJOR BLOCKER**: this means that Windows currently cannot use multi-threading
   - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
-- https://github.com/ziglang/zig/issues/13385
-- OLD VERSION TODO zig-0.12.x branch: libcxx should be upgraded from 17.0.0 to 17.0.6
+- https://github.com/ziglang/zig/issues/10411
+- https://github.com/ziglang/zig/issues/13437
+- https://github.com/ziglang/zig/issues/20376
+- https://github.com/ziglang/zig/issues/20690 RFC/Proposal: Turning Zig target triples into quadruples
 
 
 Noteworthy changes that did improve 'zig cc'
@@ -72,8 +74,9 @@ Closed zig issues
 
 - https://github.com/ziglang/zig/issues/6573
 - https://github.com/ziglang/zig/issues/12886
-- https://github.com/ziglang/zig/issues/12992
+- https://github.com/ziglang/zig/issues/12992 zig c++ does not support exceptions on macos
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
+- https://github.com/ziglang/zig/issues/13385
 - https://github.com/ziglang/zig/issues/17928 zig cc -c -fPIE stopped working
 - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
 - https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
