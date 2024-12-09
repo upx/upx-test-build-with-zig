@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-12-06
-  ZIG_DIST_VERSION: 0.14.0-dev.2384+cbc05e0b1
+  # 2024-12-09
+  ZIG_DIST_VERSION: 0.14.0-dev.2415+e62aac3ec
 
 jobs:
   job-build-on-linux:
@@ -148,9 +148,9 @@ jobs:
           # Linux ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
           - { zig_target: mips64el-linux-gnuabin32 }
-          # { zig_target: x86_64-linux-gnux32 }
-          # { zig_target: x86_64-linux-muslx32 }
-          # { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
+          - { zig_target: x86_64-linux-gnux32 }
+          - { zig_target: x86_64-linux-muslx32 }
+          - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
 
           # Windows (can use Wine for testing); also see https://github.com/mstorsjo/llvm-mingw
           - { zig_target: aarch64-windows-gnu }
