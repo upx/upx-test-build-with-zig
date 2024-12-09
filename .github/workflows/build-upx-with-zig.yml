@@ -30,7 +30,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2024-12-09
-  ZIG_DIST_VERSION: 0.14.0-dev.2415+e62aac3ec
+  ZIG_DIST_VERSION: 0.14.0-dev.2416+a221b2fbf
 
 jobs:
   job-build-on-linux:
@@ -38,7 +38,8 @@ jobs:
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
     #container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || 'alpine:edge' }} # qemu-armeb bug
-    container: 'alpine:3.19'
+    container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || (contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge') }} # qemu-armeb bug
+    #container: 'alpine:3.19'
     strategy:
       fail-fast: false
       matrix:
@@ -59,24 +60,26 @@ jobs:
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
+          - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
+          - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabihf, qemu: qemu-mips }
-          # { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIE } # zig problem: linking currently FAILS; PRIORITY 2
+          - { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips }
-          # { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE } # TODO later
+          - { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
-          # { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE } # zig problem: linking currently FAILS; PRIORITY 2
+          - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel }
-          # { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE } # TODO later
+          - { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
-          # { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE } # zig problem: linking currently FAILS; PRIORITY 2
-          - { zig_target: mips64-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
-          # { zig_target: mips64-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE } # TODO later
+          - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: mips64-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
+          # { zig_target: mips64-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
-          # { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE } # zig problem: linking currently FAILS; PRIORITY 2
-          - { zig_target: mips64el-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
-          # { zig_target: mips64el-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE } # TODO later
+          - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: mips64el-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
+          # { zig_target: mips64el-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc, zig_pic: -fPIE }
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
@@ -89,12 +92,10 @@ jobs:
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          # PRIORITY 1: thumb test crashes - possible qemu bug or bad codegen; but -fPIE works!
-          - { zig_target: thumb-linux-musleabi, NO_qemu: qemu-arm }
+          - { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: thumb-linux-musleabihf, NO_qemu: qemu-arm }
+          - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          # thumbeb: clang/zig bug: "error: write to reserved register 'R7'"
           - { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb }
           - { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb }
@@ -117,6 +118,8 @@ jobs:
           - { zig_target: i386-linux-gnu.2.12 }                     # RHEL 6, manylinux2010
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7, manylinux2014
           - { zig_target: i386-linux-gnu.2.40 }                     # latest glibc version supported by zig
+          # { zig_target: loongarch32-linux-gnu }
+          - { zig_target: loongarch64-linux-gnu }
           # { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
@@ -124,14 +127,14 @@ jobs:
           - { zig_target: mipsel-linux-gnueabihf }
           - { zig_target: mips64-linux-gnuabi64 }
           - { zig_target: mips64el-linux-gnuabi64 }
-          # { zig_target: powerpc-linux-gnueabi }                   # zig problem: currently FAILS; PRIORITY 1
-          # { zig_target: powerpc-linux-gnueabi.2.11 }              # SLES 11, Fedora 12; TODO later
-          # { zig_target: powerpc64-linux-gnu }                     # zig problem: currently FAILS; PRIORITY 1
-          # { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12; TODO later
+          - { zig_target: powerpc-linux-gnueabi }                   # zig problem: currently FAILS; PRIORITY 1
+          - { zig_target: powerpc-linux-gnueabi.2.11 }              # SLES 11, Fedora 12; TODO later
+          - { zig_target: powerpc64-linux-gnu }                     # zig problem: currently FAILS; PRIORITY 1
+          - { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12; TODO later
           - { zig_target: powerpc64le-linux-gnu }
-          # { zig_target: riscv32-linux-gnu }                       # TODO later
-          # { zig_target: riscv64-linux-gnu }                       # .cfi_label PROBLEM; see https://github.com/ziglang/zig-bootstrap/issues/115; PRIORITY 1
-          # { zig_target: s390x-linux-gnu }
+          - { zig_target: riscv32-linux-gnu }
+          - { zig_target: riscv64-linux-gnu }
+          - { zig_target: s390x-linux-gnu }
           # { zig_target: sparc-linux-gnu }
           # { zig_target: sparc64-linux-gnu }
           # { zig_target: thumb-linux-gnueabi }                     # glibc header problem
@@ -224,8 +227,6 @@ jobs:
           # { zig_target: mipsel32r6-linux-muslsf, zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel, UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
 
     env:
-      # zig problem on Windows with CMake WINDOWS_EXPORT_ALL_SYMBOLS and duplicate __chkstk/___chkstk_ms; seems fixed in 0.14.0-dev
-      ####UPX_CONFIG_DISABLE_SHARED_LIBS: ${{ contains(matrix.zig_target, '-windows') && 'ON' || 'OFF' }}
       # zig is currently missing winpthreads; see https://github.com/ziglang/zig/issues/10989
       UPX_CONFIG_EXPECT_THREADS: ${{ contains(matrix.zig_target, '-windows') && 'OFF' || 'ON' }}
       # for zig-cc wrapper scripts (see below):
@@ -239,7 +240,7 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
-      - name: ${{ format('Install packages {0}', 'alpine:edge') }}
+      - name: ${{ format('Install packages {0}', 'alpine') }}
         if: ${{ job.container }}
         shell: sh
         run: |
