@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-12-26
-  ZIG_DIST_VERSION: 0.14.0-dev.2568+42dac40b3
+  # 2025-01-03
+  ZIG_DIST_VERSION: 0.14.0-dev.2597+252c20310
 
 jobs:
   job-build-on-linux:
@@ -38,8 +38,9 @@ jobs:
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
     #container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || 'alpine:edge' }} # qemu-armeb bug
-    container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || (contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge') }} # qemu-armeb bug
+    #container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || (contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge') }} # qemu-armeb bug
     #container: 'alpine:3.19'
+    container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:edge' || (contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge') }} # qemu-armeb bug
     strategy:
       fail-fast: false
       matrix:
