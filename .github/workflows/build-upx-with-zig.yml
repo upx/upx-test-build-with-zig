@@ -29,18 +29,15 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-03
-  ZIG_DIST_VERSION: 0.14.0-dev.2597+252c20310
+  # 2025-01-04
+  ZIG_DIST_VERSION: 0.14.0-dev.2598+b4da8eef2
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    #container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || 'alpine:edge' }} # qemu-armeb bug
-    #container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:3.19' || (contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge') }} # qemu-armeb bug
-    #container: 'alpine:3.19'
-    container: ${{ contains(matrix.qemu, 'qemu-armeb') && 'alpine:edge' || (contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge') }} # qemu-armeb bug
+    container: ${{ contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge' }} # qemu-aarch64_be bug
     strategy:
       fail-fast: false
       matrix:
@@ -228,8 +225,6 @@ jobs:
           # { zig_target: mipsel32r6-linux-muslsf, zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel, UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
 
     env:
-      # zig is currently missing winpthreads; see https://github.com/ziglang/zig/issues/10989
-      UPX_CONFIG_EXPECT_THREADS: ${{ contains(matrix.zig_target, '-windows') && 'OFF' || 'ON' }}
       # for zig-cc wrapper scripts (see below):
       ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
       ZIG_FLAGS: ${{ matrix.zig_flags }}
