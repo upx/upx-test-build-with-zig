@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 107 build-on-linux targets (jobs)
+# 110 build-on-linux targets (jobs)
 #   9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-05
-  ZIG_DIST_VERSION: 0.14.0-dev.2605+136c5a916
+  # 2025-01-06
+  ZIG_DIST_VERSION: 0.14.0-dev.2606+b039a8b61
 
 jobs:
   job-build-on-linux:
@@ -107,6 +107,7 @@ jobs:
           # Linux GNU (glibc)
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64_be-linux-gnu }
+          # { zig_target: arc-linux-gnu }
           - { zig_target: arm-linux-gnueabi }
           - { zig_target: arm-linux-gnueabihf }
           - { zig_target: armeb-linux-gnueabi }
@@ -128,9 +129,9 @@ jobs:
           - { zig_target: mipsel-linux-gnueabihf }
           - { zig_target: mips64-linux-gnuabi64 }
           - { zig_target: mips64el-linux-gnuabi64 }
-          - { zig_target: powerpc-linux-gnueabi }                   # zig problem: currently FAILS; PRIORITY 1
-          - { zig_target: powerpc-linux-gnueabihf }                 # zig problem: currently FAILS; PRIORITY 1
-          - { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12; TODO later
+          - { zig_target: powerpc-linux-gnueabi }
+          - { zig_target: powerpc-linux-gnueabihf }
+          - { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12
           - { zig_target: powerpc64-linux-gnu }                     # zig problem: currently FAILS; PRIORITY 1
           - { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12; TODO later
           - { zig_target: powerpc64le-linux-gnu }
@@ -318,13 +319,18 @@ jobs:
             armeb-linux-gnueabi* | armeb-linux-musleabi*) ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
             thumb-linux-gnueabi* | thumb-linux-musleabi*) ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
           esac
+          # zig bug TODO later: need -Wno-unused-command-line-argument
+          case "$ZIG_TARGET" in
+            powerpc*)         ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
+            wasm32-wasi-musl) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
+          esac
           # clang/zig bug TODO later: bogus warnings when using -save-temps
           ##ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
-      - run: set -x; zig version; zig-cc --version; zig-cxx --version
-      #- run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
-      #- run: zig-cxx -E -x c++ -dM /dev/null # list predefined macros for C++
+      #- run: set -x; zig version; zig-cc --version; zig-cxx --version
+      - run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
+      - run: zig-cxx -E -x c++ -dM /dev/null # list predefined macros for C++
 
       - name: 'Build with local clang and gcc'
         if: ${{ matrix.zig_target == 'x86_64-linux-gnu' }} # only do this once per Action
