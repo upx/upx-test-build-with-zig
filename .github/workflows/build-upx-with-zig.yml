@@ -29,15 +29,16 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-04
-  ZIG_DIST_VERSION: 0.14.0-dev.2598+b4da8eef2
+  # 2025-01-05
+  ZIG_DIST_VERSION: 0.14.0-dev.2605+136c5a916
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: ${{ contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge' }} # qemu-aarch64_be bug
+    #container: ${{ contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge' }} # qemu-aarch64_be bug
+    container: 'alpine:edge'
     strategy:
       fail-fast: false
       matrix:
@@ -62,14 +63,14 @@ jobs:
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: mips-linux-musleabihf, qemu: qemu-mips }
-          - { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips }
           - { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
-          - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
-          - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
+          - { zig_target: mips-linux-musleabihf, qemu: qemu-mips }
+          - { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE }
+          - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
+          - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: mips64-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
@@ -78,6 +79,8 @@ jobs:
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: mips64el-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
           # { zig_target: mips64el-linux-muslabi64, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc }
+          - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc, zig_pic: -fPIE }
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
@@ -126,7 +129,8 @@ jobs:
           - { zig_target: mips64-linux-gnuabi64 }
           - { zig_target: mips64el-linux-gnuabi64 }
           - { zig_target: powerpc-linux-gnueabi }                   # zig problem: currently FAILS; PRIORITY 1
-          - { zig_target: powerpc-linux-gnueabi.2.11 }              # SLES 11, Fedora 12; TODO later
+          - { zig_target: powerpc-linux-gnueabihf }                 # zig problem: currently FAILS; PRIORITY 1
+          - { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12; TODO later
           - { zig_target: powerpc64-linux-gnu }                     # zig problem: currently FAILS; PRIORITY 1
           - { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12; TODO later
           - { zig_target: powerpc64le-linux-gnu }
@@ -319,8 +323,8 @@ jobs:
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
       - run: set -x; zig version; zig-cc --version; zig-cxx --version
-      - run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
-      - run: zig-cxx -E -x c++ -dM /dev/null # list predefined macros for C++
+      #- run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
+      #- run: zig-cxx -E -x c++ -dM /dev/null # list predefined macros for C++
 
       - name: 'Build with local clang and gcc'
         if: ${{ matrix.zig_target == 'x86_64-linux-gnu' }} # only do this once per Action

@@ -31,9 +31,6 @@ for some background info about `zig cc`.
 Noteworthy open zig issues
 ==========================
 
-- https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
-  - **MAJOR BLOCKER**: this means that Windows currently cannot use multi-threading
-  - alternative: `llvm-mingw` from https://github.com/mstorsjo/llvm-mingw
 - https://github.com/ziglang/zig/issues/10411
 - https://github.com/ziglang/zig/issues/13437
 - https://github.com/ziglang/zig/issues/20376
@@ -73,6 +70,7 @@ Closed zig issues
 =================
 
 - https://github.com/ziglang/zig/issues/6573
+- https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
 - https://github.com/ziglang/zig/issues/12886
 - https://github.com/ziglang/zig/issues/12992 zig c++ does not support exceptions on macos
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
