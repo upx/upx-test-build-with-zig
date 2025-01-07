@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-06
-  ZIG_DIST_VERSION: 0.14.0-dev.2606+b039a8b61
+  # 2025-01-07
+  ZIG_DIST_VERSION: 0.14.0-dev.2623+7aa95bc7f 
 
 jobs:
   job-build-on-linux:
@@ -321,8 +321,7 @@ jobs:
           esac
           # zig bug TODO later: need -Wno-unused-command-line-argument
           case "$ZIG_TARGET" in
-            powerpc*)         ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
-            wasm32-wasi-musl) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
+            powerpc*) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
           esac
           # clang/zig bug TODO later: bogus warnings when using -save-temps
           ##ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
