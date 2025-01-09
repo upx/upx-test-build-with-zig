@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-08
-  ZIG_DIST_VERSION: 0.14.0-dev.2627+6a21d18ad
+  # 2025-01-09
+  ZIG_DIST_VERSION: 0.14.0-dev.2628+5b5c60f43
 
 jobs:
   job-build-on-linux:
@@ -140,10 +140,6 @@ jobs:
           - { zig_target: s390x-linux-gnu }
           # { zig_target: sparc-linux-gnu }
           # { zig_target: sparc64-linux-gnu }
-          # { zig_target: thumb-linux-gnueabi }                     # glibc header problem
-          # { zig_target: thumb-linux-gnueabihf }                   # glibc header problem
-          # { zig_target: thumbeb-linux-gnueabi }                   # glibc header problem
-          # { zig_target: thumbeb-linux-gnueabihf }                 # glibc header problem
           - { zig_target: x86_64-linux-gnu }
           - { zig_target: x86_64-linux-gnu.2.3.4 }                  # RHEL 4
           - { zig_target: x86_64-linux-gnu.2.5 }                    # RHEL 5, manylinux1
@@ -168,6 +164,7 @@ jobs:
           - { zig_target: i386-windows.win7-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: i386-windows.win8-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: i386-windows.win10-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          - { zig_target: thumb-windows-gnu }
           - { zig_target: x86_64-windows-gnu, wine: wine64 }
           # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }
@@ -312,19 +309,12 @@ jobs:
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
             echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
-          # zig bug TODO later: need -mcpu=cortex_a5 because of problems when using -save-temps
-          #case "$ZIG_TARGET" in
-            # note: could also use UPX_CONFIG_DISABLE_SAVE_TEMPS
-          #  arm-linux-gnueabi*   | arm-linux-musleabi*)   ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
-          #  armeb-linux-gnueabi* | armeb-linux-musleabi*) ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
-          #  thumb-linux-gnueabi* | thumb-linux-musleabi*) ZIG_FLAGS="$ZIG_FLAGS -mcpu=cortex_a5" ;;
-          #esac
           # zig bug TODO later: need -Wno-unused-command-line-argument
           case "$ZIG_TARGET" in
             powerpc*) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
           esac
           # clang/zig bug TODO later: bogus warnings when using -save-temps
-          ##ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
+          ####ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
       #- run: set -x; zig version; zig-cc --version; zig-cxx --version
