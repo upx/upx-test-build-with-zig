@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 110 build-on-linux targets (jobs)
+# 111 build-on-linux targets (jobs)
 #   9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-09
-  ZIG_DIST_VERSION: 0.14.0-dev.2628+5b5c60f43
+  # 2025-01-11
+  ZIG_DIST_VERSION: 0.14.0-dev.2634+b36ea592b
 
 jobs:
   job-build-on-linux:
