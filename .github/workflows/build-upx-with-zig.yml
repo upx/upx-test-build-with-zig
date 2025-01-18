@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 111 build-on-linux targets (jobs)
+# 115 build-on-linux targets (jobs)
 #   9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-17
-  ZIG_DIST_VERSION: 0.14.0-dev.2802+257054a14
+  # 2025-01-18
+  ZIG_DIST_VERSION: 0.14.0-dev.2837+f38d7a92c
 
 jobs:
   job-build-on-linux:
@@ -149,7 +149,11 @@ jobs:
 
           # Linux ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
+          - { zig_target: mips64-linux-muslabin32, qemu: qemu-mipsn32, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64-linux-muslabin32, qemu: qemu-mipsn32, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-gnuabin32 }
+          - { zig_target: mips64el-linux-muslabin32, qemu: qemu-mipsn32el, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64el-linux-muslabin32, qemu: qemu-mipsn32el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-gnux32 }
           - { zig_target: x86_64-linux-muslx32 }
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }

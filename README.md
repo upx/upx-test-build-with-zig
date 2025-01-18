@@ -19,7 +19,7 @@ This repository consists of a single
 that builds
 [UPX](https://github.com/upx/upx) with a recent
 [Zig binary](https://ziglang.org/download/)
-testing 120 different build targets.
+testing 124 different build targets.
 
 See [Actions](https://github.com/upx/upx-test-build-with-zig/actions)
 for actual build results and logs.
