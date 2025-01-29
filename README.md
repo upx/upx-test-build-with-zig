@@ -71,6 +71,7 @@ Closed zig issues
 
 - https://github.com/ziglang/zig/issues/6573
 - https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
+- https://github.com/ziglang/zig/issues/12828
 - https://github.com/ziglang/zig/issues/12886
 - https://github.com/ziglang/zig/issues/12992 zig c++ does not support exceptions on macos
 - https://github.com/ziglang/zig/issues/13384 zig cc -target <arch>-windows-gnu produces a large amount of warnings
