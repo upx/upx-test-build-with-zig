@@ -29,16 +29,15 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-01-29
-  ZIG_DIST_VERSION: 0.14.0-dev.2987+183bb8b08
+  # 2025-01-30
+  ZIG_DIST_VERSION: 0.14.0-dev.2989+bf6ee7cb3
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    #container: ${{ contains(matrix.qemu, 'qemu-aarch64_be') && 'alpine:3.20' || 'alpine:edge' }} # qemu-aarch64_be bug
-    container: 'alpine:edge'
+    container: 'alpine:3.21'
     strategy:
       fail-fast: false
       matrix:
