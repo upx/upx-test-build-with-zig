@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-02-01
-  ZIG_DIST_VERSION: 0.14.0-dev.3012+3348478fc
+  # 2025-02-02
+  ZIG_DIST_VERSION: 0.14.0-dev.3020+c104e8644
 
 jobs:
   job-build-on-linux:
