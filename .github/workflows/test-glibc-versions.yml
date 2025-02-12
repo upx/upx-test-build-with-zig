@@ -57,7 +57,8 @@ jobs:
           - i386-linux-gnu.2.35                 # Ubuntu 22.04 LTS
           - i386-linux-gnu.2.36                 # Debian 12
           - i386-linux-gnu.2.39                 # Ubuntu 24.04 LTS
-          - i386-linux-gnu.2.40                 # latest glibc version supported by zig
+          - i386-linux-gnu.2.40                 #
+          - i386-linux-gnu.2.41                 # latest glibc version supported by zig
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.3              # oldest glibc version that works with current libc++
           - x86_64-linux-gnu.2.3.4              # RHEL 4
@@ -77,7 +78,8 @@ jobs:
           - x86_64-linux-gnu.2.35               # Ubuntu 22.04 LTS
           - x86_64-linux-gnu.2.36               # Debian 12
           - x86_64-linux-gnu.2.39               # Ubuntu 24.04 LTS
-          - x86_64-linux-gnu.2.40               # latest glibc version supported by zig
+          - x86_64-linux-gnu.2.40               #
+          - x86_64-linux-gnu.2.41               # latest glibc version supported by zig
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -171,8 +173,8 @@ jobs:
           path: tmp/artifact
 
       - name: 'Run ctest tests'
-        # info: glibc-2.40 cannot run on Ubuntu-24.04 GitHub runner host (glibc-2.39)
-        if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.40') }}
+        # info: glibc-2.41 cannot run on Ubuntu-24.04 GitHub runner host (glibc-2.39)
+        ##if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.41') }}
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -v
           make build/zig/${ZIG_TARGET}${ZIG_PIC}/all+test

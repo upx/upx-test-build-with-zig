@@ -118,7 +118,7 @@ jobs:
           - { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5, manylinux1
           - { zig_target: i386-linux-gnu.2.12 }                     # RHEL 6, manylinux2010
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7, manylinux2014
-          - { zig_target: i386-linux-gnu.2.40 }                     # latest glibc version supported by zig
+          - { zig_target: i386-linux-gnu.2.41 }                     # latest glibc version supported by zig
           # { zig_target: loongarch32-linux-gnu }
           - { zig_target: loongarch64-linux-gnu }
           # { zig_target: m68k-linux-gnu }
@@ -144,7 +144,7 @@ jobs:
           - { zig_target: x86_64-linux-gnu.2.5 }                    # RHEL 5, manylinux1
           - { zig_target: x86_64-linux-gnu.2.12 }                   # RHEL 6, manylinux2010
           - { zig_target: x86_64-linux-gnu.2.17 }                   # RHEL 7, manylinux2014
-          - { zig_target: x86_64-linux-gnu.2.40 }                   # latest glibc version supported by zig
+          - { zig_target: x86_64-linux-gnu.2.41 }                   # latest glibc version supported by zig
 
           # Linux ILP32 on 64-bit archs
           - { zig_target: mips64-linux-gnuabin32 }
