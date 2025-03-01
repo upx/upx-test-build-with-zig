@@ -21,8 +21,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-02-27
-  ZIG_DIST_VERSION: 0.14.0-dev.3427+dea72d15d
+  # 2025-03-01
+  ZIG_DIST_VERSION: 0.14.0-dev.3445+6c3cbb0c8
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -124,8 +124,9 @@ jobs:
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           #
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
-          if [[ $ZIG_TARGET == *-linux-gnu.2.3.3 ]]; then true;
+          if [[ $ZIG_TARGET == *-linux-gnu.2.3.* ]]; then true;
             # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
+            # glibc-2.3.4: ld.lld: error: undefined symbol: openat64
             # TODO later: check if this work-around is still needed with zig-0.13
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
             echo "ZIG_FLAGS=$ZIG_FLAGS -fno-sanitize=all" >> $GITHUB_ENV

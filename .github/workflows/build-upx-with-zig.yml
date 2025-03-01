@@ -29,15 +29,15 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-02-27
-  ZIG_DIST_VERSION: 0.14.0-dev.3427+dea72d15d
+  # 2025-03-01
+  ZIG_DIST_VERSION: 0.14.0-dev.3445+6c3cbb0c8
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: 'alpine:edge'
+    container: 'alpine:3.21'
     strategy:
       fail-fast: false
       matrix:
@@ -312,6 +312,11 @@ jobs:
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
             echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
+          if [[ $ZIG_TARGET == *-linux-gnu.2.3.4 ]]; then true;
+            # glibc-2.3.4: ld.lld: error: undefined symbol: openat64
+            ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
+            echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
+          fi
           # zig bug TODO later: need -Wno-unused-command-line-argument
           case "$ZIG_TARGET" in
             powerpc*) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
@@ -449,6 +454,7 @@ jobs:
             [[ '${{ matrix.wine }}' == wine32 ]] && sudo apt-get install -y wine wine32:i386
             [[ '${{ matrix.wine }}' == wine64 ]] && sudo apt-get install -y wine wine64
           fi
+          ls -l /usr/bin/wine* || true
           # this seems to be needed for Wine when running in a container (beause of UID mismatch??)
           mkdir -p -v ~/.wine
           wineboot --init
