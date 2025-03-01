@@ -37,7 +37,8 @@ jobs:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: 'alpine:3.21'
+    container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
+    #container: 'alpine:edge'
     strategy:
       fail-fast: false
       matrix:
