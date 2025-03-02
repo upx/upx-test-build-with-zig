@@ -29,16 +29,16 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-03-01
-  ZIG_DIST_VERSION: 0.14.0-dev.3445+6c3cbb0c8
+  # 2025-03-02
+  ZIG_DIST_VERSION: 0.14.0-dev.3446+50b40c962
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
-    #container: 'alpine:edge'
+    #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
+    container: 'alpine:edge'
     strategy:
       fail-fast: false
       matrix:
