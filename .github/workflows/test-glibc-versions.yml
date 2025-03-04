@@ -21,8 +21,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-03-01
-  ZIG_DIST_VERSION: 0.14.0-dev.3445+6c3cbb0c8
+  # 2025-03-04
+  ZIG_DIST_VERSION: 0.14.0-dev.3462+edabcf619
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -41,6 +41,8 @@ jobs:
           # i386-linux-gnu
           - i386-linux-gnu.2.3.3                # oldest glibc version that works with current libc++
           - i386-linux-gnu.2.3.4                # RHEL 4
+          - i386-linux-gnu.2.3.5                #
+          - i386-linux-gnu.2.3.6                #
           - i386-linux-gnu.2.4                  #
           - i386-linux-gnu.2.5                  # RHEL 5, manylinux1
           - i386-linux-gnu.2.7                  # Ubuntu 8.04 LTS
@@ -62,6 +64,8 @@ jobs:
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.3              # oldest glibc version that works with current libc++
           - x86_64-linux-gnu.2.3.4              # RHEL 4
+          - x86_64-linux-gnu.2.3.5              #
+          - x86_64-linux-gnu.2.3.6              #
           - x86_64-linux-gnu.2.4                #
           - x86_64-linux-gnu.2.5                # RHEL 5, manylinux1
           - x86_64-linux-gnu.2.7                # Ubuntu 8.04 LTS
@@ -120,21 +124,21 @@ jobs:
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
-          ZIG_TARGET=${ZIG_TARGET/-muslsf/-musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           #
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
           if [[ $ZIG_TARGET == *-linux-gnu.2.3.* ]]; then true;
             # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
             # glibc-2.3.4: ld.lld: error: undefined symbol: openat64
-            # TODO later: check if this work-around is still needed with zig-0.13
+            # TODO later: check if this work-around is still needed with zig-0.14
+            ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
-            echo "ZIG_FLAGS=$ZIG_FLAGS -fno-sanitize=all" >> $GITHUB_ENV
           fi
           if [[ $ZIG_TARGET == x86-linux-gnu.2.3.* ]]; then true;
              # i386 glibc-2.3.x: problems when linking shared libray in Debug build
              echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # zig problem
           fi
+          echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |

@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-03-02
-  ZIG_DIST_VERSION: 0.14.0-dev.3446+50b40c962
+  # 2025-03-04
+  ZIG_DIST_VERSION: 0.14.0-dev.3462+edabcf619
 
 jobs:
   job-build-on-linux:
@@ -319,9 +319,9 @@ jobs:
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
           fi
           # zig bug TODO later: need -Wno-unused-command-line-argument
-          case "$ZIG_TARGET" in
-            powerpc*) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
-          esac
+          #case "$ZIG_TARGET" in
+          #  powerpc*) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
+          #esac
           # clang/zig bug TODO later: bogus warnings when using -save-temps
           ####ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
