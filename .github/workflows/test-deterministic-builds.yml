@@ -22,8 +22,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2024-12-03
-  ZIG_DIST_VERSION: 0.14.0-dev.2371+c013f45ad
+  # 2025-03-05
+  ZIG_DIST_VERSION: 0.14.0
 
 jobs:
   job-build-on-linux:
@@ -75,10 +75,6 @@ jobs:
           - { zig_target: x86_64-macos-none }
 
     env:
-      # zig problem on Windows with CMake WINDOWS_EXPORT_ALL_SYMBOLS and duplicate __chkstk/___chkstk_ms; seems fixed in 0.14.0-dev
-      ####UPX_CONFIG_DISABLE_SHARED_LIBS: ${{ contains(matrix.zig_target, '-windows') && 'ON' || 'OFF' }}
-      # zig is currently missing winpthreads; see https://github.com/ziglang/zig/issues/10989
-      UPX_CONFIG_EXPECT_THREADS: ${{ contains(matrix.zig_target, '-windows') && 'OFF' || 'ON' }}
       # for zig-cc wrapper scripts (see below):
       ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
       ZIG_FLAGS: ${{ matrix.zig_flags }}
@@ -121,7 +117,6 @@ jobs:
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
           ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
-          ZIG_TARGET=${ZIG_TARGET/-muslsf/-musl} # muslsf => musl
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # update ZIG_FLAGS
           # -fPIE is for compilation only => also use the correct linker flag "-pie"

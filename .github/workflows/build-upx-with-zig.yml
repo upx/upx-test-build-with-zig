@@ -29,8 +29,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-03-04
-  ZIG_DIST_VERSION: 0.14.0-dev.3462+edabcf619
+  # 2025-03-05
+  ZIG_DIST_VERSION: 0.14.0
 
 jobs:
   job-build-on-linux:
@@ -313,7 +313,8 @@ jobs:
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
             echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
-          if [[ $ZIG_TARGET == *-linux-gnu.2.3.4 ]]; then true;
+          if [[ $ZIG_TARGET == *-linux-gnu.2.3.* ]]; then true;
+            # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
             # glibc-2.3.4: ld.lld: error: undefined symbol: openat64
             ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
