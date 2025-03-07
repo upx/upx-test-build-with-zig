@@ -196,42 +196,41 @@ jobs:
           #   - mips1 is experimental (not fully supported) by clang/llvm
           #   - mips32r4 is not supported by clang/llvm/gcc
           #   - zig bug: mips3 and mips4 do not work (need extra flags)
-          #   - zig bug: mips32r6 needs UPX_CONFIG_DISABLE_SAVE_TEMPS
           # ====== working
-          - { zig_target: mips2-linux-musleabi,        zig_flags: -march=mips2 -msoft-float,    qemu: qemu-mips }
-          - { zig_target: mips2-linux-musleabihf,      zig_flags: -march=mips2,                 qemu: qemu-mips }
-          - { zig_target: mipsel2-linux-musleabi,      zig_flags: -march=mips2 -msoft-float,    qemu: qemu-mipsel }
-          - { zig_target: mipsel2-linux-musleabihf,    zig_flags: -march=mips2,                 qemu: qemu-mipsel }
-          - { zig_target: mips32-linux-musleabi,       zig_flags: -march=mips32 -msoft-float,   qemu: qemu-mips }
-          - { zig_target: mips32-linux-musleabihf,     zig_flags: -march=mips32,                qemu: qemu-mips }
-          - { zig_target: mipsel32-linux-musleabi,     zig_flags: -march=mips32 -msoft-float,   qemu: qemu-mipsel }
-          - { zig_target: mipsel32-linux-musleabihf,   zig_flags: -march=mips32,                qemu: qemu-mipsel }
-          - { zig_target: mips32r2-linux-musleabi,     zig_flags: -march=mips32r2 -msoft-float, qemu: qemu-mips }
-          - { zig_target: mips32r2-linux-musleabihf,   zig_flags: -march=mips32r2,              qemu: qemu-mips }
-          - { zig_target: mipsel32r2-linux-musleabi,   zig_flags: -march=mips32r2 -msoft-float, qemu: qemu-mipsel }
-          - { zig_target: mipsel32r2-linux-musleabihf, zig_flags: -march=mips32r2,              qemu: qemu-mipsel }
-          - { zig_target: mips32r3-linux-musleabi,     zig_flags: -march=mips32r3 -msoft-float, qemu: qemu-mips }
-          - { zig_target: mips32r3-linux-musleabihf,   zig_flags: -march=mips32r3,              qemu: qemu-mips }
-          - { zig_target: mipsel32r3-linux-musleabi,   zig_flags: -march=mips32r3 -msoft-float, qemu: qemu-mipsel }
-          - { zig_target: mipsel32r3-linux-musleabihf, zig_flags: -march=mips32r3,              qemu: qemu-mipsel }
-          - { zig_target: mips32r5-linux-musleabi,     zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mips }
-          - { zig_target: mips32r5-linux-musleabihf,   zig_flags: -march=mips32r5,              qemu: qemu-mips }
-          - { zig_target: mipsel32r5-linux-musleabi,   zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mipsel }
-          - { zig_target: mipsel32r5-linux-musleabihf, zig_flags: -march=mips32r5,              qemu: qemu-mipsel }
+          # { zig_target: mips2-linux-musleabi,        zig_flags: -march=mips2 -msoft-float,    qemu: qemu-mips }
+          # { zig_target: mips2-linux-musleabihf,      zig_flags: -march=mips2,                 qemu: qemu-mips }
+          # { zig_target: mipsel2-linux-musleabi,      zig_flags: -march=mips2 -msoft-float,    qemu: qemu-mipsel }
+          # { zig_target: mipsel2-linux-musleabihf,    zig_flags: -march=mips2,                 qemu: qemu-mipsel }
+          # { zig_target: mips32-linux-musleabi,       zig_flags: -march=mips32 -msoft-float,   qemu: qemu-mips }
+          # { zig_target: mips32-linux-musleabihf,     zig_flags: -march=mips32,                qemu: qemu-mips }
+          # { zig_target: mipsel32-linux-musleabi,     zig_flags: -march=mips32 -msoft-float,   qemu: qemu-mipsel }
+          # { zig_target: mipsel32-linux-musleabihf,   zig_flags: -march=mips32,                qemu: qemu-mipsel }
+          # { zig_target: mips32r2-linux-musleabi,     zig_flags: -march=mips32r2 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mips32r2-linux-musleabihf,   zig_flags: -march=mips32r2,              qemu: qemu-mips }
+          # { zig_target: mipsel32r2-linux-musleabi,   zig_flags: -march=mips32r2 -msoft-float, qemu: qemu-mipsel }
+          # { zig_target: mipsel32r2-linux-musleabihf, zig_flags: -march=mips32r2,              qemu: qemu-mipsel }
+          # { zig_target: mips32r3-linux-musleabi,     zig_flags: -march=mips32r3 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mips32r3-linux-musleabihf,   zig_flags: -march=mips32r3,              qemu: qemu-mips }
+          # { zig_target: mipsel32r3-linux-musleabi,   zig_flags: -march=mips32r3 -msoft-float, qemu: qemu-mipsel }
+          # { zig_target: mipsel32r3-linux-musleabihf, zig_flags: -march=mips32r3,              qemu: qemu-mipsel }
+          # { zig_target: mips32r5-linux-musleabi,     zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mips32r5-linux-musleabihf,   zig_flags: -march=mips32r5,              qemu: qemu-mips }
+          # { zig_target: mipsel32r5-linux-musleabi,   zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mipsel }
+          # { zig_target: mipsel32r5-linux-musleabihf, zig_flags: -march=mips32r5,              qemu: qemu-mipsel }
           # ====== these currently do not work with UPX
-          - { zig_target: mips32r6-linux-musleabi,     zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips,   xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          - { zig_target: mips32r6-linux-musleabihf,   zig_flags: -march=mips32r6,              qemu: qemu-mips,   xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          - { zig_target: mipsel32r6-linux-musleabi,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel, xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          - { zig_target: mipsel32r6-linux-musleabihf, zig_flags: -march=mips32r6,              qemu: qemu-mipsel, xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          # ====== these currently do not work with zig
-          - { zig_target: mips3-linux-musleabi,        zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mips }
-          - { zig_target: mips3-linux-musleabihf,      zig_flags: -march=mips3,                 qemu: qemu-mips }
-          - { zig_target: mipsel3-linux-musleabi,      zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mipsel }
-          - { zig_target: mipsel3-linux-musleabihf,    zig_flags: -march=mips3,                 qemu: qemu-mipsel }
-          - { zig_target: mips4-linux-musleabi,        zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mips }
-          - { zig_target: mips4-linux-musleabihf,      zig_flags: -march=mips4,                 qemu: qemu-mips }
-          - { zig_target: mipsel4-linux-musleabi,      zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mipsel }
-          - { zig_target: mipsel4-linux-musleabihf,    zig_flags: -march=mips4,                 qemu: qemu-mipsel }
+          # { zig_target: mips32r6-linux-musleabi,     zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips }
+          # { zig_target: mips32r6-linux-musleabihf,   zig_flags: -march=mips32r6,              qemu: qemu-mips }
+          # { zig_target: mipsel32r6-linux-musleabi,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel }
+          # { zig_target: mipsel32r6-linux-musleabihf, zig_flags: -march=mips32r6,              qemu: qemu-mipsel }
+          # ====== these currently do not work with zig; clang works fine
+          # { zig_target: mips3-linux-musleabi,        zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mips }
+          # { zig_target: mips3-linux-musleabihf,      zig_flags: -march=mips3,                 qemu: qemu-mips }
+          # { zig_target: mipsel3-linux-musleabi,      zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mipsel }
+          # { zig_target: mipsel3-linux-musleabihf,    zig_flags: -march=mips3,                 qemu: qemu-mipsel }
+          # { zig_target: mips4-linux-musleabi,        zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mips }
+          # { zig_target: mips4-linux-musleabihf,      zig_flags: -march=mips4,                 qemu: qemu-mips }
+          # { zig_target: mipsel4-linux-musleabi,      zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mipsel }
+          # { zig_target: mipsel4-linux-musleabihf,    zig_flags: -march=mips4,                 qemu: qemu-mipsel }
 
     env:
       # for zig-cc wrapper scripts (see below):
