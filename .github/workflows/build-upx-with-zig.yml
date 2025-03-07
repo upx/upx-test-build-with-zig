@@ -26,10 +26,10 @@ env:
   UPX_DEBUG_TEST_LIBC_QSORT: 1
   ZSTD_CLEVEL: 17
   # for upx.git cloning:
-  REMOTE_REF_NAME: devel
-  REMOTE_REPOSITORY: upx/upx
-  #REMOTE_REF_NAME: test-threads
-  #REMOTE_REPOSITORY: upx/upx-test-threads
+  #REMOTE_REF_NAME: devel
+  #REMOTE_REPOSITORY: upx/upx
+  REMOTE_REF_NAME: test-threads
+  REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2025-03-05
   ZIG_DIST_VERSION: 0.14.0
@@ -218,6 +218,11 @@ jobs:
           - { zig_target: mips32r5-linux-musleabihf,   zig_flags: -march=mips32r5,              qemu: qemu-mips }
           - { zig_target: mipsel32r5-linux-musleabi,   zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mipsel }
           - { zig_target: mipsel32r5-linux-musleabihf, zig_flags: -march=mips32r5,              qemu: qemu-mipsel }
+          # ====== these currently do not work with UPX
+          - { zig_target: mips32r6-linux-musleabi,     zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips,   xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+          - { zig_target: mips32r6-linux-musleabihf,   zig_flags: -march=mips32r6,              qemu: qemu-mips,   xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+          - { zig_target: mipsel32r6-linux-musleabi,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel, xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
+          - { zig_target: mipsel32r6-linux-musleabihf, zig_flags: -march=mips32r6,              qemu: qemu-mipsel, xUPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
           # ====== these currently do not work with zig
           - { zig_target: mips3-linux-musleabi,        zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mips }
           - { zig_target: mips3-linux-musleabihf,      zig_flags: -march=mips3,                 qemu: qemu-mips }
@@ -227,10 +232,6 @@ jobs:
           - { zig_target: mips4-linux-musleabihf,      zig_flags: -march=mips4,                 qemu: qemu-mips }
           - { zig_target: mipsel4-linux-musleabi,      zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mipsel }
           - { zig_target: mipsel4-linux-musleabihf,    zig_flags: -march=mips4,                 qemu: qemu-mipsel }
-          - { zig_target: mips32r6-linux-musleabi,     zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips,   UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          - { zig_target: mips32r6-linux-musleabihf,   zig_flags: -march=mips32r6,              qemu: qemu-mips,   UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          - { zig_target: mipsel32r6-linux-musleabi,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel, UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
-          - { zig_target: mipsel32r6-linux-musleabihf, zig_flags: -march=mips32r6,              qemu: qemu-mipsel, UPX_CONFIG_DISABLE_SAVE_TEMPS: 'ON' }
 
     env:
       # for zig-cc wrapper scripts (see below):
