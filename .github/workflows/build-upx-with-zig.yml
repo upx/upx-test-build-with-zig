@@ -218,10 +218,10 @@ jobs:
           # { zig_target: mipsel32r5-linux-musleabi,   zig_flags: -march=mips32r5 -msoft-float, qemu: qemu-mipsel }
           # { zig_target: mipsel32r5-linux-musleabihf, zig_flags: -march=mips32r5,              qemu: qemu-mipsel }
           # ====== these currently do not work with UPX
-          # { zig_target: mips32r6-linux-musleabi,     zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips }
-          # { zig_target: mips32r6-linux-musleabihf,   zig_flags: -march=mips32r6,              qemu: qemu-mips }
-          # { zig_target: mipsel32r6-linux-musleabi,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel }
-          # { zig_target: mipsel32r6-linux-musleabihf, zig_flags: -march=mips32r6,              qemu: qemu-mipsel }
+          - { zig_target: mips32r6-linux-musleabi,     zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mips }
+          - { zig_target: mips32r6-linux-musleabihf,   zig_flags: -march=mips32r6,              qemu: qemu-mips }
+          - { zig_target: mipsel32r6-linux-musleabi,   zig_flags: -march=mips32r6 -msoft-float, qemu: qemu-mipsel }
+          - { zig_target: mipsel32r6-linux-musleabihf, zig_flags: -march=mips32r6,              qemu: qemu-mipsel }
           # ====== these currently do not work with zig; clang works fine
           # { zig_target: mips3-linux-musleabi,        zig_flags: -march=mips3 -msoft-float,    qemu: qemu-mips }
           # { zig_target: mips3-linux-musleabihf,      zig_flags: -march=mips3,                 qemu: qemu-mips }
