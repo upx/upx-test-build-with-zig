@@ -83,6 +83,5 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/20359
 - https://github.com/ziglang/zig/issues/20376
 - https://github.com/ziglang/zig/pull/20389 Some riscv32-linux porting work
-
 - https://github.com/llvm/llvm-project/issues/97222 [MC] Support .cfi_label
 - https://github.com/llvm/llvm-project/pull/121819
