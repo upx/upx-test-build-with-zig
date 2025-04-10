@@ -21,8 +21,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-04-08
-  ZIG_DIST_VERSION: 0.15.0-dev.263+d8153fa74
+  # 2025-04-10
+  ZIG_DIST_VERSION: 0.15.0-dev.286+ddcf6fcdf
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -101,6 +101,13 @@ jobs:
       UPX_DEBUG_DOCTEST_VERBOSE: 0
 
     steps:
+      - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
+        run: |
+          git clone --branch "$REMOTE_REF_NAME" --depth 1 "$REMOTE_SERVER_URL/$REMOTE_REPOSITORY" .
+          git submodule update --init
+          rev=$(git rev-parse --short=7 HEAD)
+          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
         shell: bash
@@ -115,6 +122,9 @@ jobs:
           ln -s -v ${ZIG_DIST_NAME}/zig zig
           #echo "PATH=$PATH" && which zig
           echo -n 'zig version: '; zig version
+          # patch zig
+          ls -la "$HOME" "$GITHUB_WORKSPACE" || true
+          (cd ${ZIG_DIST_NAME} && patch --verbose -p1 -i "$GITHUB_WORKSPACE"/misc/patches/zig/0001-x.patch)
           # create wrapper scripts (needed for CMake)
           log=
           log='set -x\n'
@@ -139,13 +149,6 @@ jobs:
              echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # zig problem
           fi
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
-
-      - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
-        run: |
-          git clone --branch "$REMOTE_REF_NAME" --depth 1 "$REMOTE_SERVER_URL/$REMOTE_REPOSITORY" .
-          git submodule update --init
-          rev=$(git rev-parse --short=7 HEAD)
-          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
 
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
