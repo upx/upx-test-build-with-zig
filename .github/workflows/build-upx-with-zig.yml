@@ -26,10 +26,10 @@ env:
   UPX_DEBUG_TEST_LIBC_QSORT: 1
   ZSTD_CLEVEL: 17
   # for upx.git cloning:
-  #REMOTE_REF_NAME: devel
-  #REMOTE_REPOSITORY: upx/upx
-  REMOTE_REF_NAME: test-threads
-  REMOTE_REPOSITORY: upx/upx-test-threads
+  REMOTE_REF_NAME: devel
+  REMOTE_REPOSITORY: upx/upx
+  #REMOTE_REF_NAME: test-threads
+  #REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2025-04-10
   ZIG_DIST_VERSION: 0.15.0-dev.286+ddcf6fcdf
