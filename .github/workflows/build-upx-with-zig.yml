@@ -31,8 +31,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-04-10
-  ZIG_DIST_VERSION: 0.15.0-dev.286+ddcf6fcdf
+  # 2025-04-11
+  ZIG_DIST_VERSION: 0.15.0-dev.288+4b63f94b4
 
 jobs:
   job-build-on-linux:
@@ -65,22 +65,18 @@ jobs:
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips }
-          - { zig_target: mips-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mips, zig_pic: -fPIE }
+          - { zig_target: mips-linux-musleabi, qemu: qemu-mips }
+          - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabihf, qemu: qemu-mips }
           - { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIE }
-          - { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel }
-          - { zig_target: mipsel-linux-musleabi, zig_flags: -msoft-float, qemu: qemu-mipsel, zig_pic: -fPIE }
+          - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel }
+          - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: mips64-linux-muslabi64-sf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
-          - { zig_target: mips64-linux-muslabi64-sf, zig_flags: -msoft-float, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: mips64el-linux-muslabi64-sf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
-          - { zig_target: mips64el-linux-muslabi64-sf, zig_flags: -msoft-float, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc }
