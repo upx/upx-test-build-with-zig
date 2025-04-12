@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 115 build-on-linux targets (jobs)
+# 118 build-on-linux targets (jobs)
 #   9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -31,8 +31,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-04-11
-  ZIG_DIST_VERSION: 0.15.0-dev.288+4b63f94b4
+  # 2025-04-12
+  ZIG_DIST_VERSION: 0.15.0-dev.300+9e21ba12d
 
 jobs:
   job-build-on-linux:
@@ -61,6 +61,8 @@ jobs:
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
@@ -121,6 +123,7 @@ jobs:
           # { zig_target: hexagon-linux-gnu }
           # { zig_target: loongarch32-linux-gnu }
           - { zig_target: loongarch64-linux-gnu }
+          - { zig_target: loongarch64-linux-gnusf }
           # { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
