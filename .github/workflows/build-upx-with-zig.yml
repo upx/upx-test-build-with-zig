@@ -31,8 +31,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-04-12
-  ZIG_DIST_VERSION: 0.15.0-dev.300+9e21ba12d
+  # 2025-04-13
+  ZIG_DIST_VERSION: 0.15.0-dev.337+4e700fdf8
 
 jobs:
   job-build-on-linux:
@@ -55,16 +55,18 @@ jobs:
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
-          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE, UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, xUPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE, xUPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, zig_pic: -fPIE }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
+          - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips }
@@ -115,12 +117,12 @@ jobs:
           # { zig_target: csky-linux-gnueabi }
           # { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
-          - { zig_target: i386-linux-gnu.2.3.4, UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
+          - { zig_target: i386-linux-gnu.2.3.4, xUPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
           - { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5, manylinux1
           - { zig_target: i386-linux-gnu.2.12 }                     # RHEL 6, manylinux2010
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7, manylinux2014
           - { zig_target: i386-linux-gnu.2.41 }                     # latest glibc version supported by zig
-          # { zig_target: hexagon-linux-gnu }
+          - { zig_target: hexagon-linux-gnu }
           # { zig_target: loongarch32-linux-gnu }
           - { zig_target: loongarch64-linux-gnu }
           - { zig_target: loongarch64-linux-gnusf }
@@ -338,7 +340,7 @@ jobs:
           ####ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
-      #- run: set -x; zig version; zig-cc --version; zig-cxx --version
+      - run: set -x; zig version; zig-cc --version || true; zig-cxx --version || true
       - run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
       - run: zig-cxx -E -x c++ -dM /dev/null # list predefined macros for C++
 
@@ -578,10 +580,10 @@ jobs:
           echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV
           case "${{ matrix.os }}" in
             # TODO FIXME: UPX problem: UPX on macos-13+ is broken => disable run-packed for now
-            macos-13 | macos-14 | macos-15) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
+            macos-1[345]) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
           esac
 
-      # note that ~/bin is included in the default $PATH on macos-11/12/13/14 runners
+      # note that ~/bin is included in the default $PATH on macos-11+ runners
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
         run: |
           uname -a; pwd; id; umask
