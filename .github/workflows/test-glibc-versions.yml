@@ -21,8 +21,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-04-13
-  ZIG_DIST_VERSION: 0.15.0-dev.337+4e700fdf8
+  # 2025-04-14
+  ZIG_DIST_VERSION: 0.15.0-dev.345+ec2888858
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -40,6 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         zig_target:
+
           # i386-linux-gnu
           - i386-linux-gnu.2.3.3                # oldest glibc version that works with current libc++
           - i386-linux-gnu.2.3.4                # RHEL 4
@@ -63,6 +64,7 @@ jobs:
           - i386-linux-gnu.2.39                 # Ubuntu 24.04 LTS
           - i386-linux-gnu.2.40                 #
           - i386-linux-gnu.2.41                 # latest glibc version supported by zig
+
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.3              # oldest glibc version that works with current libc++
           - x86_64-linux-gnu.2.3.4              # RHEL 4
@@ -180,9 +182,7 @@ jobs:
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
         uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.artifact_name }}
-          path: tmp/artifact
+        with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests'
         # info: glibc-2.41 cannot run on Ubuntu-24.04 GitHub runner host (glibc-2.39)

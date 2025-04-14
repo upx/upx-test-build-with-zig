@@ -143,9 +143,7 @@ jobs:
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
         uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.artifact_name }}
-          path: tmp/artifact
+        with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests - Release'
         run: |

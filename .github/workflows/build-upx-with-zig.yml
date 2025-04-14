@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 118 build-on-linux targets (jobs)
+# 120 build-on-linux targets (jobs)
 #   9 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -31,8 +31,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-04-13
-  ZIG_DIST_VERSION: 0.15.0-dev.337+4e700fdf8
+  # 2025-04-14
+  ZIG_DIST_VERSION: 0.15.0-dev.345+ec2888858
 
 jobs:
   job-build-on-linux:
@@ -55,8 +55,8 @@ jobs:
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
-          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, xUPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
-          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE, xUPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 0 }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
@@ -117,12 +117,12 @@ jobs:
           # { zig_target: csky-linux-gnueabi }
           # { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
-          - { zig_target: i386-linux-gnu.2.3.4, xUPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
+          - { zig_target: i386-linux-gnu.2.3.4, UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
           - { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5, manylinux1
           - { zig_target: i386-linux-gnu.2.12 }                     # RHEL 6, manylinux2010
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7, manylinux2014
           - { zig_target: i386-linux-gnu.2.41 }                     # latest glibc version supported by zig
-          - { zig_target: hexagon-linux-gnu }
+          # { zig_target: hexagon-linux-gnu }
           # { zig_target: loongarch32-linux-gnu }
           - { zig_target: loongarch64-linux-gnu }
           - { zig_target: loongarch64-linux-gnusf }
@@ -386,9 +386,7 @@ jobs:
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
         uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.artifact_name }}
-          path: tmp/artifact
+        with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Install QEMU'
         if: ${{ matrix.qemu }}
@@ -532,11 +530,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # { os: macos-11, zig_target: x86_64-macos-none }         # macos-11 is EOL
-          # { os: macos-11, zig_target: x86_64-macos.11.0-none }    # macos-11 is EOL
-          # { os: macos-12, zig_target: x86_64-macos-none }
-          # { os: macos-12, zig_target: x86_64-macos.11.0-none }
-          # { os: macos-12, zig_target: x86_64-macos.12.0-none }
           - { os: macos-13, zig_target: x86_64-macos-none }
           - { os: macos-13, zig_target: x86_64-macos.11.0-none }
           # { os: macos-13, zig_target: x86_64-macos.12.0-none }
@@ -652,9 +645,7 @@ jobs:
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
         uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.artifact_name }}
-          path: tmp/artifact
+        with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests - Release'
         run: |
