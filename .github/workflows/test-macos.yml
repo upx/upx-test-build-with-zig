@@ -32,11 +32,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # { os: macos-11, zig_target: x86_64-macos-none }         # macos-11 is EOL
-          # { os: macos-11, zig_target: x86_64-macos.11.0-none }    # macos-11 is EOL
-          # { os: macos-12, zig_target: x86_64-macos-none }
-          # { os: macos-12, zig_target: x86_64-macos.11.0-none }
-          # { os: macos-12, zig_target: x86_64-macos.12.0-none }
           - { os: macos-13, zig_target: x86_64-macos-none }
           - { os: macos-13, zig_target: x86_64-macos.11.0-none }
           - { os: macos-13, zig_target: x86_64-macos.12.0-none }
@@ -69,17 +64,33 @@ jobs:
       BUILD_SUBDIR: zig-on-${{ matrix.os }}
 
     steps:
-      # note that ~/bin is included in the default $PATH on macos-11/12/13/14 runners
+      - run: uname -a; pwd; id; umask
+      - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
+        run: |
+          git clone --branch "$REMOTE_REF_NAME" --depth 1 "$REMOTE_SERVER_URL/$REMOTE_REPOSITORY" .
+          git submodule update --init
+          rev=$(git rev-parse --short=7 HEAD)
+          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
+          #
+          mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
+          echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV
+          case "${{ matrix.os }}" in
+            # TODO FIXME: UPX problem: UPX on macos-13+ is broken => disable run-packed for now
+            macos-1[345]) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
+          esac
+
+      # note that ~/bin is included in the default $PATH on macos-11+ runners
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
         run: |
-          uname -a; pwd; id; umask
           mkdir -p -v ~/bin
           cd ~/bin
           ZIG_DIST_NAME=zig-macos-aarch64-${ZIG_DIST_VERSION}
           case "${{ matrix.os }}" in
             *-1[0-3]) ZIG_DIST_NAME=zig-macos-x86_64-${ZIG_DIST_VERSION} ;;
           esac
-          wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          #wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          #curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          curl -sS -L -O https://ziglang.org/download/0.14.0/${ZIG_DIST_NAME}.tar.xz
           ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
@@ -95,27 +106,17 @@ jobs:
           echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
-          # update ZIG_TARGET
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
-          echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
 
-      - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
-        run: |
-          git clone --branch "$REMOTE_REF_NAME" --depth 1 "$REMOTE_SERVER_URL/$REMOTE_REPOSITORY" .
-          git submodule update --init
-          rev=$(git rev-parse --short=7 HEAD)
-          echo "UPX_GITREV_SHORT=$rev" >> $GITHUB_ENV
-          #
-          mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
-          echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV
-          case "${{ matrix.os }}" in
-            # TODO FIXME: UPX on macos-13+ is broken => disable run-packed for now
-            macos-13 | macos-14 | macos-15) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
-          esac
+      - run: set -x; xcode-select -p || true; xcodebuild -version || true
+      - run: set -x; zig version; zig-cc --version; zig-cxx --version
+      - run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
+      - run: zig-cxx -E -x c++ -dM /dev/null # list predefined macros for C++
 
       - name: 'Build with local clang'
         if: ${{ endsWith(matrix.zig_target,'-macos-none') }} # only do this once per Action
         run: |
+          export UPX_CONFIG_HAVE_WORKING_BUILD_RPATH=ON
+          clang --version; clang++ --version
           make build/extra/clang/all+test
 
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
@@ -135,6 +136,11 @@ jobs:
           N=$(echo "upx-zigcc-${{ matrix.os }}-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           mkdir -p "tmp/artifact/$N/$xbuild"
+          dirs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdir/$BUILD_SUBDIR/$d" cmake --install build/$BUILD_SUBDIR/$d; done
+          for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdirAndStrip/$BUILD_SUBDIR/$d" cmake --install build/$BUILD_SUBDIR/$d --strip; done
+          for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$BUILD_SUBDIR/$d"; done
+          for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$BUILD_SUBDIR/$d" --strip; done
           (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
           hardlink="$HOMEBREW_PREFIX/opt/util-linux/bin/hardlink"
           if test -f "$hardlink"; then (cd "tmp/artifact/$N" && "$hardlink" .) fi
