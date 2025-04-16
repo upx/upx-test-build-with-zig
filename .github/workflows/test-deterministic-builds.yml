@@ -19,6 +19,8 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   ZSTD_CLEVEL: 17
   # for upx.git cloning:
+  #REMOTE_REF_NAME: devel
+  #REMOTE_REPOSITORY: upx/upx
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
@@ -27,9 +29,10 @@ env:
 
 jobs:
   job-build-on-linux:
+    #if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
-    container: 'alpine:3.20'
+    container: 'alpine:3.21'
     strategy:
       fail-fast: false
       matrix:
@@ -39,19 +42,17 @@ jobs:
           - { zig_target: aarch64-linux-musl, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf }
           - { zig_target: arm-linux-musleabihf, zig_pic: -fPIE }
-          - { zig_target: mips-linux-musl }
-          - { zig_target: mips-linux-muslsf, zig_flags: -msoft-float }
-          - { zig_target: mipsel-linux-musl }
-          - { zig_target: mipsel-linux-muslsf, zig_flags: -msoft-float }
-          - { zig_target: mips64-linux-musl }
-          - { zig_target: mips64el-linux-musl }
-          - { zig_target: powerpc-linux-musl }
-          - { zig_target: powerpc-linux-musl, zig_pic: -fPIE }
+          - { zig_target: mips-linux-musleabi }
+          - { zig_target: mipsel-linux-musleabi }
+          - { zig_target: mips64-linux-muslabi64, zig_pic: -fPIE }
+          - { zig_target: mips64el-linux-muslabi64, zig_pic: -fPIE }
+          - { zig_target: powerpc-linux-musleabi }
+          - { zig_target: powerpc-linux-musleabi, zig_pic: -fPIE }
           - { zig_target: powerpc64-linux-musl }
           - { zig_target: powerpc64-linux-musl, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl }
           - { zig_target: powerpc64le-linux-musl, zig_pic: -fPIE }
-          - { zig_target: riscv64-linux-musl }
+          # { zig_target: riscv64-linux-musl }
           - { zig_target: riscv64-linux-musl, zig_pic: -fPIE }
           - { zig_target: x86-linux-musl, zig_flags: -march=i586 }
           - { zig_target: x86-linux-musl, zig_flags: -march=i586, zig_pic: -fPIE }
@@ -83,14 +84,15 @@ jobs:
 
     steps:
       - run: uname -a; pwd; id; umask
-      - name: ${{ format('Install packages {0}', 'alpine:3.20') }}
+      - name: ${{ format('Install packages {0}', 'alpine:3.21') }}
         shell: sh
         run: |
           cat /etc/alpine-release
-          apk update && apk upgrade && apk add bash cmake coreutils curl file git make util-linux tar xz zstd
+          apk update && apk upgrade && apk add bash cmake coreutils curl file git make parallel patch tar util-linux xz zstd
           # set PATH like in Ubuntu
           echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
           git config --global --add safe.directory '*' # needed when running in a container
+          mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |
@@ -125,29 +127,16 @@ jobs:
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/i386-/x86-} # i386 => x86
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # update ZIG_FLAGS
           # -fPIE is for compilation only => also use the correct linker flag "-pie"
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
           if test "X$ZIG_PIC" = "X-fPIE"; then true;
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
+            echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
-
-      - name: ${{ format('Build x86 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
-        run: |
-          # prepare zig-host directory (for identical location of host tools)
-          (cd ~/.local/bin && rm -rf ./zig ./zig-host && mv -v zig-linux-x86 zig-host && ln -s zig-host/zig zig)
-          command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
-          echo -n 'zig version: '; zig version
-          rm -rf ~/.cache/zig # remove cache
-          # build debug+release
-          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
-            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
-          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
-          # move result away
-          mv -v build/zig build/zig-with-x86
 
       - name: ${{ format('Build x86_64 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
@@ -156,12 +145,28 @@ jobs:
           command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
           echo -n 'zig version: '; zig version
           rm -rf ~/.cache/zig # remove cache
+          ls -la ~/.cache || true
           # build debug+release
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
           file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
           # move result away
           mv -v build/zig build/zig-with-x86_64
+
+      - name: ${{ format('Build x86 with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
+        run: |
+          # prepare zig-host directory (for identical location of host tools)
+          (cd ~/.local/bin && rm -rf ./zig ./zig-host && mv -v zig-linux-x86 zig-host && ln -s zig-host/zig zig)
+          command -v zig; ls -l "$(command -v zig)"; file "$(readlink -fn "$(command -v zig)")"
+          echo -n 'zig version: '; zig version
+          rm -rf ~/.cache/zig # remove cache
+          ls -la ~/.cache || true
+          # build debug+release
+          make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/all \
+            CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
+          file build/zig/${ZIG_TARGET}${ZIG_PIC}/*/upx*
+          # move result away
+          mv -v build/zig build/zig-with-x86
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
         shell: bash
@@ -191,6 +196,7 @@ jobs:
           echo
           # compare
           exit_code=0
+          #for build_type in debug; do
           for build_type in debug release; do
             a=( build/zig-with-x86_64/*/$build_type/upx{,.exe} )
             b=( build/zig-with-x86/*/$build_type/upx{,.exe} )
