@@ -24,8 +24,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-03-05
-  ZIG_DIST_VERSION: 0.14.0
+  # 2025-05-21
+  ZIG_DIST_VERSION: 0.14.1
 
 jobs:
   job-build-on-linux:
@@ -110,8 +110,9 @@ jobs:
           # download and unpack zig-linux-x86 & zig-linux-x86_64
           for arch in x86 x86_64; do
             ZIG_DIST_NAME=zig-linux-${arch}-${ZIG_DIST_VERSION}
+            ZIG_DIST_NAME=zig-${arch}-linux-${ZIG_DIST_VERSION}
             #curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
-            curl -sS -L -O https://ziglang.org/download/0.14.0/${ZIG_DIST_NAME}.tar.xz
+            curl -sS -L -O https://ziglang.org/download/0.14.1/${ZIG_DIST_NAME}.tar.xz
             ls -l ${ZIG_DIST_NAME}.tar.xz
             tar -xoaf ${ZIG_DIST_NAME}.tar.xz
             rm ${ZIG_DIST_NAME}.tar.xz
