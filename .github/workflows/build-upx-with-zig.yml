@@ -26,13 +26,13 @@ env:
   UPX_DEBUG_TEST_LIBC_QSORT: 1
   ZSTD_CLEVEL: 17
   # for upx.git cloning:
-  REMOTE_REF_NAME: devel
-  REMOTE_REPOSITORY: upx/upx
-  #REMOTE_REF_NAME: test-threads
-  #REMOTE_REPOSITORY: upx/upx-test-threads
+  #REMOTE_REF_NAME: devel
+  #REMOTE_REPOSITORY: upx/upx
+  REMOTE_REF_NAME: test-threads
+  REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-02
-  ZIG_DIST_VERSION: 0.15.0-dev.905+edf785db0
+  # 2025-07-06
+  ZIG_DIST_VERSION: 0.15.0-dev.920+b461d07a5
 
 jobs:
   job-build-on-linux:
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
     #container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
-    container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.19' || 'alpine:edge' }}
+    container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.18' || 'alpine:edge' }}
     #container: 'alpine:edge'
     strategy:
       fail-fast: false
