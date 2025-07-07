@@ -40,7 +40,8 @@ jobs:
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
     #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
-    container: 'alpine:edge'
+    container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
+    #container: 'alpine:edge'
     strategy:
       fail-fast: false
       matrix:
