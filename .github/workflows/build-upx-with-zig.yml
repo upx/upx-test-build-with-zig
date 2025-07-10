@@ -31,19 +31,19 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-07
-  ZIG_DIST_VERSION: 0.15.0-dev.929+31e46be74
+  # 2025-07-08
+  ZIG_DIST_VERSION: 0.15.0-dev.936+fc2c1883b
 
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
     runs-on: ubuntu-latest
+    #container: 'alpine:edge'
     #container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
     #container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.18' || 'alpine:edge' }}
     container: ${{ (matrix.qemu == 'qemu-aarch64' && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
     #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
-    #container: 'alpine:edge'
     strategy:
       fail-fast: false
       matrix:
