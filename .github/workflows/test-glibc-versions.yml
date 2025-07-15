@@ -35,7 +35,7 @@ jobs:
   job-build-on-linux:
     # if: github.repository_owner == 'upx'
     name: ${{ format('{0}', matrix.zig_target) }}
-    runs-on: ubuntu-24.04 # host glibc-2.39
+    runs-on: ubuntu-latest
     container: 'ubuntu:24.04' # host glibc-2.39
     strategy:
       fail-fast: false
