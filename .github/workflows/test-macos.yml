@@ -5,6 +5,8 @@ name: 'Test macOS'
 # info: run workflow manually from GitHub Actions web page
 on: [workflow_dispatch]
 
+defaults: { run: { shell: bash } }
+
 env:
   CMAKE_REQUIRED_QUIET: 'OFF'
   CMAKE_VERBOSE_MAKEFILE: 'ON'

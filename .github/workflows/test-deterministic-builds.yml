@@ -9,6 +9,8 @@ name: 'Test deterministic builds'
 
 on: [workflow_dispatch]
 
+defaults: { run: { shell: bash } }
+
 env:
   CMAKE_REQUIRED_QUIET: 'OFF'
   CMAKE_VERBOSE_MAKEFILE: 'ON'
@@ -84,6 +86,7 @@ jobs:
 
     steps:
       - run: uname -a; pwd; id; umask
+        shell: sh
       - name: ${{ format('Install packages {0}', 'alpine:3.21') }}
         shell: sh
         run: |

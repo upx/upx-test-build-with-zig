@@ -5,6 +5,8 @@ name: 'Test glibc versions'
 # info: run workflow manually from GitHub Actions web page
 on: [workflow_dispatch]
 
+defaults: { run: { shell: bash } }
+
 env:
   CMAKE_REQUIRED_QUIET: 'OFF'
   CMAKE_VERBOSE_MAKEFILE: 'ON'
@@ -21,8 +23,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-16
-  ZIG_DIST_VERSION: 0.15.0-dev.1084+dbe0e0c1b
+  # 2025-07-22
+  ZIG_DIST_VERSION: 0.15.0-dev.1184+c41ac8f19
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -105,6 +107,7 @@ jobs:
 
     steps:
       - run: uname -a; pwd; id; umask
+        shell: sh
       - name: ${{ format('Install packages {0}', 'ubuntu') }}
         if: ${{ job.container }}
         shell: sh
