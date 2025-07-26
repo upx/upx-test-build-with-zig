@@ -106,7 +106,6 @@ jobs:
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
-        shell: bash
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
@@ -173,7 +172,6 @@ jobs:
           mv -v build/zig build/zig-with-x86
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
-        shell: bash
         run: |
           N=$(echo "upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
@@ -189,7 +187,6 @@ jobs:
         with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: Verify deterministic build
-        shell: bash
         run: |
           shopt -s nullglob
           ls -l     build/*/*/*/upx{,.exe}

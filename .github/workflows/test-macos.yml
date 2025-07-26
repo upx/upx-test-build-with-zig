@@ -127,13 +127,14 @@ jobs:
         run: |
           make UPX_XTARGET=$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC} xtarget/release \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/bin/zig-ar" CMAKE_RANLIB="$HOME/bin/zig-ranlib"
-          file build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release/upx*
 
       - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           make UPX_XTARGET=$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC} xtarget/debug \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/bin/zig-ar" CMAKE_RANLIB="$HOME/bin/zig-ranlib"
-          file build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug/upx*
+
+      - run: ls -l build/*/*/*/upx* || true
+      - run: file  build/*/*/*/upx* || true
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
         run: |

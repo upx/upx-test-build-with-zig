@@ -23,8 +23,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-22
-  ZIG_DIST_VERSION: 0.15.0-dev.1184+c41ac8f19
+  # 2025-07-24
+  ZIG_DIST_VERSION: 0.15.0-dev.1222+5fb36d260
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -129,7 +129,6 @@ jobs:
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
-        shell: bash
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
@@ -179,17 +178,17 @@ jobs:
         run: |
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/release \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
-          file build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx*
 
       - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         if: success() || failure() # run this step even if the previous step failed
         run: |
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/debug \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
-          file build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx*
+
+      - run: ls -l build/*/*/*/upx* || true
+      - run: file  build/*/*/*/upx* || true
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
-        shell: bash
         run: |
           N=$(echo "upx-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-zigcc-${{ matrix.zig_target }}${ZIG_PIC}--${ZIG_DIST_VERSION}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')

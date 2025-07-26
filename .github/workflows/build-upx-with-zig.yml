@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-22
-  ZIG_DIST_VERSION: 0.15.0-dev.1184+c41ac8f19
+  # 2025-07-24
+  ZIG_DIST_VERSION: 0.15.0-dev.1222+5fb36d260
 
 jobs:
   job-build-on-linux:
@@ -299,7 +299,6 @@ jobs:
 
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
-        shell: bash
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
@@ -380,16 +379,16 @@ jobs:
         run: |
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/release \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
-          file build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx*
 
       - name: ${{ format('Build Debug with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
           make UPX_XTARGET=zig/${ZIG_TARGET}${ZIG_PIC} xtarget/debug \
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
-          file build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx*
+
+      - run: ls -l build/*/*/*/upx* || true
+      - run: file  build/*/*/*/upx* || true
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
-        shell: bash
         run: |
           N=$(echo "upx-zigcc-linux-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-${{ matrix.zig_target }}${ZIG_PIC}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
@@ -413,7 +412,6 @@ jobs:
 
       - name: 'Install QEMU'
         if: ${{ matrix.qemu }}
-        shell: bash
         run: |
           qemu='${{ matrix.qemu }}'
           if test -f /etc/alpine-release; then
@@ -425,7 +423,6 @@ jobs:
 
       - name: 'Run basic tests under QEMU - Release'
         if: ${{ matrix.qemu }}
-        shell: bash
         run: |
           set -ex -o pipefail
           cd build/zig/${ZIG_TARGET}${ZIG_PIC}/release
@@ -445,7 +442,6 @@ jobs:
 
       - name: 'Run basic tests under QEMU - Debug'
         if: ${{ matrix.qemu }}
-        shell: bash
         run: |
           set -ex -o pipefail
           cd build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
@@ -477,7 +473,6 @@ jobs:
 
       - name: 'Install Wine'
         if: ${{ matrix.wine }}
-        shell: bash
         run: |
           if test -f /etc/alpine-release; then
             # Wine >= 8.0 can run i686 win32 programs in WOW64 mode under pure 64-bit Alpine Linux
@@ -495,7 +490,6 @@ jobs:
 
       - name: 'Run basic tests under Wine - Release'
         if: ${{ matrix.wine }}
-        shell: bash
         run: |
           set -ex -o pipefail
           cd build/zig/${ZIG_TARGET}${ZIG_PIC}/release
@@ -513,7 +507,6 @@ jobs:
 
       - name: 'Run basic tests under Wine - Debug'
         if: ${{ matrix.wine }}
-        shell: bash
         run: |
           set -ex -o pipefail
           cd build/zig/${ZIG_TARGET}${ZIG_PIC}/debug
