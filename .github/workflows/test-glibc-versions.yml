@@ -23,8 +23,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-24
-  ZIG_DIST_VERSION: 0.15.0-dev.1222+5fb36d260
+  # 2025-07-26
+  ZIG_DIST_VERSION: 0.15.0-dev.1254+c9ce1debe
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -52,6 +52,9 @@ jobs:
           - i386-linux-gnu.2.4                  #
           - i386-linux-gnu.2.5                  # RHEL 5, manylinux1
           - i386-linux-gnu.2.7                  # Ubuntu 8.04 LTS
+          - i386-linux-gnu.2.8                  #
+          - i386-linux-gnu.2.9                  #
+          - i386-linux-gnu.2.10                 #
           - i386-linux-gnu.2.11                 # SLES 11, Fedora 12
           - i386-linux-gnu.2.12                 # RHEL 6, manylinux2010
           - i386-linux-gnu.2.15                 #
@@ -76,6 +79,9 @@ jobs:
           - x86_64-linux-gnu.2.4                #
           - x86_64-linux-gnu.2.5                # RHEL 5, manylinux1
           - x86_64-linux-gnu.2.7                # Ubuntu 8.04 LTS
+          - x86_64-linux-gnu.2.8                #
+          - x86_64-linux-gnu.2.9                #
+          - x86_64-linux-gnu.2.10               #
           - x86_64-linux-gnu.2.11               # SLES 11, Fedora 12
           - x86_64-linux-gnu.2.12               # RHEL 6, manylinux2010
           - x86_64-linux-gnu.2.15               #
@@ -161,6 +167,11 @@ jobs:
           if [[ $ZIG_TARGET == *-linux-gnu.2.3.* ]]; then true;
             # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
             # glibc-2.3.4: ld.lld: error: undefined symbol: openat64
+            ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
+            echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
+          fi
+          if [[ $ZIG_TARGET == *-linux-gnu.2.[456] ]]; then true;
+            # glibc-2.x: undefined symbols in Debug build: pwritev64
             ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
           fi
