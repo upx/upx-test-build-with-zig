@@ -39,14 +39,6 @@ env:
 jobs:
   job-build-on-linux:
     if: github.repository_owner == 'upx'
-    name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
-    runs-on: ubuntu-latest
-    #container: 'alpine:edge'
-    #container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
-    #container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.18' || 'alpine:edge' }}
-    #container: ${{ (matrix.qemu == 'qemu-aarch64' && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
-    container: ${{ ((matrix.qemu == 'qemu-aarch64' || matrix.qemu == 'qemu-x86_64') && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
-    #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
     strategy:
       fail-fast: false
       matrix:
@@ -54,7 +46,7 @@ jobs:
 
           # Linux musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
-          - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE }
+          - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE, container: 'alpine:3.18' }
           - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED }
           - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm }
@@ -110,7 +102,7 @@ jobs:
           - { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb }
           - { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 }
-          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIE }
+          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIE, container: 'alpine:3.18' }
 
           # Linux GNU (glibc)
           - { zig_target: aarch64-linux-gnu }
@@ -255,7 +247,18 @@ jobs:
           # { zig_target: mipsel4-linux-musleabi,      zig_flags: -march=mips4 -msoft-float,    qemu: qemu-mipsel }
           # { zig_target: mipsel4-linux-musleabihf,    zig_flags: -march=mips4,                 qemu: qemu-mipsel }
 
+    name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
+    runs-on: ubuntu-latest
+    #container: 'alpine:edge'
+    #container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
+    #container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.18' || 'alpine:edge' }}
+    #container: ${{ (matrix.qemu == 'qemu-aarch64' && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
+    #container: ${{ ((matrix.qemu == 'qemu-aarch64' || matrix.qemu == 'qemu-x86_64') && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
+    #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
+    container: ${{ matrix.container || 'alpine:edge' }}
+
     env:
+      container: ${{ matrix.container || 'alpine:edge' }}
       # for zig-cc wrapper scripts (see below):
       ZIG_CPPFLAGS: -DUPX_DOCTEST_CONFIG_MULTITHREADING
       ZIG_FLAGS: ${{ matrix.zig_flags }}
@@ -269,7 +272,7 @@ jobs:
     steps:
       - run: uname -a; pwd; id; umask
         shell: sh
-      - name: ${{ format('Install packages {0}', 'alpine') }}
+      - name: ${{ format('Install packages {0} - {1}', 'alpine', env.container) }}
         if: ${{ job.container }}
         shell: sh
         run: |
