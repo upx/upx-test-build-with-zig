@@ -281,7 +281,7 @@ jobs:
           git config --global --add safe.directory '*' # needed when running in a container
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
 
-      - run: sudo dmidecode | sed -n -e '/System Information/,/^$/p'
+      - run: (sudo dmidecode | sed -n -e '/System Information/,/^$/p') || true
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |
