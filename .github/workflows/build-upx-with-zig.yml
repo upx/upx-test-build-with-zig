@@ -44,7 +44,8 @@ jobs:
     #container: 'alpine:edge'
     #container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
     #container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.18' || 'alpine:edge' }}
-    container: ${{ (matrix.qemu == 'qemu-aarch64' && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
+    #container: ${{ (matrix.qemu == 'qemu-aarch64' && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
+    container: ${{ ((matrix.qemu == 'qemu-aarch64' || matrix.qemu == 'qemu-x86_64') && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
     #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
     strategy:
       fail-fast: false
