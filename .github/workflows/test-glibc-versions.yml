@@ -23,8 +23,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-29
-  ZIG_DIST_VERSION: 0.15.0-dev.1274+147a85280
+  # 2025-07-30
+  ZIG_DIST_VERSION: 0.15.0-dev.1283+1fcaf90dd
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -122,11 +122,13 @@ jobs:
         run: |
           dpkg --add-architecture i386
           apt-get update && apt-get upgrade -y
-          apt-get install -y --no-install-recommends bash ca-certificates cmake curl file git make parallel patch tar time xz-utils zstd libc6:i386
+          apt-get install -y --no-install-recommends bash ca-certificates cmake curl dmidecode file gdb git make ninja-build parallel patch strace sudo tar time util-linux xz-utils zstd libc6:i386
           # set PATH like in Ubuntu
           echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
           git config --global --add safe.directory '*' # needed when running in a container
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
+
+      - run: (sudo dmidecode | sed -n -e '/System Information/,/^$/p') || true
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
         run: |
