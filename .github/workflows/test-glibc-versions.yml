@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-07-30
-  ZIG_DIST_VERSION: 0.15.0-dev.1283+1fcaf90dd
+  # 2025-08-03
+  ZIG_DIST_VERSION: 0.15.0-dev.1380+e98aeeb73
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -72,7 +72,8 @@ jobs:
           - i386-linux-gnu.2.36                 # Debian 12
           - i386-linux-gnu.2.39                 # RHEL 10, Ubuntu 24.04 LTS
           - i386-linux-gnu.2.40                 #
-          - i386-linux-gnu.2.41                 # latest glibc version supported by zig
+          - i386-linux-gnu.2.41                 #
+          - i386-linux-gnu.2.42                 # latest glibc version supported by zig
 
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.3              # oldest glibc version that works with current libc++
@@ -100,7 +101,8 @@ jobs:
           - x86_64-linux-gnu.2.36               # Debian 12
           - x86_64-linux-gnu.2.39               # RHEL 10, Ubuntu 24.04 LTS
           - x86_64-linux-gnu.2.40               #
-          - x86_64-linux-gnu.2.41               # latest glibc version supported by zig
+          - x86_64-linux-gnu.2.41               #
+          - x86_64-linux-gnu.2.42               # latest glibc version supported by zig
 
     env:
       # for zig-cc wrapper scripts (see below):
