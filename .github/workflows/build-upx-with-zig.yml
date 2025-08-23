@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-08-17
-  ZIG_DIST_VERSION: 0.15.0-dev.1593+399bace2f
+  # 2025-08-19
+  ZIG_DIST_VERSION: 0.15.1
 
 jobs:
   job-build-on-linux:
@@ -310,8 +310,8 @@ jobs:
           cd ~/.local/bin
           ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           ZIG_DIST_NAME=zig-x86_64-linux-${ZIG_DIST_VERSION}
-          curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
-          #curl -sS -L -O https://ziglang.org/download/0.14.1/${ZIG_DIST_NAME}.tar.xz
+          #curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          curl -sS -L -O https://ziglang.org/download/0.15.1/${ZIG_DIST_NAME}.tar.xz
           ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
@@ -613,7 +613,8 @@ jobs:
            #*-1[0-3]) ZIG_DIST_NAME=zig-macos-x86_64-${ZIG_DIST_VERSION} ;;
             *-1[0-3]) ZIG_DIST_NAME=zig-x86_64-macos-${ZIG_DIST_VERSION} ;;
           esac
-          wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          #wget -q https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          wget -q https://ziglang.org/download/0.15.1/${ZIG_DIST_NAME}.tar.xz
           ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
