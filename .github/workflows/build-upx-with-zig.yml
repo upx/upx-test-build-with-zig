@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 130 build-on-linux targets (jobs)
+# 132 build-on-linux targets (jobs)
 #  12 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -191,6 +191,8 @@ jobs:
 
           # FreeBSD
           - { zig_target: aarch64-freebsd-none }
+          - { zig_target: arm-freebsd-eabi }
+          - { zig_target: arm-freebsd-eabihf }
           - { zig_target: powerpc64-freebsd-none }
           - { zig_target: powerpc64le-freebsd-none }
           - { zig_target: riscv64-freebsd-none }
