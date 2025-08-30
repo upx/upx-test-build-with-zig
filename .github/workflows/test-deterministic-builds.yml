@@ -130,7 +130,7 @@ jobs:
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-} # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/#i386-/x86-} # i386 => x86
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # update ZIG_FLAGS
           # -fPIE is for compilation only => also use the correct linker flag "-pie"

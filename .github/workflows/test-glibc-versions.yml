@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-08-23
-  ZIG_DIST_VERSION: 0.16.0-dev.23+47a2f2dda
+  # 2025-08-29
+  ZIG_DIST_VERSION: 0.16.0-dev.70+73a0b5441
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -170,7 +170,7 @@ jobs:
           chmod +x zig-ar zig-cc zig-cxx zig-ranlib
           ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
           # update ZIG_TARGET
-          ZIG_TARGET=${ZIG_TARGET/i386-/x86-}    # i386 => x86
+          ZIG_TARGET=${ZIG_TARGET/#i386-/x86-} # i386 => x86
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
           # update ZIG_FLAGS
           if [[ $ZIG_TARGET == *-linux-gnu.2.3.* ]]; then true;
