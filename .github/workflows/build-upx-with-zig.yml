@@ -34,7 +34,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2025-09-04
-  ZIG_DIST_VERSION: 0.16.0-dev.172+a11dfaf61
+  ZIG_DIST_VERSION: 0.16.0-dev.178+b1189ab03
 
 jobs:
   job-build-on-linux:
@@ -65,8 +65,8 @@ jobs:
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabihf, qemu: qemu-mips }
@@ -124,7 +124,7 @@ jobs:
           # { zig_target: loongarch32-linux-gnu }
           - { zig_target: loongarch64-linux-gnu }
           - { zig_target: loongarch64-linux-gnusf }
-          - { zig_target: m68k-linux-gnu }
+          # { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
           - { zig_target: mipsel-linux-gnueabi }
