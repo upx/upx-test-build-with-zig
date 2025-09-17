@@ -164,6 +164,7 @@ jobs:
           - { zig_target: mips64el-linux-muslabin32, qemu: qemu-mipsn32el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-gnux32 }
           - { zig_target: x86_64-linux-muslx32 }
+          - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIC }
           - { zig_target: x86_64-linux-muslx32, zig_pic: -fPIE }
 
           # Windows (can use Wine for testing); also see https://github.com/mstorsjo/llvm-mingw
@@ -357,7 +358,7 @@ jobs:
           # INFO: it seems the zig driver does handle this automatically(??), so not really needed
           if test "X$ZIG_PIC" = "X-fPIE"; then true;
             ZIG_FLAGS="$ZIG_FLAGS --start-no-unused-arguments -pie --end-no-unused-arguments"
-            echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
+            #echo "UPX_CONFIG_DISABLE_SHARED_LIBS=ON" >> $GITHUB_ENV # conflicts with ZIG_PIC/ZIG_FLAGS
           fi
           if [[ $ZIG_TARGET == *-linux-gnu.2.3.* ]]; then true;
             # glibc-2.3.3: undefined symbols in Debug build: __snprintf_chk __vsnprintf_chk
