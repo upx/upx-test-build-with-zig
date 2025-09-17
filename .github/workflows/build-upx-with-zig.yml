@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-09-12
-  ZIG_DIST_VERSION: 0.16.0-dev.233+a0ec4e270
+  # 2025-09-16
+  ZIG_DIST_VERSION: 0.16.0-dev.237+496313a1b
 
 jobs:
   job-build-on-linux:
@@ -76,8 +76,10 @@ jobs:
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc, zig_pic: -fPIE }
@@ -88,8 +90,10 @@ jobs:
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED }
+          - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED }
+          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
