@@ -2,8 +2,8 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 131 build-on-linux targets (jobs)
-#  12 build-on-macos targets (jobs)
+# 137 build-on-linux targets (jobs)
+#  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
 #   runtime tests using QEMU.
@@ -76,7 +76,7 @@ jobs:
           - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
-          - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_flags: -Woption-ignored }
+          - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_flags: -Wno-option-ignored }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_flags: -Wno-option-ignored }
@@ -578,6 +578,10 @@ jobs:
           - { os: macos-15, zig_target: aarch64-macos.11.0-none }
           - { os: macos-15, zig_target: aarch64-macos.12.0-none }
           - { os: macos-15, zig_target: aarch64-macos.13.0-none }
+          - { os: macos-26, zig_target: aarch64-macos-none }
+          - { os: macos-26, zig_target: aarch64-macos.11.0-none }
+          - { os: macos-26, zig_target: aarch64-macos.12.0-none }
+          - { os: macos-26, zig_target: aarch64-macos.13.0-none }
 
     env:
       UPX_CONFIG_HAVE_WORKING_BUILD_RPATH: 'ON'
@@ -606,7 +610,7 @@ jobs:
           echo "UPX_DEBUG_FORCE_PACK_MACOS=1" >> $GITHUB_ENV
           case "${{ matrix.os }}" in
             # TODO FIXME: UPX problem: UPX on macos-13+ is broken => disable run-packed for now
-            macos-1[345]) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
+            macos-[12][3456]*) echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV ;;
           esac
 
       # note that ~/bin is included in the default $PATH on macos-11+ runners
