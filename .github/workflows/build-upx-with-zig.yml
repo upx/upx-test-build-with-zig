@@ -76,10 +76,10 @@ jobs:
           - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
-          - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_flags: -Woption-ignored }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED }
+          - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_flags: -Wno-option-ignored }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc }
