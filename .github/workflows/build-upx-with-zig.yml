@@ -46,35 +46,49 @@ jobs:
 
           # Linux musl (statically linked, can use qemu-user for testing)
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64 }
+          - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIC, container: 'alpine:3.18' }
           - { zig_target: aarch64-linux-musl, qemu: qemu-aarch64, zig_pic: -fPIE, container: 'alpine:3.18' }
           - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED }
+          - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: aarch64_be-linux-musl, qemu: qemu-aarch64_be, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm }
+          - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIC }
           - { zig_target: arm-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm }
+          - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIC }
           - { zig_target: arm-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb }
+          - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIC }
           - { zig_target: armeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb }
+          - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIC }
           - { zig_target: armeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
+          - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIC }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
           - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
           - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
+          - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
+          - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips }
+          - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIC }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabihf, qemu: qemu-mips }
+          - { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIC }
           - { zig_target: mips-linux-musleabihf, qemu: qemu-mips, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel }
+          - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel, zig_pic: -fPIC }
           - { zig_target: mipsel-linux-musleabi, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel }
+          - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIC }
           - { zig_target: mipsel-linux-musleabihf, qemu: qemu-mipsel, zig_pic: -fPIE }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_flags: -Wno-option-ignored }
           - { zig_target: mips64-linux-muslabi64, qemu: qemu-mips64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
@@ -83,12 +97,16 @@ jobs:
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: mips64el-linux-muslabi64, qemu: qemu-mips64el, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc }
+          - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc, zig_pic: -fPIC }
           - { zig_target: powerpc-linux-musleabi, qemu: qemu-ppc, zig_pic: -fPIE }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc }
+          - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc, zig_pic: -fPIC }
           - { zig_target: powerpc-linux-musleabihf, qemu: qemu-ppc, zig_pic: -fPIE }
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64 }
+          - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIC }
           - { zig_target: powerpc64-linux-musl, qemu: qemu-ppc64, zig_pic: -fPIE }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le }
+          - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIC }
           - { zig_target: powerpc64le-linux-musl, qemu: qemu-ppc64le, zig_pic: -fPIE }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
@@ -97,16 +115,22 @@ jobs:
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
+          - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm }
+          - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIC }
           - { zig_target: thumb-linux-musleabi, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm }
+          - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIC }
           - { zig_target: thumb-linux-musleabihf, qemu: qemu-arm, zig_pic: -fPIE }
           - { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb }
+          - { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIC }
           - { zig_target: thumbeb-linux-musleabi, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb }
+          - { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIC }
           - { zig_target: thumbeb-linux-musleabihf, qemu: qemu-armeb, zig_pic: -fPIE }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64 }
+          - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIC, container: 'alpine:3.18' }
           - { zig_target: x86_64-linux-musl, qemu: qemu-x86_64, zig_pic: -fPIE, container: 'alpine:3.18' }
 
           # Linux GNU (glibc)
@@ -139,8 +163,8 @@ jobs:
           - { zig_target: powerpc-linux-gnueabi }
           - { zig_target: powerpc-linux-gnueabihf }
           - { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12
-          - { zig_target: powerpcle-linux-gnueabi }
-          - { zig_target: powerpcle-linux-gnueabihf }
+          # { zig_target: powerpcle-linux-gnueabi }
+          # { zig_target: powerpcle-linux-gnueabihf }
           - { zig_target: powerpc64-linux-gnu }
           - { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12
           - { zig_target: powerpc64le-linux-gnu }
