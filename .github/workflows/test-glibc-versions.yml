@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-09-22
-  ZIG_DIST_VERSION: 0.16.0-dev.368+2a97e0af6
+  # 2025-09-24
+  ZIG_DIST_VERSION: zig-0.16.0-dev.381+bc512648d
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -148,6 +148,7 @@ jobs:
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
+          ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           ZIG_DIST_NAME=zig-x86_64-linux-${ZIG_DIST_VERSION}
           curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
@@ -211,6 +212,7 @@ jobs:
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
         run: |
+          ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           N=$(echo "upx-${GITHUB_REF_NAME}-${GITHUB_SHA:0:7}-zigcc-${{ matrix.zig_target }}${ZIG_PIC}--${ZIG_DIST_VERSION}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           xbuild=$(echo "build-upx-${REMOTE_REF_NAME}-${UPX_GITREV_SHORT}" | sed 's/[^0-9a-zA-Z_.+-]/-/g')
           mkdir -p "tmp/artifact/$N/$xbuild"

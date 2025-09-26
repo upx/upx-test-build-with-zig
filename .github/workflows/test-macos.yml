@@ -86,6 +86,7 @@ jobs:
         run: |
           mkdir -p -v ~/bin
           cd ~/bin
+          ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           ZIG_DIST_NAME=zig-macos-aarch64-${ZIG_DIST_VERSION}
           ZIG_DIST_NAME=zig-aarch64-linux-${ZIG_DIST_VERSION}
           case "${{ matrix.os }}" in

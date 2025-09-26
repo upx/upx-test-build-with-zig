@@ -233,9 +233,18 @@ jobs:
 
           # NetBSD
           - { zig_target: aarch64-netbsd-none }
+          - { zig_target: aarch64_be-netbsd-none }
           - { zig_target: arm-netbsd-eabi }
           - { zig_target: arm-netbsd-eabihf }
+          - { zig_target: armeb-netbsd-eabi }
+          - { zig_target: armeb-netbsd-eabihf }
           - { zig_target: i386-netbsd-none }
+          - { zig_target: mips-netbsd-eabi }
+          - { zig_target: mips-netbsd-eabihf }
+          - { zig_target: mipsel-netbsd-eabi }
+          - { zig_target: mipsel-netbsd-eabihf }
+          - { zig_target: powerpc-netbsd-eabi }
+          - { zig_target: powerpc-netbsd-eabihf }
           - { zig_target: x86_64-netbsd-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)

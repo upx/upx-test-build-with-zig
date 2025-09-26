@@ -109,6 +109,7 @@ jobs:
         run: |
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
+          ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           # download and unpack zig-linux-x86 & zig-linux-x86_64
           for arch in x86 x86_64; do
             ZIG_DIST_NAME=zig-linux-${arch}-${ZIG_DIST_VERSION}
