@@ -19,7 +19,7 @@ This repository consists of a single
 that builds
 [UPX](https://github.com/upx/upx) with a recent
 [Zig binary](https://ziglang.org/download/)
-testing 178 different build targets.
+testing 187 different build targets.
 
 See [Actions](https://github.com/upx/upx-test-build-with-zig/actions)
 for actual build results and logs.
@@ -31,7 +31,6 @@ for some background info about `zig cc`.
 Noteworthy open zig issues
 ==========================
 
-- https://github.com/ziglang/zig/issues/10411
 - https://github.com/ziglang/zig/issues/20690 RFC/Proposal: Turning Zig target triples into quadruples
 
 
@@ -68,6 +67,7 @@ Closed zig issues
 =================
 
 - https://github.com/ziglang/zig/issues/6573
+- https://github.com/ziglang/zig/issues/10411
 - https://github.com/ziglang/zig/issues/10989 pthread.h not found for target x86_64-windows-gnu
 - https://github.com/ziglang/zig/issues/12828
 - https://github.com/ziglang/zig/issues/12886
