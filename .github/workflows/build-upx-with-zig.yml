@@ -34,7 +34,10 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2025-09-28
-  ZIG_DIST_VERSION: zig-0.16.0-dev.457+f90510b08
+  #ZIG_DIST_VERSION: zig-0.16.0-dev.457+f90510b08
+  # 0.14.1                              # 2025-05-21 llvm-19.1.7
+  ZIG_DIST_VERSION: zig-0.14.1
+  # 0.15.1                              # 2025-08-19 llvm-20.1.2
 
 jobs:
   job-build-on-linux:
@@ -355,7 +358,8 @@ jobs:
           ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           ZIG_DIST_NAME=zig-x86_64-linux-${ZIG_DIST_VERSION}
-          curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          #curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          curl -sS -L -O https://ziglang.org/download/0.14.1/${ZIG_DIST_NAME}.tar.xz
           #curl -sS -L -O https://ziglang.org/download/0.15.1/${ZIG_DIST_NAME}.tar.xz
           ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
