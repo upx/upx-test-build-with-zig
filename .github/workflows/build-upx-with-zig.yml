@@ -369,7 +369,7 @@ jobs:
           echo -n 'zig version: '; zig version
           # patch zig
           ls -la "$HOME" "$GITHUB_WORKSPACE" || true
-          (cd ${ZIG_DIST_NAME} && patch --verbose -p1 -i "$GITHUB_WORKSPACE"/misc/patches/zig/0001-x.patch)
+          #(cd ${ZIG_DIST_NAME} && patch --verbose -p1 -i "$GITHUB_WORKSPACE"/misc/patches/zig/0001-x.patch)
           # create wrapper scripts (needed for CMake)
           log=
           log='set -x\n'
