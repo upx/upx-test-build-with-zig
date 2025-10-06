@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-10-03
-  ZIG_DIST_VERSION: zig-0.16.0-dev.600+12ed0ff1e
+  # 2025-10-05
+  ZIG_DIST_VERSION: zig-0.16.0-dev.624+606c7bcc8
   # 0.14.1                              # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.14.1
   # 0.15.1                              # 2025-08-19 llvm-20.1.2
