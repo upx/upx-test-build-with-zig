@@ -26,7 +26,8 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2025-10-03
-  ZIG_DIST_VERSION: zig-0.16.0-dev.600+12ed0ff1e
+  #ZIG_DIST_VERSION: zig-0.16.0-dev.600+12ed0ff1e
+  ZIG_DIST_VERSION: zig-0.15.2
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
   # 0.12.0                              # 2024-04-20 llvm-17.0.6
@@ -37,6 +38,7 @@ env:
   # 0.15.0-dev.208+8acedfd5b            # 2025-04-05 llvm-19.1.7; last llvm-19
   # 0.15.1                              # 2025-08-19 llvm-20.1.2
   # 0.16.0-dev.70+73a0b5441             # 2025-08-29 llvm-20.1.2; last llvm-20
+  # 0.15.2                              # 2025-10-11 llvm-20.1.2
 
 jobs:
   job-build-on-linux:
@@ -152,8 +154,8 @@ jobs:
           ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           ZIG_DIST_NAME=zig-x86_64-linux-${ZIG_DIST_VERSION}
-          curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
-          #curl -sS -L -O https://ziglang.org/download/0.15.1/${ZIG_DIST_NAME}.tar.xz
+          #curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          curl -sS -L -O https://ziglang.org/download/0.15.2/${ZIG_DIST_NAME}.tar.xz
           ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
           rm ${ZIG_DIST_NAME}.tar.xz
