@@ -204,7 +204,7 @@ jobs:
           # Windows (can use Wine for testing); also see https://github.com/mstorsjo/llvm-mingw
           - { zig_target: aarch64-windows-gnu }
           # TODO later: UPX problem: fix i386-windows need for UPX_CONFIG_DISABLE_RUN_PACKED_TEST
-          - { zig_target: i386-windows-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
+          - { zig_target: i386-windows-gnu, wine: wine32, x_UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           # { zig_target: i386-windows.xp-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           # { zig_target: i386-windows.vista-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: i386-windows.win7-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
