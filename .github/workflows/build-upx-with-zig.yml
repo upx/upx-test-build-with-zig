@@ -34,7 +34,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2025-11-06
-  ZIG_DIST_VERSION: zig-0.16.0-dev.1236+26db54d69
+  ZIG_DIST_VERSION: zig-0.16.0-dev.1240+b2895f356
   # 0.14.1                              # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.14.1
   # 0.15.1                              # 2025-08-19 llvm-20.1.2
@@ -600,6 +600,20 @@ jobs:
           export upx_exe_runner=wine
           export upx_exe=./upx.exe
           env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug   bash "$PWD"/misc/testsuite/mimic_ctest.sh
+
+      - name: Mimic ctest tests with Valgrind
+        if: ${{ matrix.zig_target == 'x86_64-linux-musl' }}
+        #if: ${{ matrix.zig_target == 'x86_64-linux-musl' || contains(matrix.zig_target, 'x86_64-linux-gnu.2') }}
+        #if: false
+        run: |
+          export UPX_CONFIG_DISABLE_EXHAUSTIVE_TESTS=ON # valgrind is SLOW
+          apk add coreutils valgrind
+          test -n "$NEED_GCOMPAT" && apk add gcompat
+          export upx_exe_runner="valgrind --leak-check=no --error-exitcode=1 --quiet --gen-suppressions=all"
+          upx_exe_runner="$upx_exe_runner --suppressions=$PWD/misc/valgrind/musl.supp"
+          jobs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          echo "===== parallel jobs: $jobs"
+          parallel -kv --lb 'cd build/zig/{} && bash ../../../../misc/testsuite/mimic_ctest.sh' ::: $jobs
 
   job-build-on-macos:
     if: github.repository_owner == 'upx'
