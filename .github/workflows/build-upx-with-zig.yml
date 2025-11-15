@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-11-13
-  ZIG_DIST_VERSION: zig-0.16.0-dev.1316+181b25ce4
+  # 2025-11-14
+  ZIG_DIST_VERSION: zig-0.16.0-dev.1326+2e6f7d36b
   # 0.14.1                              # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.14.1
   # 0.15.1                              # 2025-08-19 llvm-20.1.2
@@ -141,6 +141,7 @@ jobs:
           # Linux GNU (glibc)
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64_be-linux-gnu }
+          # { zig_target: alpha-linux-gnu }
           # { zig_target: arc-linux-gnu }
           - { zig_target: arm-linux-gnueabi }
           - { zig_target: arm-linux-gnueabihf }
@@ -155,7 +156,10 @@ jobs:
           - { zig_target: i386-linux-gnu.2.17 }                     # RHEL 7, manylinux2014
           - { zig_target: i386-linux-gnu.2.42 }                     # latest glibc version supported by zig
           # { zig_target: hexagon-linux-gnu }
+          # { zig_target: hppa-linux-gnu }
+          # { zig_target: hppa64-linux-gnu }
           # { zig_target: loongarch32-linux-gnu }
+          # { zig_target: loongarch32-linux-gnusf }
           - { zig_target: loongarch64-linux-gnu }
           - { zig_target: loongarch64-linux-gnusf }
           # { zig_target: m68k-linux-gnu }
@@ -370,7 +374,7 @@ jobs:
           echo -n 'zig version: '; zig version
           # patch zig
           ls -la "$HOME" "$GITHUB_WORKSPACE" || true
-          (cd ${ZIG_DIST_NAME} && patch --verbose -p1 -i "$GITHUB_WORKSPACE"/misc/patches/zig/0001-x.patch)
+          #(cd ${ZIG_DIST_NAME} && patch --verbose -p1 -i "$GITHUB_WORKSPACE"/misc/patches/zig/0001-x.patch)
           # create wrapper scripts (needed for CMake)
           log=
           log='set -x\n'
