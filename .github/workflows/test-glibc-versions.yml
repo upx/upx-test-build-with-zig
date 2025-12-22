@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2025-11-26
-  ZIG_DIST_VERSION: zig-0.16.0-dev.1484+d0ba6642b
+  # 2025-12-21
+  ZIG_DIST_VERSION: zig-0.16.0-dev.1634+b27bdd5af
   #ZIG_DIST_VERSION: zig-0.15.2
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
@@ -225,7 +225,7 @@ jobs:
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests'

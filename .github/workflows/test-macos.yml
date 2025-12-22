@@ -34,14 +34,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: macos-13, zig_target: x86_64-macos-none }
-          - { os: macos-13, zig_target: x86_64-macos.11.0-none }
-          - { os: macos-13, zig_target: x86_64-macos.12.0-none }
-          - { os: macos-13, zig_target: x86_64-macos.13.0-none }
           - { os: macos-14, zig_target: x86_64-macos-none }         # does not work??
           - { os: macos-14, zig_target: x86_64-macos.11.0-none }    # does not work??
           - { os: macos-14, zig_target: x86_64-macos.12.0-none }    # does not work??
           - { os: macos-14, zig_target: x86_64-macos.13.0-none }    # does not work??
+
           - { os: macos-14, zig_target: aarch64-macos-none }
           - { os: macos-14, zig_target: aarch64-macos.11.0-none }
           - { os: macos-14, zig_target: aarch64-macos.12.0-none }
@@ -50,6 +47,10 @@ jobs:
           - { os: macos-15, zig_target: aarch64-macos.11.0-none }
           - { os: macos-15, zig_target: aarch64-macos.12.0-none }
           - { os: macos-15, zig_target: aarch64-macos.13.0-none }
+          - { os: macos-26, zig_target: aarch64-macos-none }
+          - { os: macos-26, zig_target: aarch64-macos.11.0-none }
+          - { os: macos-26, zig_target: aarch64-macos.12.0-none }
+          - { os: macos-26, zig_target: aarch64-macos.13.0-none }
 
     env:
       UPX_CONFIG_HAVE_WORKING_BUILD_RPATH: 'ON'
@@ -154,7 +155,7 @@ jobs:
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests - Release'
