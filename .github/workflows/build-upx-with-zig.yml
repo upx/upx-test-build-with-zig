@@ -610,19 +610,28 @@ jobs:
           $wine ./tt.unpacked.exe --version-short
           [[ $UPX_CONFIG_DISABLE_RUN_PACKED_TEST == ON ]] || $wine ./tt.packed.exe --version-short
 
-      - name: 'Mimic ctest tests under Wine - Release'
+      - name: 'Mimic ctest tests under Wine'
         if: ${{ matrix.wine }}
         run: |
           export upx_exe_runner=wine
           export upx_exe=./upx.exe
-          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/release bash "$PWD"/misc/testsuite/mimic_ctest.sh
+          jobs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          echo "===== parallel jobs: $jobs"
+          parallel -kv --lb 'cd build/zig/{} && bash ../../../../misc/testsuite/mimic_ctest.sh' ::: $jobs
+          ls -ld ./build/*/*/*/upx-* || true
+          rm -rf ./build/*/*/*/upx-*
 
-      - name: 'Mimic ctest tests under Wine - Debug'
+      - name: 'Run test suite under Wine'
         if: ${{ matrix.wine }}
         run: |
           export upx_exe_runner=wine
           export upx_exe=./upx.exe
-          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug   bash "$PWD"/misc/testsuite/mimic_ctest.sh
+          export upx_testsuite_SRCDIR="$(readlink -en ../deps/upx-testsuite)"
+          jobs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          echo "===== parallel jobs: $jobs"
+          parallel -kv --lb 'cd build/zig/{} && bash ../../../../misc/testsuite/upx_testsuite_1.sh' ::: $jobs
+          ls -ld ./build/*/*/*/tmp-upx-testsuite* || true
+          rm -rf ./build/*/*/*/tmp-upx-testsuite*
 
       - name: Mimic ctest tests with Valgrind
         #if: ${{ matrix.zig_target == 'x86_64-linux-musl' }}
