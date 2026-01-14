@@ -356,6 +356,10 @@ jobs:
           test -z "${{ matrix.UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO }}" || echo "UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO=${{ matrix.UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO }}" >> $GITHUB_ENV
           test -z "${{ matrix.tt }}" || echo "UPX_CONFIG_DISABLE_SELF_PACK_TEST=ON" >> $GITHUB_ENV
 
+      - name: Check out test suite
+        if: ${{ matrix.qemu || matrix.wine }}
+        run: git clone --depth=1 https://github.com/upx/upx-testsuite ../deps/upx-testsuite
+
       # note that ~/.local/bin is included in the default $PATH on Ubuntu
       - name: ${{ format('Install Zig {0}', env.ZIG_DIST_VERSION) }}
         run: |
@@ -532,19 +536,28 @@ jobs:
           [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           true
 
-      - name: ${{ format('Mimic ctest tests with QEMU {0} - Release', matrix.qemu) }}
-        if: ${{ matrix.qemu }}
-        run: |
-          export upx_exe_runner="${{ matrix.qemu }}"
-          UPX_DEBUG_DOCTEST_VERBOSE=1 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short || true
-          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/release bash "$PWD"/misc/testsuite/mimic_ctest.sh
-
-      - name: ${{ format('Mimic ctest tests with QEMU {0} - Debug', matrix.qemu) }}
+      - name: ${{ format('Mimic ctest tests with QEMU {0}', matrix.qemu) }}
         if: ${{ matrix.qemu }}
         run: |
           export upx_exe_runner="${{ matrix.qemu }}"
           UPX_DEBUG_DOCTEST_VERBOSE=1 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --version-short || true
-          env -C build/zig/${ZIG_TARGET}${ZIG_PIC}/debug   bash "$PWD"/misc/testsuite/mimic_ctest.sh
+          UPX_DEBUG_DOCTEST_VERBOSE=1 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short || true
+          jobs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          echo "===== parallel jobs: $jobs"
+          parallel -kv --lb 'cd build/zig/{} && bash ../../../../misc/testsuite/mimic_ctest.sh' ::: $jobs
+          ls -ld ./build/*/*/*/upx-* || true
+          rm -rf ./build/*/*/*/upx-*
+
+      - name: ${{ format('Run test suite with QEMU {0}', matrix.qemu) }}
+        if: ${{ matrix.qemu }}
+        run: |
+          export upx_exe_runner="${{ matrix.qemu }}"
+          export upx_testsuite_SRCDIR="$(readlink -en ../deps/upx-testsuite)"
+          jobs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
+          echo "===== parallel jobs: $jobs"
+          parallel -kv --lb 'cd build/zig/{} && bash ../../../../misc/testsuite/upx_testsuite_1.sh' ::: $jobs
+          ls -ld ./build/*/*/*/tmp-upx-testsuite* || true
+          rm -rf ./build/*/*/*/tmp-upx-testsuite*
 
       - name: 'Install Wine'
         if: ${{ matrix.wine }}
