@@ -478,6 +478,7 @@ jobs:
             for d in $dirs; do cmake --install build/zig/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$d" --strip; done
           fi
           (cd build && shopt -s nullglob && cp -ai --parents */upx{,.exe} */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
+          (cd build && shopt -s globstar && cp -ai --parents **/dt_cxxlib.* "../tmp/artifact/$N/$xbuild")
           (cd tmp/artifact/$N/$xbuild && find . -type f | LC_ALL=C sort | xargs -r file)
           if command -v hardlink >/dev/null; then (cd "tmp/artifact/$N" && hardlink .) fi
           (cd tmp/artifact && tar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la && zstd -tq "$N.tar.zst")
