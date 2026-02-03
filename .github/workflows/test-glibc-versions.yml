@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-01-30
-  ZIG_DIST_VERSION: zig-0.16.0-dev.2368+380ea6fb5
+  # 2026-02-03
+  ZIG_DIST_VERSION: zig-0.16.0-dev.2471+e9eadee00
   #ZIG_DIST_VERSION: zig-0.15.2
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
@@ -78,7 +78,8 @@ jobs:
           - i386-linux-gnu.2.39                 # RHEL 10, Ubuntu 24.04 LTS
           - i386-linux-gnu.2.40                 #
           - i386-linux-gnu.2.41                 #
-          - i386-linux-gnu.2.42                 # latest glibc version supported by zig
+          - i386-linux-gnu.2.42                 #
+          - i386-linux-gnu.2.43                 # latest glibc version supported by zig
 
           # x86_64-linux-gnu
           - x86_64-linux-gnu.2.3.3              # oldest glibc version that works with current libc++
@@ -107,7 +108,8 @@ jobs:
           - x86_64-linux-gnu.2.39               # RHEL 10, Ubuntu 24.04 LTS
           - x86_64-linux-gnu.2.40               #
           - x86_64-linux-gnu.2.41               #
-          - x86_64-linux-gnu.2.42               # latest glibc version supported by zig
+          - x86_64-linux-gnu.2.42               #
+          - x86_64-linux-gnu.2.43               # latest glibc version supported by zig
 
     env:
       # for zig-cc wrapper scripts (see below):
@@ -233,5 +235,6 @@ jobs:
         # info: glibc-2.41 cannot run on Ubuntu-24.04 GitHub runner host (glibc-2.39)
         ##if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.41') }}
         run: |
-          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -v
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -vv
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx --sysinfo -vv
           make build/zig/${ZIG_TARGET}${ZIG_PIC}/all+test
