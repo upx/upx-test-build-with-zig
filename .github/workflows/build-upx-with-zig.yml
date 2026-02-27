@@ -772,9 +772,9 @@ jobs:
           for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdirAndStrip/$BUILD_SUBDIR/$d" cmake --install build/$BUILD_SUBDIR/$d --strip; done
           for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$BUILD_SUBDIR/$d"; done
           for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$BUILD_SUBDIR/$d" --strip; done
-          (cd build && shopt -s nullglob && rsync -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
-          #(cd build && shopt -s globstar && rsync -R -a **/dt_cxxlib.* "../tmp/artifact/$N/$xbuild/")
-          (cd build && rsync -R -a $(find . -type f -name 'dt_cxxlib.*') "../tmp/artifact/$N/$xbuild/")
+          (cd build && shopt -s nullglob && rsync -v -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
+          #(cd build && shopt -s globstar && rsync -v -R -a **/dt_cxxlib.* "../tmp/artifact/$N/$xbuild/")
+          (cd build && rsync -v -R -a $(find . -type f -name 'dt_cxxlib.*') "../tmp/artifact/$N/$xbuild/")
           hardlink="$HOMEBREW_PREFIX/opt/util-linux/bin/hardlink"
           if test -f "$hardlink"; then (cd "tmp/artifact/$N" && "$hardlink" .) fi
           (cd tmp/artifact && gtar --sort=name --zstd -cf "$N.tar.zst" "$N" && rm -rf "./$N" && ls -la && zstd -tq "$N.tar.zst")
