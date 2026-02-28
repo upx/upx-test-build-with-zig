@@ -215,7 +215,7 @@ jobs:
           - { zig_target: i386-windows.win8-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: i386-windows.win10-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: thumb-windows-gnu }
-          - { zig_target: x86_64-windows-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows-gnu, wine: wine64, container: 'alpine:3.23' }
           # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win7-gnu, wine: wine64 }
@@ -543,6 +543,8 @@ jobs:
           export upx_exe_runner="${{ matrix.qemu }}"
           UPX_DEBUG_DOCTEST_VERBOSE=1 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --version-short || true
           UPX_DEBUG_DOCTEST_VERBOSE=1 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx --version-short || true
+          UPX_DEBUG_DOCTEST_VERBOSE=0 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -vv || true
+          UPX_DEBUG_DOCTEST_VERBOSE=0 $upx_exe_runner ./build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx --sysinfo -vv || true
           jobs="${ZIG_TARGET}${ZIG_PIC}/debug ${ZIG_TARGET}${ZIG_PIC}/release"
           echo "===== parallel jobs: $jobs"
           parallel -kv --lb 'cd build/zig/{} && bash ../../../../misc/testsuite/mimic_ctest.sh' ::: $jobs
