@@ -219,7 +219,7 @@ jobs:
           # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.vista-gnu, wine: wine64, container: 'alpine:3.22' }
           - { zig_target: x86_64-windows.win7-gnu, wine: wine64, container: 'alpine:3.21' }
-          - { zig_target: x86_64-windows.win8-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.win8-gnu, wine: wine64, container: 'alpine:3.20' }
           - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
 
           # macOS
@@ -432,6 +432,10 @@ jobs:
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
           fi
           if [[ $ZIG_TARGET == arm-freebsd-eabihf ]]; then true;
+            ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
+            echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
+          fi
+          if [[ $ZIG_TARGET == *-openbsd-* ]]; then true;
             ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
           fi
