@@ -217,8 +217,8 @@ jobs:
           - { zig_target: thumb-windows-gnu }
           - { zig_target: x86_64-windows-gnu, wine: wine64, container: 'alpine:3.23' }
           # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
-          - { zig_target: x86_64-windows.vista-gnu, wine: wine64 }
-          - { zig_target: x86_64-windows.win7-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.vista-gnu, wine: wine64, container: 'alpine:3.22' }
+          - { zig_target: x86_64-windows.win7-gnu, wine: wine64, container: 'alpine:3.21' }
           - { zig_target: x86_64-windows.win8-gnu, wine: wine64 }
           - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
 
@@ -255,6 +255,10 @@ jobs:
           - { zig_target: powerpc-netbsd-eabi }
           - { zig_target: powerpc-netbsd-eabihf }
           - { zig_target: x86_64-netbsd-none }
+
+          # OpenBSD
+          - { zig_target: aarch64-openbsd-none }
+          - { zig_target: x86_64-openbsd-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
           - { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_DISABLE -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON', UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON', UPX_CONFIG_EXPECT_THREADS: 'OFF' }
