@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 171 build-on-linux targets (jobs)
+# 173 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -438,11 +438,18 @@ jobs:
           if [[ $ZIG_TARGET == *-openbsd-* ]]; then true;
             ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
+            echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
           fi
           # zig bug TODO later: need -Wno-unused-command-line-argument
           #case "$ZIG_TARGET" in
           #  powerpc*) ZIG_FLAGS="$ZIG_FLAGS -Wno-unused-command-line-argument" ;;
           #esac
+          if [[ $ZIG_TARGET == *-gnux32 ]]; then true;
+            echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
+          fi
+          if [[ $ZIG_TARGET == *-muslx32 ]]; then true;
+            echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
+          fi
           # clang/zig bug TODO later: bogus warnings when using -save-temps
           ####ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
