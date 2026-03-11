@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-02-28
-  ZIG_DIST_VERSION: zig-0.16.0-dev.2682+02142a54d
+  # 2026-03-09
+  ZIG_DIST_VERSION: zig-0.16.0-dev.2736+3b515fbed
   # 0.14.1                              # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.14.1
   # 0.15.1                              # 2025-08-19 llvm-20.1.2
@@ -333,7 +333,8 @@ jobs:
         if: ${{ job.container }}
         shell: sh
         run: |
-          apk update && apk upgrade && apk add bash cmake coreutils curl dmidecode file gdb git make parallel patch strace sudo tar time tree util-linux xz zstd
+          apk update && apk upgrade && apk add bash cmake coreutils curl dmidecode file gdb git make parallel patch strace sudo tar tree util-linux xz zstd
+          apk add time || true
           if test '${{ matrix.zig_target }}' = 'x86_64-linux-gnu'; then true; # only do this once per Action
             apk add clang g++
           fi
