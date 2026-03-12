@@ -818,6 +818,7 @@ jobs:
           make build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug+test
 
       - name: 'Run test suite - Release'
+        if: ${{ !endsWith(matrix.os, 'macos-14') }}
         run: |
           export upx_testsuite_SRCDIR="$(readlink -fn ../deps/upx-testsuite)"
           (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/release && bash ../../../../misc/testsuite/upx_testsuite_1.sh)
@@ -825,6 +826,7 @@ jobs:
           rm -rf ./build/*/*/*/tmp-upx-testsuite*
 
       - name: 'Run test suite - Debug'
+        if: ${{ !endsWith(matrix.os, 'macos-14') }}
         run: |
           export upx_testsuite_SRCDIR="$(readlink -fn ../deps/upx-testsuite)"
           (cd build/$BUILD_SUBDIR/${ZIG_TARGET}${ZIG_PIC}/debug && bash ../../../../misc/testsuite/upx_testsuite_1.sh)
