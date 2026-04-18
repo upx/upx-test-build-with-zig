@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 161 build-on-linux targets (jobs)
+# 165 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -33,15 +33,12 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-04-09
-  #ZIG_DIST_VERSION: zig-0.16.0-dev.3142+5ccfeb926.tar.xz
-  # 0.14.1                              # 2025-05-21 llvm-19.1.7
-  #ZIG_DIST_VERSION: zig-0.14.1
-  # 0.15.1                              # 2025-08-19 llvm-20.1.2
-  # 0.15.2                              # 2025-10-11 llvm-20.1.2
-  #ZIG_DIST_VERSION: zig-0.15.2
-  # 0.16.0                              # 2026-04-13 llvm-21.1.0
-  ZIG_DIST_VERSION: zig-0.16.0
+  # 2026-04-17
+  ZIG_DIST_VERSION: zig-0.17.0-dev.27+0dd99c37c.tar.xz
+  #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
+  #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
+  #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
+  #ZIG_DIST_VERSION: zig-0.16.0         # 2026-04-13 llvm-21.1.0
 
 jobs:
   job-build-on-linux:
@@ -259,10 +256,10 @@ jobs:
           - { zig_target: x86_64-netbsd-none }
 
           # OpenBSD
-          # { zig_target: aarch64-openbsd-none }
-          # { zig_target: arm-openbsd-eabi }
-          # { zig_target: riscv64-openbsd-none }
-          # { zig_target: x86_64-openbsd-none }
+          - { zig_target: aarch64-openbsd-none }
+          - { zig_target: arm-openbsd-eabi }
+          - { zig_target: riscv64-openbsd-none }
+          - { zig_target: x86_64-openbsd-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
           # { zig_target: wasm32-wasi-musl, zig_flags: -Wno-macro-redefined -DDOCTEST_CONFIG_DISABLE -DDOCTEST_CONFIG_NO_EXCEPTIONS_BUT_WITH_ALL_ASSERTS -DDOCTEST_CONFIG_NO_POSIX_SIGNALS -DHAVE_SETJMP_H=0 -DHAVE_SIGNAL_H=0 -DHAVE_CHMOD=0 -DHAVE_CHOWN=0 -DHAVE_DUP=0, UPX_CONFIG_DISABLE_SANITIZE: 'ON', UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON', UPX_CONFIG_EXPECT_THREADS: 'OFF' }
