@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-02-03
-  ZIG_DIST_VERSION: zig-0.16.0-dev.2471+e9eadee00
+  # 2026-04-30
+  ZIG_DIST_VERSION: zig-0.17.0-dev.215+8c5542bd3.tar.xz
   #ZIG_DIST_VERSION: zig-0.15.2
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
@@ -39,13 +39,15 @@ env:
   # 0.15.1                              # 2025-08-19 llvm-20.1.2
   # 0.16.0-dev.70+73a0b5441             # 2025-08-29 llvm-20.1.2; last llvm-20
   # 0.15.2                              # 2025-10-11 llvm-20.1.2
+  #ZIG_DIST_VERSION: 0.16.0                     # 2026-04-13 llvm-21.1.0
+  #ZIG_DIST_VERSION: 0.17.0-dev.135+9df02121d   # 2026-04-26 llvm-21.1.0; last llvm-21
 
 jobs:
   job-build-on-linux:
     # if: github.repository_owner == 'upx'
     name: ${{ format('{0}', matrix.zig_target) }}
     runs-on: ubuntu-latest
-    container: 'ubuntu:24.04' # host glibc-2.39
+    container: 'ubuntu:26.04' # host glibc-2.39
     strategy:
       fail-fast: false
       matrix:
@@ -154,6 +156,7 @@ jobs:
           mkdir -p -v ~/.local/bin
           cd ~/.local/bin
           ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
+          ZIG_DIST_VERSION=${ZIG_DIST_VERSION/%.tar.xz/}
           ZIG_DIST_NAME=zig-linux-x86_64-${ZIG_DIST_VERSION}
           ZIG_DIST_NAME=zig-x86_64-linux-${ZIG_DIST_VERSION}
           curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
@@ -173,9 +176,10 @@ jobs:
           echo -e '#!/bin/sh\n'$log'exec zig ar "$@"' > zig-ar
           echo -e '#!/bin/sh\n'$log'exec zig cc  -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CFLAGS   "$@"' > zig-cc
           echo -e '#!/bin/sh\n'$log'exec zig c++ -target $ZIG_TARGET $ZIG_PIC $ZIG_FLAGS $ZIG_CPPFLAGS $ZIG_CXXFLAGS "$@"' > zig-cxx
+          echo -e '#!/bin/sh\n'$log'exec zig objcopy "$@"' > zig-objcopy
           echo -e '#!/bin/sh\n'$log'exec zig ranlib "$@"' > zig-ranlib
-          chmod +x zig-ar zig-cc zig-cxx zig-ranlib
-          ls -la; head zig-ar zig-cc zig-cxx zig-ranlib
+          chmod +x zig-ar zig-cc zig-cxx zig-objcopy zig-ranlib
+          ls -la; head zig-ar zig-cc zig-cxx zig-objcopy zig-ranlib
           # update ZIG_TARGET
           ZIG_TARGET=${ZIG_TARGET/#i386-/x86-} # i386 => x86
           echo "ZIG_TARGET=$ZIG_TARGET" >> $GITHUB_ENV
@@ -213,6 +217,7 @@ jobs:
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
 
       - run: ls -l build/*/*/*/upx* || true
+      - run: size  build/*/*/*/upx* || true
       - run: file  build/*/*/*/upx* || true
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
