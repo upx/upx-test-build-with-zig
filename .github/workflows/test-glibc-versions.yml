@@ -25,8 +25,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-04-30
-  ZIG_DIST_VERSION: zig-0.17.0-dev.215+8c5542bd3.tar.xz
+  # 2026-05-01
+  ZIG_DIST_VERSION: zig-0.17.0-dev.224+c166c49b1.tar.xz
   #ZIG_DIST_VERSION: zig-0.15.2
   # 0.11.0-dev.2401+348751462           # 2023-04-07 llvm-15.0.7; last llvm-15
   # 0.12.0-dev.415+5af5d87ad            # 2023-09-19 llvm-16.0.6; last llvm-16
@@ -47,7 +47,7 @@ jobs:
     # if: github.repository_owner == 'upx'
     name: ${{ format('{0}', matrix.zig_target) }}
     runs-on: ubuntu-latest
-    container: 'ubuntu:26.04' # host glibc-2.39
+    container: 'ubuntu:26.04' # host glibc-2.43
     strategy:
       fail-fast: false
       matrix:
@@ -217,7 +217,7 @@ jobs:
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/.local/bin/zig-ar" CMAKE_RANLIB="$HOME/.local/bin/zig-ranlib"
 
       - run: ls -l build/*/*/*/upx* || true
-      - run: size  build/*/*/*/upx* || true
+      # run: size  build/*/*/*/upx* || true
       - run: file  build/*/*/*/upx* || true
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
@@ -237,9 +237,14 @@ jobs:
         with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests'
-        # info: glibc-2.41 cannot run on Ubuntu-24.04 GitHub runner host (glibc-2.39)
-        ##if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.41') }}
+        # info: glibc-2.44 cannot run on Ubuntu-26.04 GitHub runner host (glibc-2.43)
+        ##if: ${{ !endsWith(matrix.zig_target, '-linux-gnu.2.44') }}
         run: |
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/debug/upx --sysinfo -vv
           UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/zig/${ZIG_TARGET}${ZIG_PIC}/release/upx --sysinfo -vv
           make build/zig/${ZIG_TARGET}${ZIG_PIC}/all+test
+
+      - run: apt-get install -y binutils
+      - run: ls -l build/*/*/*/upx* || true
+      - run: size  build/*/*/*/upx* || true
+      - run: file  build/*/*/*/upx* || true
