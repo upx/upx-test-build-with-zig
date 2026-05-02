@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 165 build-on-linux targets (jobs)
+# 167 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -70,9 +70,9 @@ jobs:
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIC }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
-          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
-          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
@@ -173,8 +173,8 @@ jobs:
           - { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12
           # { zig_target: powerpcle-linux-gnueabi }
           # { zig_target: powerpcle-linux-gnueabihf }
-          - { zig_target: powerpc64-linux-gnu }
-          - { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12
+          # { zig_target: powerpc64-linux-gnu }
+          # { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12
           - { zig_target: powerpc64le-linux-gnu }
           - { zig_target: riscv32-linux-gnu }
           - { zig_target: riscv64-linux-gnu }
