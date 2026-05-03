@@ -34,7 +34,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2026-05-01
-  ZIG_DIST_VERSION: zig-0.17.0-dev.224+c166c49b1.tar.xz
+  ZIG_DIST_VERSION: zig-0.17.0-dev.228+ce198b7c2.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -70,9 +70,9 @@ jobs:
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIC }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
+          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
+          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
