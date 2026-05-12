@@ -141,13 +141,13 @@ jobs:
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64_be-linux-gnu }
           # { zig_target: alpha-linux-gnu }
-          # { zig_target: arc-linux-gnu }
+          - { zig_target: arc-linux-gnu }
           - { zig_target: arm-linux-gnueabi }
           - { zig_target: arm-linux-gnueabihf }
           - { zig_target: armeb-linux-gnueabi }
           - { zig_target: armeb-linux-gnueabihf }
-          # { zig_target: csky-linux-gnueabi }
-          # { zig_target: csky-linux-gnueabihf }
+          - { zig_target: csky-linux-gnueabi }
+          - { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
           # { zig_target: i386-linux-gnu.2.3.4, UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
           # { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5, manylinux1
@@ -161,7 +161,7 @@ jobs:
           # { zig_target: loongarch32-linux-gnusf }
           - { zig_target: loongarch64-linux-gnu }
           - { zig_target: loongarch64-linux-gnusf }
-          # { zig_target: m68k-linux-gnu }
+          - { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
           - { zig_target: mipsel-linux-gnueabi }
@@ -179,8 +179,8 @@ jobs:
           - { zig_target: riscv32-linux-gnu }
           - { zig_target: riscv64-linux-gnu }
           - { zig_target: s390x-linux-gnu }
-          # { zig_target: sparc-linux-gnu }
-          # { zig_target: sparc64-linux-gnu }
+          - { zig_target: sparc-linux-gnu }
+          - { zig_target: sparc64-linux-gnu }
           - { zig_target: x86_64-linux-gnu }
           # { zig_target: x86_64-linux-gnu.2.3.4 }                  # RHEL 4
           # { zig_target: x86_64-linux-gnu.2.5 }                    # RHEL 5, manylinux1
@@ -234,6 +234,7 @@ jobs:
           # FreeBSD
           - { zig_target: aarch64-freebsd-none }
           - { zig_target: arm-freebsd-eabihf }
+          - { zig_target: i386-freebsd-none }
           - { zig_target: powerpc64-freebsd-none }
           - { zig_target: powerpc64le-freebsd-none }
           - { zig_target: riscv64-freebsd-none }
@@ -247,19 +248,27 @@ jobs:
           - { zig_target: armeb-netbsd-eabi }
           - { zig_target: armeb-netbsd-eabihf }
           - { zig_target: i386-netbsd-none }
+          - { zig_target: m68k-netbsd-eabi }
           - { zig_target: mips-netbsd-eabi }
           - { zig_target: mips-netbsd-eabihf }
           - { zig_target: mipsel-netbsd-eabi }
           - { zig_target: mipsel-netbsd-eabihf }
           - { zig_target: powerpc-netbsd-eabi }
           - { zig_target: powerpc-netbsd-eabihf }
+          - { zig_target: sparc-netbsd-none }
+          - { zig_target: sparc64-netbsd-none }
           - { zig_target: x86_64-netbsd-none }
 
           # OpenBSD
           - { zig_target: aarch64-openbsd-none }
           - { zig_target: arm-openbsd-eabi }
+          - { zig_target: i386-openbsd-none }
+          - { zig_target: mips64-openbsd-eabi }
+          - { zig_target: mips64el-openbsd-eabi }
+          - { zig_target: powerpc-openbsd-eabihf }
           - { zig_target: powerpc64-openbsd-none }
           - { zig_target: riscv64-openbsd-none }
+          - { zig_target: sparc64-openbsd-none }
           - { zig_target: x86_64-openbsd-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
