@@ -168,9 +168,9 @@ jobs:
           - { zig_target: mipsel-linux-gnueabihf }
           - { zig_target: mips64-linux-gnuabi64 }
           - { zig_target: mips64el-linux-gnuabi64 }
-          - { zig_target: powerpc-linux-gnueabi }
-          - { zig_target: powerpc-linux-gnueabihf }
-          - { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12
+          # { zig_target: powerpc-linux-gnueabi }
+          # { zig_target: powerpc-linux-gnueabihf }
+          # { zig_target: powerpc-linux-gnueabihf.2.11 }            # SLES 11, Fedora 12
           # { zig_target: powerpcle-linux-gnueabi }
           # { zig_target: powerpcle-linux-gnueabihf }
           # { zig_target: powerpc64-linux-gnu }
@@ -258,6 +258,7 @@ jobs:
           # OpenBSD
           - { zig_target: aarch64-openbsd-none }
           - { zig_target: arm-openbsd-eabi }
+          - { zig_target: powerpc64-openbsd-none }
           - { zig_target: riscv64-openbsd-none }
           - { zig_target: x86_64-openbsd-none }
 
