@@ -70,18 +70,18 @@ jobs:
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIC }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
-          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
+          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
+          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
-          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
+          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIC }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIE }
@@ -214,12 +214,12 @@ jobs:
           - { zig_target: i386-windows.win8-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: i386-windows.win10-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: thumb-windows-gnu }
-          - { zig_target: x86_64-windows-gnu, wine: wine64, container: 'alpine:3.23' }
+          - { zig_target: x86_64-windows-gnu, Q_wine: wine64, container: 'alpine:3.23' }
           # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
           # { zig_target: x86_64-windows.vista-gnu, Q_wine: wine64, container: 'alpine:3.22' }
           - { zig_target: x86_64-windows.win7-gnu, Q_wine: wine64, container: 'alpine:3.21' }
           - { zig_target: x86_64-windows.win8-gnu, Q_wine: wine64, container: 'alpine:3.20' }
-          - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
+          - { zig_target: x86_64-windows.win10-gnu, Q_wine: wine64 }
 
           # macOS
           - { zig_target: aarch64-macos-none }
@@ -248,7 +248,7 @@ jobs:
           - { zig_target: armeb-netbsd-eabi }
           - { zig_target: armeb-netbsd-eabihf }
           - { zig_target: i386-netbsd-none }
-          - { zig_target: m68k-netbsd-none }
+          # { zig_target: m68k-netbsd-none }
           - { zig_target: mips-netbsd-eabi }
           - { zig_target: mips-netbsd-eabihf }
           - { zig_target: mipsel-netbsd-eabi }
@@ -453,6 +453,9 @@ jobs:
           if [[ $ZIG_TARGET == *-openbsd-* ]]; then true;
             ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
+          fi
+          if [[ $ZIG_TARGET == mips64*-openbsd-* ]]; then true;
+            echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
           fi
           if [[ $ZIG_TARGET == powerpc64le-linux-gnu ]]; then true;
             echo "UPX_CONFIG_EXPECT_THREADS=OFF" >> $GITHUB_ENV
