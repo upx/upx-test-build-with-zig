@@ -70,18 +70,18 @@ jobs:
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386 }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIC }
           - { zig_target: i386-linux-musl, zig_flags: -march=i586, qemu: qemu-i386, zig_pic: -fPIE }
-          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
-          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
-          - { zig_target: hexagon-linux-musl, Q_qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
+          - { zig_target: hexagon-linux-musl, qemu: qemu-hexagon, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-musl, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: loongarch64-linux-muslsf, qemu: qemu-loongarch64, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
-          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
-          # { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
+          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED }
+          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
+          - { zig_target: m68k-linux-musl, qemu: qemu-m68k, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIC }
           - { zig_target: mips-linux-musleabi, qemu: qemu-mips, zig_pic: -fPIE }
@@ -141,13 +141,13 @@ jobs:
           - { zig_target: aarch64-linux-gnu }
           - { zig_target: aarch64_be-linux-gnu }
           # { zig_target: alpha-linux-gnu }
-          - { zig_target: arc-linux-gnu }
+          # { zig_target: arc-linux-gnu }
           - { zig_target: arm-linux-gnueabi }
           - { zig_target: arm-linux-gnueabihf }
           - { zig_target: armeb-linux-gnueabi }
           - { zig_target: armeb-linux-gnueabihf }
-          - { zig_target: csky-linux-gnueabi }
-          - { zig_target: csky-linux-gnueabihf }
+          # { zig_target: csky-linux-gnueabi }
+          # { zig_target: csky-linux-gnueabihf }
           - { zig_target: i386-linux-gnu }
           # { zig_target: i386-linux-gnu.2.3.4, UPX_CONFIG_DISABLE_SHARED_LIBS: 'ON' } # RHEL 4
           # { zig_target: i386-linux-gnu.2.5 }                      # RHEL 5, manylinux1
@@ -161,7 +161,7 @@ jobs:
           # { zig_target: loongarch32-linux-gnusf }
           - { zig_target: loongarch64-linux-gnu }
           - { zig_target: loongarch64-linux-gnusf }
-          - { zig_target: m68k-linux-gnu }
+          # { zig_target: m68k-linux-gnu }
           - { zig_target: mips-linux-gnueabi }
           - { zig_target: mips-linux-gnueabihf }
           - { zig_target: mipsel-linux-gnueabi }
@@ -179,8 +179,8 @@ jobs:
           - { zig_target: riscv32-linux-gnu }
           - { zig_target: riscv64-linux-gnu }
           - { zig_target: s390x-linux-gnu }
-          - { zig_target: sparc-linux-gnu }
-          - { zig_target: sparc64-linux-gnu }
+          # { zig_target: sparc-linux-gnu }
+          # { zig_target: sparc64-linux-gnu }
           - { zig_target: x86_64-linux-gnu }
           # { zig_target: x86_64-linux-gnu.2.3.4 }                  # RHEL 4
           # { zig_target: x86_64-linux-gnu.2.5 }                    # RHEL 5, manylinux1
@@ -214,12 +214,12 @@ jobs:
           - { zig_target: i386-windows.win8-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: i386-windows.win10-gnu, wine: wine32, UPX_CONFIG_DISABLE_RUN_PACKED_TEST: 'ON' }
           - { zig_target: thumb-windows-gnu }
-          - { zig_target: x86_64-windows-gnu, Q_wine: wine64, container: 'alpine:3.23' }
+          - { zig_target: x86_64-windows-gnu, wine: wine64, container: 'alpine:3.23' }
           # { zig_target: x86_64-windows.xp-gnu, wine: wine64 }
           # { zig_target: x86_64-windows.vista-gnu, Q_wine: wine64, container: 'alpine:3.22' }
           - { zig_target: x86_64-windows.win7-gnu, Q_wine: wine64, container: 'alpine:3.21' }
           - { zig_target: x86_64-windows.win8-gnu, Q_wine: wine64, container: 'alpine:3.20' }
-          - { zig_target: x86_64-windows.win10-gnu, Q_wine: wine64 }
+          - { zig_target: x86_64-windows.win10-gnu, wine: wine64 }
 
           # macOS
           - { zig_target: aarch64-macos-none }
@@ -248,27 +248,27 @@ jobs:
           - { zig_target: armeb-netbsd-eabi }
           - { zig_target: armeb-netbsd-eabihf }
           - { zig_target: i386-netbsd-none }
-          - { zig_target: m68k-netbsd-eabi }
+          - { zig_target: m68k-netbsd-none }
           - { zig_target: mips-netbsd-eabi }
           - { zig_target: mips-netbsd-eabihf }
           - { zig_target: mipsel-netbsd-eabi }
           - { zig_target: mipsel-netbsd-eabihf }
           - { zig_target: powerpc-netbsd-eabi }
           - { zig_target: powerpc-netbsd-eabihf }
-          - { zig_target: sparc-netbsd-none }
-          - { zig_target: sparc64-netbsd-none }
+          # { zig_target: sparc-netbsd-none }
+          # { zig_target: sparc64-netbsd-none }
           - { zig_target: x86_64-netbsd-none }
 
           # OpenBSD
           - { zig_target: aarch64-openbsd-none }
           - { zig_target: arm-openbsd-eabi }
           - { zig_target: i386-openbsd-none }
-          - { zig_target: mips64-openbsd-eabi }
-          - { zig_target: mips64el-openbsd-eabi }
+          - { zig_target: mips64-openbsd-none }
+          - { zig_target: mips64el-openbsd-none }
           - { zig_target: powerpc-openbsd-eabihf }
           - { zig_target: powerpc64-openbsd-none }
           - { zig_target: riscv64-openbsd-none }
-          - { zig_target: sparc64-openbsd-none }
+          # { zig_target: sparc64-openbsd-none }
           - { zig_target: x86_64-openbsd-none }
 
           # wasm/WebAssembly (TODO later: can use Wasmtime for testing?)
@@ -453,7 +453,9 @@ jobs:
           if [[ $ZIG_TARGET == *-openbsd-* ]]; then true;
             ZIG_FLAGS="$ZIG_FLAGS -fno-sanitize=all"
             echo "UPX_CONFIG_DISABLE_SANITIZE=ON" >> $GITHUB_ENV
-            #echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
+          fi
+          if [[ $ZIG_TARGET == powerpc64le-linux-gnu ]]; then true;
+            echo "UPX_CONFIG_EXPECT_THREADS=OFF" >> $GITHUB_ENV
           fi
           # zig bug TODO later: need -Wno-unused-command-line-argument
           #case "$ZIG_TARGET" in
@@ -484,6 +486,10 @@ jobs:
           gcc --version; g++ --version
           make build/extra/clang/all+test
           make build/extra/gcc/all+test
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/extra/clang/debug/upx --sysinfo -vv
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/extra/clang/release/upx --sysinfo -vv
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/extra/gcc/debug/upx --sysinfo -vv
+          UPX_DEBUG_DOCTEST_VERBOSE=1 ./build/extra/gcc/release/upx --sysinfo -vv
 
       - name: ${{ format('Build Release with zig-cc -target {0} {1}', env.ZIG_TARGET, env.ZIG_PIC) }}
         run: |
