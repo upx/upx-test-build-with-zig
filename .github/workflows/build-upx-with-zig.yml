@@ -470,8 +470,12 @@ jobs:
           if [[ $ZIG_TARGET == *-muslx32 ]]; then true;
             #echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
           fi
-          # clang/zig bug TODO later: bogus warnings when using -save-temps
-          ####ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
+          echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
+      - run: |
+          if [[ $UPX_CONFIG_DISABLE_SAVE_TEMPS != ON ]]; then true;
+            # clang/zig bug TODO later: bogus warnings when using -save-temps
+            ####ZIG_FLAGS="$ZIG_FLAGS -save-temps=obj -Wno-parentheses-equality -Wno-self-assign"
+          fi
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
 
       - run: set -x; zig version; zig-cc --version || true; zig-cxx --version || true
