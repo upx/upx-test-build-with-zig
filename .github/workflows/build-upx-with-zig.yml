@@ -471,6 +471,11 @@ jobs:
             #echo "UPX_CONFIG_DISABLE_SAVE_TEMPS=ON" >> $GITHUB_ENV
           fi
           echo "ZIG_FLAGS=$ZIG_FLAGS" >> $GITHUB_ENV
+          if [[ 1 == 1 ]]; then true;
+            echo "ZIG_CXXFLAGS=$ZIG_CXXFLAGS -std=gnu++20" >> $GITHUB_ENV
+            echo "UPX_CONFIG_DISABLE_CXX_STANDARD=ON" >> $GITHUB_ENV
+          fi
+          true
       - run: |
           if [[ $UPX_CONFIG_DISABLE_SAVE_TEMPS != ON ]]; then true;
             # clang/zig bug TODO later: bogus warnings when using -save-temps
