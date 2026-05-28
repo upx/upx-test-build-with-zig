@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 169 build-on-linux targets (jobs)
+# 170 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -33,8 +33,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-05-25
-  ZIG_DIST_VERSION: zig-0.17.0-dev.356+3140b375f.tar.xz
+  # 2026-05-26
+  ZIG_DIST_VERSION: zig-0.17.0-dev.389+f5a1968f6.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -175,7 +175,7 @@ jobs:
           # { zig_target: powerpcle-linux-gnueabihf }
           # { zig_target: powerpc64-linux-gnu }
           # { zig_target: powerpc64-linux-gnu.2.11 }                # SLES 11, Fedora 12
-          ##- { zig_target: powerpc64le-linux-gnu }
+          - { zig_target: powerpc64le-linux-gnu }
           - { zig_target: riscv32-linux-gnu }
           - { zig_target: riscv64-linux-gnu }
           - { zig_target: s390x-linux-gnu }
@@ -255,6 +255,8 @@ jobs:
           - { zig_target: mipsel-netbsd-eabihf }
           - { zig_target: powerpc-netbsd-eabi }
           - { zig_target: powerpc-netbsd-eabihf }
+          - { zig_target: riscv32-netbsd-none }
+          - { zig_target: riscv64-netbsd-none }
           # { zig_target: sparc-netbsd-none }
           # { zig_target: sparc64-netbsd-none }
           - { zig_target: x86_64-netbsd-none }
