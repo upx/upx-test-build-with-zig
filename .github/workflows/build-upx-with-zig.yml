@@ -120,8 +120,8 @@ jobs:
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          # { zig_target: riscv64-linux-musl, qemu: qemu-riscv64 }
-          - { zig_target: riscv64-linux-musl, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
+          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64 }
+          # { zig_target: riscv64-linux-musl, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIC }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIE, container: 'alpine:3.18' }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
