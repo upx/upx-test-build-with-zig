@@ -31,6 +31,7 @@ for some background info about `zig cc`.
 Noteworthy open zig issues
 ==========================
 
+- https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
 - https://github.com/ziglang/zig/issues/20690 RFC/Proposal: Turning Zig target triples into quadruples
 
 
@@ -79,7 +80,6 @@ Closed zig issues
 - https://github.com/ziglang/zig/issues/18009 zig cc -c -fstack-protector stopped working
 - https://github.com/ziglang/zig/issues/18690 zig cc -target x86_64-windows.win7-gnu stopped working
 - https://github.com/ziglang/zig/issues/19206 zig cc -target x86_64-macos-none stopped working
-- https://github.com/ziglang/zig/pull/19385 Improve old glibc versions
 - https://github.com/ziglang/zig/issues/20359
 - https://github.com/ziglang/zig/issues/20376
 - https://github.com/ziglang/zig/pull/20389 Some riscv32-linux porting work
