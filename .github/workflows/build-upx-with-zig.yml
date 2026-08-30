@@ -38,8 +38,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-08-21
-  ZIG_DIST_VERSION: zig-0.17.0-dev.1857+3c46da14d.tar.xz
+  # 2026-08-28
+  ZIG_DIST_VERSION: zig-0.17.0-dev.1933+e19a73c2d.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -330,8 +330,8 @@ jobs:
     #container: ${{ (matrix.qemu == 'qemu-aarch64' && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
     #container: ${{ ((matrix.qemu == 'qemu-aarch64' || matrix.qemu == 'qemu-x86_64') && matrix.zig_pic == '-fPIE') && 'alpine:3.18' || 'alpine:edge' }}
     #container: ${{ contains(matrix.wine, 'wine') && 'alpine:3.21' || 'alpine:edge' }} # wine bug
-    container: ${{ matrix.container || 'alpine:3.23' }}
-    #container: ${{ matrix.container || 'alpine:edge' }}
+    #container: ${{ matrix.container || 'alpine:3.23' }}
+    container: ${{ matrix.container || 'alpine:edge' }}
 
     env:
       container: ${{ matrix.container || 'alpine:edge' }}
