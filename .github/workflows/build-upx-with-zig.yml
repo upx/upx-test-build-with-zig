@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 178 build-on-linux targets (jobs)
+# 181 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -123,7 +123,10 @@ jobs:
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIC }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIE, container: 'alpine:3.18' }
+          - { zig_target: riscv64-linux-musl-generic_ooo, zig_flags: -march=generic_ooo, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-rva23u64, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
+          - { zig_target: riscv64-linux-musl-sifive_p670, zig_flags: -march=sifive_p670, qemu: qemu-riscv64 }
+          - { zig_target: riscv64-linux-musl-sifive_p870, zig_flags: -march=sifive_p870, qemu: qemu-riscv64 }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
