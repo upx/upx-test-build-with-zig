@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 177 build-on-linux targets (jobs)
+# 178 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -38,8 +38,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-09-02
-  ZIG_DIST_VERSION: zig-0.17.0-dev.1978+c961124d9.tar.xz
+  # 2026-09-07
+  ZIG_DIST_VERSION: zig-0.17.0-dev.2056+79a9897cd.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -120,10 +120,10 @@ jobs:
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: riscv32-linux-musl, qemu: qemu-riscv32, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
-          # { zig_target: riscv64-linux-musl, qemu: qemu-riscv64 }
-          - { zig_target: riscv64-linux-musl, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
+          - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIC }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIE, container: 'alpine:3.18' }
+          - { zig_target: riscv64-linux-musl-rva23u64, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
@@ -423,6 +423,8 @@ jobs:
           [[ $ZIG_TARGET == mipsel-linux-musleabihf-* ]]  && ZIG_TARGET=mipsel-linux-musleabihf
           [[ $ZIG_TARGET == mips64-linux-muslabi64-* ]]   && ZIG_TARGET=mips64-linux-muslabi64
           [[ $ZIG_TARGET == mips64el-linux-muslabi64-* ]] && ZIG_TARGET=mips64el-linux-muslabi64
+          [[ $ZIG_TARGET == riscv64-linux-gnu-* ]]        && ZIG_TARGET=riscv64-linux-gnu
+          [[ $ZIG_TARGET == riscv64-linux-musl-* ]]       && ZIG_TARGET=riscv64-linux-musl
           ZIG_TARGET=${ZIG_TARGET/#i386-/x86-} # i386 => x86
           ZIG_TARGET=${ZIG_TARGET/#mips2-/mips-}; ZIG_TARGET=${ZIG_TARGET/#mipsel2-/mipsel-}
           ZIG_TARGET=${ZIG_TARGET/#mips3-/mips-}; ZIG_TARGET=${ZIG_TARGET/#mipsel3-/mipsel-}
