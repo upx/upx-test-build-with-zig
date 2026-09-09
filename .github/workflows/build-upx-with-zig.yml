@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 181 build-on-linux targets (jobs)
+# 180 build-on-linux targets (jobs)
 #  16 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -38,8 +38,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-09-07
-  ZIG_DIST_VERSION: zig-0.17.0-dev.2056+79a9897cd.tar.xz
+  # 2026-09-08
+  ZIG_DIST_VERSION: zig-0.17.0-dev.2085+5e36170b5.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -123,8 +123,8 @@ jobs:
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIC }
           - { zig_target: riscv64-linux-musl, qemu: qemu-riscv64, zig_pic: -fPIE, container: 'alpine:3.18' }
-          - { zig_target: riscv64-linux-musl-generic_ooo, zig_flags: -march=generic_ooo, qemu: qemu-riscv64 }
-          - { zig_target: riscv64-linux-musl-rva23u64, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
+          # { zig_target: riscv64-linux-musl-rva23u64, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
+          - { zig_target: riscv64-linux-musl-sifive_p470, zig_flags: -march=sifive_p470, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-sifive_p670, zig_flags: -march=sifive_p670, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-sifive_p870, zig_flags: -march=sifive_p870, qemu: qemu-riscv64 }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
