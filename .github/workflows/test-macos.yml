@@ -136,6 +136,7 @@ jobs:
             CC="zig-cc" CXX="zig-cxx" CMAKE_AR="$HOME/bin/zig-ar" CMAKE_RANLIB="$HOME/bin/zig-ranlib"
 
       - run: ls -l build/*/*/*/upx* || true
+      - run: size  build/*/*/*/upx* || true
       - run: file  build/*/*/*/upx* || true
 
       - name: ${{ format('Make artifact from upx-{0}-{1}', env.REMOTE_REF_NAME, env.UPX_GITREV_SHORT) }}
@@ -155,7 +156,8 @@ jobs:
           echo "artifact_name=$N" >> $GITHUB_ENV
 
       - name: ${{ format('Upload artifact {0}', env.artifact_name) }}
-        uses: actions/upload-artifact@v6
+        if: ${{ env.artifact_name }}
+        uses: actions/upload-artifact@v7
         with: { name: '${{ env.artifact_name }}', path: tmp/artifact }
 
       - name: 'Run ctest tests - Release'
