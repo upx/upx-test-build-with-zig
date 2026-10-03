@@ -39,11 +39,12 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2026-09-30
-  ZIG_DIST_VERSION: zig-0.17.0-dev.2375+d8aab4878.tar.xz
+  #ZIG_DIST_VERSION: zig-0.17.0-dev.2375+d8aab4878.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.16.0         # 2026-04-13 llvm-21.1.0
+  ZIG_DIST_VERSION: zig-0.17.0         # 2026-10-01 llvm-22.1.8
 
 jobs:
   job-build-on-linux:
@@ -396,9 +397,10 @@ jobs:
           ZIG_DIST_VERSION=${ZIG_DIST_VERSION/#zig-/}
           ZIG_DIST_VERSION=${ZIG_DIST_VERSION/%.tar.xz/}
           ZIG_DIST_NAME=zig-x86_64-linux-${ZIG_DIST_VERSION}
-          curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
+          #curl -sS -L -O https://ziglang.org/builds/${ZIG_DIST_NAME}.tar.xz
           #curl -sS -L -O https://ziglang.org/download/0.14.1/${ZIG_DIST_NAME}.tar.xz
           #curl -sS -L -O https://ziglang.org/download/0.15.2/${ZIG_DIST_NAME}.tar.xz
+          curl -sS -L -O https://ziglang.org/download/0.17.0/${ZIG_DIST_NAME}.tar.xz
           #curl -sS -L -O https://github.com/upx/upx-stubtools/releases/download/v20160918/${ZIG_DIST_NAME}.tar.xz
           ls -l ${ZIG_DIST_NAME}.tar.xz
           tar -xoJf ${ZIG_DIST_NAME}.tar.xz
