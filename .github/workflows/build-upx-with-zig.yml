@@ -39,7 +39,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2026-10-08
-  ZIG_DIST_VERSION: zig-0.18.0-dev.120+9fe22a29b.tar.xz
+  ZIG_DIST_VERSION: zig-0.18.0-dev.131+41f885830.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -127,7 +127,7 @@ jobs:
           # { zig_target: riscv64-linux-musl-rva23u64, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-sifive_p470, zig_flags: -march=sifive_p470, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-sifive_p670, zig_flags: -march=sifive_p670, qemu: qemu-riscv64 }
-          - { zig_target: riscv64-linux-musl-sifive_p870, zig_flags: -march=sifive_p870, qemu: qemu-riscv64 }
+          - { zig_target: riscv64-linux-musl-sifive_p870_d, zig_flags: -march=sifive_p870_d, qemu: qemu-riscv64 }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           - { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
