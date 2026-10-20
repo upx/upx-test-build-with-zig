@@ -38,8 +38,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-10-17
-  ZIG_DIST_VERSION: zig-0.18.0-dev.349+d924f83bf.tar.xz
+  # 2026-10-19
+  ZIG_DIST_VERSION: zig-0.18.0-dev.362+705a6b4ef.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -367,6 +367,7 @@ jobs:
           mkdir -p ~/.parallel && : > ~/.parallel/$(echo 6305-4721 | tr 0-7 leticlwi)
 
       - run: set -x; cat /etc/alpine-release || true
+      - run: (apk info -v | LC_ALL=C sort) || true
       - run: (sudo dmidecode | sed -n -e '/System Information/,/^$/p') || true
 
       - name: ${{ format('Check out UPX {0} source code', env.REMOTE_REF_NAME) }}
@@ -547,6 +548,7 @@ jobs:
             for d in $dirs; do cmake --install build/zig/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$d"; done
             for d in $dirs; do cmake --install build/zig/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$d" --strip; done
           fi
+          rm -rf "./tmp/artifact/$N/$xbuild/InstallWithCMake"
           (cd build && shopt -s nullglob && cp -v -ai --parents */upx{,.exe} */*/*/upx{,.exe} "../tmp/artifact/$N/$xbuild")
           (cd build && shopt -s globstar && cp -v -ai --parents **/dt_cxxlib.* "../tmp/artifact/$N/$xbuild")
           (cd "tmp/artifact/$N/$xbuild" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0r file)
@@ -817,6 +819,7 @@ jobs:
           fi
           true
 
+      - run: brew list --versions || true
       - run: set -x; xcode-select -p || true; xcodebuild -version || true
       - run: set -x; zig version; zig-cc --version; zig-cxx --version
       - run: zig-cc  -E -x c   -dM /dev/null # list predefined macros for C
@@ -855,6 +858,7 @@ jobs:
           for d in $dirs; do DESTDIR="$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithDestdirAndStrip/$BUILD_SUBDIR/$d" cmake --install build/$BUILD_SUBDIR/$d --strip; done
           for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefix/$BUILD_SUBDIR/$d"; done
           for d in $dirs; do cmake --install build/$BUILD_SUBDIR/$d --prefix "$PWD/tmp/artifact/$N/$xbuild/InstallWithCMake/InstallWithPrefixAndStrip/$BUILD_SUBDIR/$d" --strip; done
+          rm -rf "./tmp/artifact/$N/$xbuild/InstallWithCMake"
           (cd build && shopt -s nullglob && rsync -v -R -a */upx */*/*/upx "../tmp/artifact/$N/$xbuild/")
           #(cd build && shopt -s globstar && rsync -v -R -a **/dt_cxxlib.* "../tmp/artifact/$N/$xbuild/")
           #(cd build && rsync -v -R -a $(find . -type f -name 'dt_cxxlib.*') "../tmp/artifact/$N/$xbuild/")
