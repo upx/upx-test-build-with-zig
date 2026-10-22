@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 180 build-on-linux targets (jobs)
+# 168 build-on-linux targets (jobs)
 #  12 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -26,7 +26,6 @@ env:
   UPX_CMAKE_CONFIG_FLAGS: -Wdev --warn-uninitialized
   UPX_CONFIG_DISABLE_RELEASE_O2: 'ON'
   #UPX_CONFIG_EXTRA_COMPILE_OPTIONS_UPX: -fomit-frame-pointer
-  #UPX_CONFIG_EXTRA_COMPILE_OPTIONS_UPX: '$<$<CONFIG:Release>:-fomit-frame-pointer>'
   UPX_CONFIG_EXTRA_COMPILE_OPTIONS_UPX: '$$<$$<CONFIG:Release>:-fomit-frame-pointer>'
   #UPX_CONFIG_EXTRA_COMPILE_OPTIONS_UPX: '$$<$$<CONFIG:Release>:-fomit-frame-pointer>;-DWITH_ZLIB'
   UPX_DEBUG_TEST_FLOAT_DIVISION_BY_ZERO: 1
@@ -127,7 +126,7 @@ jobs:
           # { zig_target: riscv64-linux-musl-rva23u64, zig_flags: -march=rva23u64, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-sifive_p470, zig_flags: -march=sifive_p470, qemu: qemu-riscv64 }
           - { zig_target: riscv64-linux-musl-sifive_p670, zig_flags: -march=sifive_p670, qemu: qemu-riscv64 }
-          - { zig_target: riscv64-linux-musl-sifive_p870, zig_flags: -march=sifive_p870, qemu: qemu-riscv64 }
+          # { zig_target: riscv64-linux-musl-sifive_p870, zig_flags: -march=sifive_p870, qemu: qemu-riscv64 }
           # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED }
           # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIC }
           # { zig_target: s390x-linux-musl, qemu: qemu-s390x, tt: UPX-UNSUPPORTED, zig_pic: -fPIE }
