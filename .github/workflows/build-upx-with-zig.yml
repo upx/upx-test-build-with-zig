@@ -37,8 +37,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-10-23
-  ZIG_DIST_VERSION: zig-0.18.0-dev.543+fa4f5b262.tar.xz
+  # 2026-10-24
+  ZIG_DIST_VERSION: zig-0.18.0-dev.567+7f0281900.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -326,7 +326,7 @@ jobs:
           # { zig_target: mipsel4-linux-musleabihf,    zig_flags: -march=mips4,                 qemu: qemu-mipsel }
 
     name: ${{ format('{0} {1}', matrix.zig_target, matrix.zig_pic) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     #container: 'alpine:edge'
     #container: ${{ contains(matrix.qemu, 'qemu-aarch64') && 'alpine:3.21' || 'alpine:edge' }}
     #container: ${{ (matrix.qemu == 'qemu-aarch64') && 'alpine:3.18' || 'alpine:edge' }}
