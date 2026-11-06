@@ -588,10 +588,12 @@ jobs:
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
-          $qemu ./upx -3 $tt --no-filter -o tt2.packed
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
+          $qemu ./upx --fileinfo tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
+          $qemu ./upx -3 $tt --no-filter -o tt2.packed
+          $qemu ./upx --fileinfo tt2.packed
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
           [[ $tt == ./upx ]] && $qemu ./tt2.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
@@ -609,10 +611,12 @@ jobs:
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
-          $qemu ./upx -3 $tt --no-filter -o tt2.packed
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
+          $qemu ./upx --fileinfo tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
+          $qemu ./upx -3 $tt --no-filter -o tt2.packed
+          $qemu ./upx --fileinfo tt2.packed
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
           [[ $tt == ./upx ]] && $qemu ./tt2.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
