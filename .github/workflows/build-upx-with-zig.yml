@@ -38,7 +38,7 @@ env:
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
   # 2026-11-05
-  ZIG_DIST_VERSION: zig-0.18.0-dev.861+1a0778dc2.tar.xz
+  ZIG_DIST_VERSION: zig-0.18.0-dev.897+117fd40fb.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -588,10 +588,12 @@ jobs:
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
+          $qemu ./upx -3 $tt --no-filter -o tt2.packed
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
+          [[ $tt == ./upx ]] && $qemu ./tt2.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           true
 
@@ -607,10 +609,12 @@ jobs:
           [[ -z $tt ]] && tt=./upx
           $qemu ./upx --version-short
           $qemu ./upx -3 $tt -o tt.packed
+          $qemu ./upx -3 $tt --no-filter -o tt2.packed
           $qemu ./upx -l tt.packed
           $qemu ./upx -t tt.packed
           $qemu ./upx -d tt.packed -o tt.unpacked
           [[ $tt == ./upx ]] && $qemu ./tt.unpacked --version-short
+          [[ $tt == ./upx ]] && $qemu ./tt2.packed --version-short
           [[ $tt == ./upx ]] && $qemu ./tt.packed --version-short
           true
 
