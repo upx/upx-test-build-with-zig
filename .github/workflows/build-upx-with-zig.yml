@@ -2,7 +2,7 @@
 #   for current target status see https://github.com/ziglang/zig-bootstrap/
 #   also see: zig targets | jq '.["libc"]'
 
-# 167 build-on-linux targets (jobs)
+# 166 build-on-linux targets (jobs)
 #  12 build-on-macos targets (jobs)
 #
 # All linux-musl targets also perform exhaustive
@@ -37,8 +37,8 @@ env:
   REMOTE_REF_NAME: test-threads
   REMOTE_REPOSITORY: upx/upx-test-threads
   REMOTE_SERVER_URL: https://github.com
-  # 2026-11-14
-  ZIG_DIST_VERSION: zig-0.18.0-dev.1151+8dfb7a7cc.tar.xz
+  # 2026-11-17
+  ZIG_DIST_VERSION: zig-0.18.0-dev.1180+2e9bb03df.tar.xz
   #ZIG_DIST_VERSION: zig-0.14.1         # 2025-05-21 llvm-19.1.7
   #ZIG_DIST_VERSION: zig-0.15.1         # 2025-08-19 llvm-20.1.2
   #ZIG_DIST_VERSION: zig-0.15.2         # 2025-10-11 llvm-20.1.2
@@ -244,7 +244,7 @@ jobs:
           # FreeBSD
           - { zig_target: aarch64-freebsd-none }
           - { zig_target: arm-freebsd-eabihf }
-          - { zig_target: i386-freebsd-none }
+          # { zig_target: i386-freebsd-none }
           - { zig_target: powerpc64-freebsd-none }
           - { zig_target: powerpc64le-freebsd-none }
           - { zig_target: riscv64-freebsd-none }
